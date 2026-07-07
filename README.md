@@ -4,6 +4,8 @@
 
 > Built for **Built with Claude: Life Sciences** (Researcher track, 2026), in partnership with Gladstone Institutes. All work in this repository is done from scratch during the hackathon, per the event rules.
 
+> 📄 Full design rationale and method write-up: [`docs/design.md`](./docs/design.md).
+
 ---
 
 ## The reframing
@@ -99,6 +101,7 @@ G-perturb/
 ├── analysis/
 │   ├── data/     # released summary statistics + CODEBOOK.json (large files gitignored)
 │   └── ...       # analysis scripts / notebooks
+├── docs/         # design rationale + method write-up (design.md)
 ├── results/      # ranked tables and figures
 ├── LICENSE       # Apache-2.0
 └── NOTICE
