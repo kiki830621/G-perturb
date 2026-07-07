@@ -15,10 +15,22 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RAW="$HERE/raw"
 mkdir -p "$RAW"
 
-get() {  # get <relative-path> <local-name>
+get() {  # get <relative-path> <local-name> — plain (small files)
   local url="$BASE/$1" out="$RAW/$2"
   echo "→ $2"
   curl -fSL --retry 3 -o "$out" "$url"
+}
+
+getr() {  # resumable get for large files — survives interruption (curl -C -)
+  local url="$BASE/$1" out="$RAW/$2"
+  echo "→ $2 (resumable)"
+  # -C - resumes from a partial file, or starts fresh if absent. On an already
+  # complete file S3 returns 416; curl exit 33/36 there means "nothing to do".
+  curl -fSL -C - --retry 5 --retry-delay 5 -o "$out" "$url" || {
+    rc=$?
+    if [ "$rc" -eq 33 ] || [ "$rc" -eq 36 ]; then echo "  (already complete — $out)"
+    else return "$rc"; fi
+  }
 }
 
 echo "== MB-scale summary statistics (always) =="
@@ -33,12 +45,12 @@ get "suppl_tables/sgrna_library_metadata.suppl_table.csv" "sgrna_library_metadat
 for arg in "$@"; do
   case "$arg" in
     --h5ad)
-      echo "== DE_stats.h5ad (15.6 GB — reliability correlation fields in .obs) =="
-      get "GWCD4i.DE_stats.h5ad" "GWCD4i.DE_stats.h5ad" ;;
+      echo "== DE_stats.h5ad (16.8 GB — reliability correlation fields in .obs) =="
+      getr "GWCD4i.DE_stats.h5ad" "GWCD4i.DE_stats.h5ad" ;;
     --h5mu)
       echo "== per-facet h5mu (27 + 15.7 GB — raw guide-/donor-resolved effect vectors) =="
-      get "GWCD4i.DE_stats.by_guide.h5mu"  "GWCD4i.DE_stats.by_guide.h5mu"
-      get "GWCD4i.DE_stats.by_donors.h5mu" "GWCD4i.DE_stats.by_donors.h5mu" ;;
+      getr "GWCD4i.DE_stats.by_guide.h5mu"  "GWCD4i.DE_stats.by_guide.h5mu"
+      getr "GWCD4i.DE_stats.by_donors.h5mu" "GWCD4i.DE_stats.by_donors.h5mu" ;;
     *) echo "⚠ unknown flag: $arg (use --h5ad / --h5mu)" >&2 ;;
   esac
 done
