@@ -58,9 +58,9 @@ The released summary statistics reportedly include useful reliability/QC fields 
 
 A standard Perturb-seq ranking may prioritize targets by:
 
-\[
+$$
 \text{effect size},\quad z\text{-score},\quad p\text{-value},\quad \text{FDR},\quad \#\text{DE genes}
-\]
+$$
 
 These statistics answer:
 
@@ -82,7 +82,7 @@ Target discovery often fails not because the original hit was insignificant, but
 
 This project adds a reliability layer to target discovery:
 
-\[
+$$
 \text{Target priority}
 =
 \text{effect magnitude}
@@ -92,7 +92,7 @@ This project adds a reliability layer to target discovery:
 \text{domain-specific dependability}
 \times
 \text{QC}
-\]
+$$
 
 ---
 
@@ -131,32 +131,32 @@ The improved version uses a **domain-specific generalizability profile**.
 
 Instead of asking:
 
-\[
+$$
 \text{Is target } t \text{ reliable?}
-\]
+$$
 
 we ask:
 
-\[
+$$
 \text{Reliable with respect to which domain?}
-\]
+$$
 
-For each target \(t\), estimate:
+For each target $t$, estimate:
 
-\[
+$$
 R_t =
 (
 R^{guide}_t,\;
 R^{donor}_t,\;
 R^{condition}_t
 )
-\]
+$$
 
 where:
 
-- \(R^{guide}_t\): guide-domain generalizability;
-- \(R^{donor}_t\): donor-domain generalizability;
-- \(R^{condition}_t\): condition-domain generalizability.
+- $R^{guide}_t$: guide-domain generalizability;
+- $R^{donor}_t$: donor-domain generalizability;
+- $R^{condition}_t$: condition-domain generalizability.
 
 This profile is more informative than a single scalar score because it diagnoses *why* a target is fragile or dependable.
 
@@ -175,33 +175,33 @@ Two guides targeting the same gene are analogous to two parallel test forms.
 
 Let:
 
-\[
+$$
 \mathbf{z}_{t,g,c}
-\]
+$$
 
-be the DE z-score profile for target \(t\), guide \(g\), condition \(c\).
+be the DE z-score profile for target $t$, guide $g$, condition $c$.
 
 A simple guide-domain reliability score is:
 
-\[
+$$
 R^{guide}_{t,c}
 =
 cor(
 \mathbf{z}_{t,g=1,c},
 \mathbf{z}_{t,g=2,c}
 )
-\]
+$$
 
 A condition-averaged score is:
 
-\[
+$$
 R^{guide}_{t}
 =
 mean_c
 \left[
 R^{guide}_{t,c}
 \right]
-\]
+$$
 
 ### Interpretation
 
@@ -227,15 +227,15 @@ In this dataset, donor generalizability is constrained by the fact that there ar
 
 Let:
 
-\[
+$$
 \mathbf{z}_{t,d,c}
-\]
+$$
 
-be the estimated perturbation effect profile for target \(t\), donor or donor subset \(d\), condition \(c\).
+be the estimated perturbation effect profile for target $t$, donor or donor subset $d$, condition $c$.
 
 A donor-domain score can be:
 
-\[
+$$
 R^{donor}_{t,c}
 =
 mean_{d_i < d_j}
@@ -243,11 +243,11 @@ cor(
 \mathbf{z}_{t,d_i,c},
 \mathbf{z}_{t,d_j,c}
 )
-\]
+$$
 
 or, using donor-pair DE summaries:
 
-\[
+$$
 R^{donor}_{t,c}
 =
 mean_{p_i < p_j}
@@ -255,9 +255,9 @@ cor(
 \mathbf{z}_{t,p_i,c},
 \mathbf{z}_{t,p_j,c}
 )
-\]
+$$
 
-where \(p_i\) and \(p_j\) are donor-pair subsets.
+where `p_i` and `p_j` are donor-pair subsets.
 
 ### Interpretation
 
@@ -302,7 +302,7 @@ This identifies broad or core T cell regulators.
 
 A possible score:
 
-\[
+$$
 R^{condition}_t
 =
 mean_{c_i < c_j}
@@ -310,7 +310,7 @@ cor(
 \mathbf{z}_{t,c_i},
 \mathbf{z}_{t,c_j}
 )
-\]
+$$
 
 #### B. Within-condition universe
 
@@ -322,7 +322,7 @@ This identifies condition-specific regulators.
 
 For example:
 
-\[
+$$
 R^{dep}_{t,Stim8hr}
 =
 f(
@@ -330,7 +330,7 @@ R^{guide}_{t,Stim8hr},
 R^{donor}_{t,Stim8hr},
 Q_{t,Stim8hr}
 )
-\]
+$$
 
 ### Interpretation
 
@@ -350,7 +350,7 @@ The key principle:
 
 Each target can be assigned a profile:
 
-\[
+$$
 G_t =
 (
 E_t,\;
@@ -359,15 +359,15 @@ R^{donor}_t,\;
 R^{condition}_t,\;
 Q_t
 )
-\]
+$$
 
 where:
 
-- \(E_t\): effect magnitude;
-- \(R^{guide}_t\): guide-domain generalizability;
-- \(R^{donor}_t\): donor-domain generalizability;
-- \(R^{condition}_t\): condition-domain generalizability;
-- \(Q_t\): perturbation quality / QC.
+- $E_t$: effect magnitude;
+- $R^{guide}_t$: guide-domain generalizability;
+- $R^{donor}_t$: donor-domain generalizability;
+- $R^{condition}_t$: condition-domain generalizability;
+- $Q_t$: perturbation quality / QC.
 
 Example interpretation table:
 
@@ -391,7 +391,7 @@ A scalar score can still be useful for ranking, but it should not replace the pr
 
 For targets intended to generalize across guide, donor, and condition domains:
 
-\[
+$$
 S^{broad}_t
 =
 E_t
@@ -403,7 +403,7 @@ R^{donor}_t
 R^{condition}_t
 \times
 Q_t
-\]
+$$
 
 This prioritizes broadly dependable targets.
 
@@ -411,7 +411,7 @@ This prioritizes broadly dependable targets.
 
 For context-specific regulators:
 
-\[
+$$
 S^{condition}_{t,c}
 =
 E_{t,c}
@@ -421,7 +421,7 @@ R^{guide}_{t,c}
 R^{donor}_{t,c}
 \times
 Q_{t,c}
-\]
+$$
 
 This does **not** penalize cross-condition instability, because condition specificity is the target of discovery.
 
@@ -448,20 +448,20 @@ It is important not to overclaim.
 
 Traditional G-theory coefficients such as:
 
-\[
+$$
 E\rho^2
-\]
+$$
 
 and
 
-\[
+$$
 \Phi
-\]
+$$
 
 are usually **design-level** quantities. They describe the reliability of the measurement design under a specified universe of generalization.
 
-- \(E\rho^2\): generalizability coefficient for relative decisions.
-- \(\Phi\): dependability coefficient for absolute decisions.
+- $E\rho^2$: generalizability coefficient for relative decisions.
+- $\Phi$: dependability coefficient for absolute decisions.
 
 These should be reported for the overall design or for specified decision universes.
 
@@ -469,27 +469,27 @@ These should be reported for the overall design or for specified decision univer
 
 For target ranking, this project defines:
 
-\[
+$$
 R^{dep}_t
-\]
+$$
 
 or a vector:
 
-\[
+$$
 (
 R^{guide}_t,
 R^{donor}_t,
 R^{condition}_t
 )
-\]
+$$
 
-These are **target-specific empirical dependability scores**, inspired by G-theory but not identical to the classical design-level \(\Phi\).
+These are **target-specific empirical dependability scores**, inspired by G-theory but not identical to the classical design-level $\Phi$.
 
 Recommended language:
 
 > We report design-level G-theory coefficients to characterize the measurement design, and define target-specific empirical dependability profiles to prioritize candidate targets.
 
-This avoids incorrectly claiming that each target naturally has its own classical G-theory \(\Phi_t\).
+This avoids incorrectly claiming that each target naturally has its own classical G-theory $\Phi_t$.
 
 ---
 
@@ -499,7 +499,7 @@ A G study estimates how much variation in perturbation effects is attributable t
 
 A possible mixed model is:
 
-\[
+$$
 y_{t,g,d,c}
 =
 \mu
@@ -527,27 +527,27 @@ TDC_{tdc}
 TGDC_{tgdc}
 +
 \epsilon_{tgdc}
-\]
+$$
 
 where:
 
-- \(T_t\): target effect;
-- \(G_g\): guide facet;
-- \(D_d\): donor facet;
-- \(C_c\): condition facet;
-- interactions involving \(T\) indicate domain-specific instability.
+- $T_t$: target effect;
+- $G_g$: guide facet;
+- $D_d$: donor facet;
+- $C_c$: condition facet;
+- interactions involving $T$ indicate domain-specific instability.
 
 Important components:
 
 | Component | Meaning |
 |---|---|
-| \(\sigma_T^2\) | stable target-level signal |
-| \(\sigma^2_{TG}\) | guide-specific target instability |
-| \(\sigma^2_{TD}\) | donor-specific target instability |
-| \(\sigma^2_{TC}\) | condition-specific target instability |
+| $\sigma_T^2$ | stable target-level signal |
+| $\sigma^2_{TG}$ | guide-specific target instability |
+| $\sigma^2_{TD}$ | donor-specific target instability |
+| $\sigma^2_{TC}$ | condition-specific target instability |
 | residual | remaining unexplained instability |
 
-The most important components for this project are those involving \(T\), because they describe where target evidence fails to generalize.
+The most important components for this project are those involving $T$, because they describe where target evidence fails to generalize.
 
 ---
 
@@ -571,21 +571,21 @@ Example D-study questions:
 
 For example, if guide-related error dominates:
 
-\[
+$$
 \sigma^2_{TG}
-\]
+$$
 
-then increasing the number of guides \(n_g\) will reduce the guide-related error component roughly as:
+then increasing the number of guides $n_g$ will reduce the guide-related error component roughly as:
 
-\[
+$$
 \frac{\sigma^2_{TG}}{n_g}
-\]
+$$
 
 If donor-related target variation dominates:
 
-\[
+$$
 \sigma^2_{TD}
-\]
+$$
 
 then increasing guides will not solve the main problem; future validation should add donors.
 
@@ -613,32 +613,32 @@ Use:
 
 For each target-condition pair:
 
-\[
+$$
 R^{guide}_{t,c}
 =
 cor(
 \mathbf{z}_{t,g=1,c},
 \mathbf{z}_{t,g=2,c}
 )
-\]
+$$
 
 ### Step 3. Load donor-pair DE statistics
 
 For each target-condition pair:
 
-\[
+$$
 R^{donor}_{t,c}
 =
 mean\;cor(
 \text{donor-pair DE profiles}
 )
-\]
+$$
 
 ### Step 4. Estimate condition generalizability
 
 Across Rest, Stim8hr, Stim48hr:
 
-\[
+$$
 R^{condition}_t
 =
 mean_{c_i<c_j}
@@ -646,13 +646,13 @@ cor(
 \mathbf{z}_{t,c_i},
 \mathbf{z}_{t,c_j}
 )
-\]
+$$
 
 ### Step 5. Define QC penalty
 
 Example:
 
-\[
+$$
 Q_t =
 I(\text{on-target significant})
 \times
@@ -661,7 +661,7 @@ I(\text{not off-target flagged})
 I(\text{not single-guide-only})
 \times
 q(\text{cell count})
-\]
+$$
 
 ### Step 6. Produce output tables
 
@@ -684,13 +684,13 @@ Target × Guide × Donor × Condition → transcriptomic effect profile.
 
 Scatter plot:
 
-\[
+$$
 x = \text{standard effect-size rank}
-\]
+$$
 
-\[
+$$
 y = \text{domain-specific dependability rank}
-\]
+$$
 
 Highlight targets whose rank changes substantially.
 
@@ -707,13 +707,13 @@ Columns:
 
 ### Figure 4. Four-quadrant target map
 
-\[
+$$
 x = \text{effect magnitude}
-\]
+$$
 
-\[
+$$
 y = R^{dep}_t
-\]
+$$
 
 Quadrants:
 
@@ -808,13 +808,13 @@ Instead, it claims:
 
 In short:
 
-\[
+$$
 \text{G-theory is not the discovery engine;}
-\]
+$$
 
-\[
+$$
 \text{it is the evidence-stability layer.}
-\]
+$$
 
 ---
 
