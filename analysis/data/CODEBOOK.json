@@ -1,0 +1,805 @@
+{
+  "dataset": {
+    "name": "Genome-scale Perturb-seq in primary human CD4+ T cells",
+    "citation": "Zhu, Dann, Yan, Reyes Retana, Goto, Guitche, Petersen, Ota, Pritchard, Marson (2025). bioRxiv 2025.12.23.696273.",
+    "labs": "Marson & Pritchard",
+    "platform": "genome-scale CRISPRi Perturb-seq",
+    "n_cells_approx": 22000000,
+    "n_donors": 4,
+    "conditions": [
+      "Rest",
+      "Stim8hr",
+      "Stim48hr"
+    ],
+    "s3": "s3://genome-scale-tcell-perturb-seq/marson2025_data/",
+    "geo": "GSE314342 / SRP643211 (raw reads)",
+    "note": "Field descriptions taken from the dataset's data_sharing_readme.md; profiles from the actual downloaded CSVs."
+  },
+  "facet_design": {
+    "target": {
+      "role": "object of measurement",
+      "source": "target_contrast (DE_stats)",
+      "n": "~12,748 genes"
+    },
+    "guide": {
+      "role": "parallel-forms facet",
+      "available": true,
+      "source": "guide_id (cell .obs) / sgRNA (library) / by_guide.h5mu modalities",
+      "n_per_gene": "~2 (targets with 1 passing guide flagged single_guide_estimate)"
+    },
+    "donor": {
+      "role": "occasion facet",
+      "available": true,
+      "source": "donor_id",
+      "n_levels": 4
+    },
+    "condition": {
+      "role": "crossed context facet (biology, not just error)",
+      "available": true,
+      "source": "culture_condition",
+      "n_levels": 3,
+      "note": "Two rankings planned: global (condition random) vs context-specific (condition fixed)."
+    },
+    "effect_and_SE": {
+      "logFC/zscore": "DE_stats.h5ad .layers (log_fc, zscore)",
+      "SE": "lfcSE (.layers)",
+      "reliability_correlations": "DE_stats.h5ad .obs (guide_correlation_*, donor_correlation_*) — NOT in the flat CSV"
+    }
+  },
+  "known_gaps": [
+    "DE_stats.suppl_table.csv is a reduced 16-col release: it lacks guide_correlation_*, donor_correlation_*, n_guides, single_guide_estimate, neighboring_gene_KD, distal_offtarget_flag. Those live in GWCD4i.DE_stats.h5ad .obs (15.6 GB).",
+    "guide_kd_efficiency + several suppl tables are on the companion GitHub repo (emdann/GWT_perturbseq_analysis_2025), not this S3 bucket.",
+    "Two guides / four donors -> per-target variance components under-identified; the full G-study uses partial-pooling REML (see repo README / issue #2)."
+  ],
+  "files_downloaded": {
+    "sample_metadata.suppl_table.csv": {
+      "description": "Per-sample experimental metadata + donor demographics (one row per donor x condition x run).",
+      "n_rows": 12,
+      "n_cols": 19,
+      "fields": [
+        {
+          "name": "Unnamed: 0",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "int64",
+          "n_unique": 12,
+          "n_missing": 0,
+          "example": 0
+        },
+        {
+          "name": "cell_sample_id",
+          "facet_role": "id",
+          "description": "Unique biological sample identifier.",
+          "dtype": "object",
+          "n_unique": 12,
+          "n_missing": 0,
+          "example": "CD4i_R1_D1_Rest"
+        },
+        {
+          "name": "10xrun_id",
+          "facet_role": "meta",
+          "description": "Processing batch / run identifier (R1 or R2).",
+          "dtype": "object",
+          "n_unique": 2,
+          "n_missing": 0,
+          "example": "CD4i_R1"
+        },
+        {
+          "name": "donor_id",
+          "facet_role": "donor",
+          "description": "Donor facet identifier (4 donors).",
+          "dtype": "object",
+          "n_unique": 4,
+          "n_missing": 0,
+          "example": "CE0008162"
+        },
+        {
+          "name": "culture_condition",
+          "facet_role": "condition",
+          "description": "Stimulation condition facet: Rest / Stim8hr / Stim48hr.",
+          "dtype": "object",
+          "n_unique": 3,
+          "n_missing": 0,
+          "example": "Rest"
+        },
+        {
+          "name": "library_id",
+          "facet_role": "id",
+          "description": "Sequencing library identifier (matches cellranger outputs).",
+          "dtype": "object",
+          "n_unique": 12,
+          "n_missing": 0,
+          "example": "CD4i_R1_D1_Rest_CD4i_R1_Ultima"
+        },
+        {
+          "name": "library_prep_kit",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 1,
+          "n_missing": 0,
+          "example": "GEMX_flex_v2"
+        },
+        {
+          "name": "probe_hyb_loading",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 4,
+          "n_missing": 0,
+          "example": "2M cells/probe, 40uL GEX probe, BC001-004, CRISPR probe, ..."
+        },
+        {
+          "name": "GEM_loading",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 1,
+          "n_missing": 0,
+          "example": "1M cells/GEM"
+        },
+        {
+          "name": "sequencing_platform",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 1,
+          "n_missing": 0,
+          "example": "Ultima"
+        },
+        {
+          "name": "age",
+          "facet_role": "demographic",
+          "description": "Donor age (years).",
+          "dtype": "int64",
+          "n_unique": 4,
+          "n_missing": 0,
+          "example": 29
+        },
+        {
+          "name": "sex",
+          "facet_role": "demographic",
+          "description": "Donor sex.",
+          "dtype": "object",
+          "n_unique": 2,
+          "n_missing": 0,
+          "example": "Female"
+        },
+        {
+          "name": "ethnicity",
+          "facet_role": "demographic",
+          "description": "Donor ethnicity.",
+          "dtype": "object",
+          "n_unique": 3,
+          "n_missing": 0,
+          "example": "Hispanic"
+        },
+        {
+          "name": "weight_kg",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "int64",
+          "n_unique": 4,
+          "n_missing": 0,
+          "example": 87
+        },
+        {
+          "name": "height_cm",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "int64",
+          "n_unique": 2,
+          "n_missing": 0,
+          "example": 160
+        },
+        {
+          "name": "smoker",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 1,
+          "n_missing": 0,
+          "example": "No"
+        },
+        {
+          "name": "blood_type",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 1,
+          "n_missing": 0,
+          "example": "O+"
+        },
+        {
+          "name": "anticoagulant",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 1,
+          "n_missing": 0,
+          "example": "ACDA"
+        },
+        {
+          "name": "harvest_date",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 3,
+          "n_missing": 0,
+          "example": "1/28/25"
+        }
+      ]
+    },
+    "DE_stats.suppl_table.csv": {
+      "description": "Per-(target x condition) differential-expression summary. REDUCED 16-col release: effect magnitude + basic QC only; reliability correlation fields are NOT here (see DE_stats.h5ad .obs).",
+      "n_rows": 33983,
+      "n_cols": 16,
+      "fields": [
+        {
+          "name": "index",
+          "facet_role": "id",
+          "description": "Observation key `{target_contrast}_{culture_condition}`.",
+          "dtype": "object",
+          "n_unique": 33983,
+          "n_missing": 0,
+          "example": "ENSG00000121410_Rest"
+        },
+        {
+          "name": "target_contrast_gene_name",
+          "facet_role": "target",
+          "description": "Symbol of the perturbed gene.",
+          "dtype": "object",
+          "n_unique": 11526,
+          "n_missing": 0,
+          "example": "A1BG"
+        },
+        {
+          "name": "culture_condition",
+          "facet_role": "condition",
+          "description": "Stimulation condition facet: Rest / Stim8hr / Stim48hr.",
+          "dtype": "object",
+          "n_unique": 3,
+          "n_missing": 0,
+          "example": "Rest"
+        },
+        {
+          "name": "target_contrast",
+          "facet_role": "target",
+          "description": "Ensembl gene ID of the perturbed gene (object of measurement).",
+          "dtype": "object",
+          "n_unique": 11526,
+          "n_missing": 0,
+          "example": "ENSG00000121410"
+        },
+        {
+          "name": "chunk",
+          "facet_role": "meta",
+          "description": "DE processing group identifier.",
+          "dtype": "int64",
+          "n_unique": 681,
+          "n_missing": 0,
+          "example": 530
+        },
+        {
+          "name": "n_cells_target",
+          "facet_role": "quality",
+          "description": "Number of cells with a targeting guide for this perturbation.",
+          "dtype": "float64",
+          "n_unique": 2060,
+          "n_missing": 0,
+          "example": 734.0
+        },
+        {
+          "name": "n_up_genes",
+          "facet_role": "effect",
+          "description": "Count of significantly upregulated genes (10% FDR).",
+          "dtype": "int64",
+          "n_unique": 965,
+          "n_missing": 0,
+          "example": 1
+        },
+        {
+          "name": "n_down_genes",
+          "facet_role": "effect",
+          "description": "Count of significantly downregulated genes (10% FDR).",
+          "dtype": "int64",
+          "n_unique": 747,
+          "n_missing": 0,
+          "example": 0
+        },
+        {
+          "name": "n_total_de_genes",
+          "facet_role": "effect",
+          "description": "Total significantly DE genes at 10% FDR (a candidate E_t).",
+          "dtype": "int64",
+          "n_unique": 1279,
+          "n_missing": 0,
+          "example": 1
+        },
+        {
+          "name": "ontarget_effect_size",
+          "facet_role": "effect",
+          "description": "Effect size of the perturbation on its intended target gene.",
+          "dtype": "float64",
+          "n_unique": 28134,
+          "n_missing": 0,
+          "example": 0.0
+        },
+        {
+          "name": "ontarget_significant",
+          "facet_role": "quality",
+          "description": "On-target knockdown significant (10% FDR)?",
+          "dtype": "bool",
+          "n_unique": 2,
+          "n_missing": 0,
+          "example": false
+        },
+        {
+          "name": "target_baseMean",
+          "facet_role": "effect",
+          "description": "Mean baseline expression of the target gene.",
+          "dtype": "float64",
+          "n_unique": 28133,
+          "n_missing": 5850,
+          "example": 30.96842337432218
+        },
+        {
+          "name": "offtarget_flag",
+          "facet_role": "quality",
+          "description": "Potential off-target effect flag (reduced-CSV consolidation of neighboring/distal flags).",
+          "dtype": "bool",
+          "n_unique": 2,
+          "n_missing": 0,
+          "example": false
+        },
+        {
+          "name": "n_total_genes_category",
+          "facet_role": "effect",
+          "description": "Category based on number of trans-effects.",
+          "dtype": "object",
+          "n_unique": 4,
+          "n_missing": 0,
+          "example": "1 DE gene"
+        },
+        {
+          "name": "ontarget_effect_category",
+          "facet_role": "effect",
+          "description": "Categorical label of on-target knockdown outcome.",
+          "dtype": "object",
+          "n_unique": 3,
+          "n_missing": 0,
+          "example": "no on-target KD"
+        },
+        {
+          "name": "n_downstream",
+          "facet_role": "effect",
+          "description": "Downstream (trans) DE genes, excluding the on-target effect.",
+          "dtype": "int64",
+          "n_unique": 1280,
+          "n_missing": 0,
+          "example": 1
+        }
+      ]
+    },
+    "sgrna_library_metadata.suppl_table.csv": {
+      "description": "Per-sgRNA guide library: genomic target, design, off-target neighbours (guide -> gene mapping; the guide facet's definition).",
+      "n_rows": 26504,
+      "n_cols": 31,
+      "fields": [
+        {
+          "name": "sgRNA",
+          "facet_role": "guide",
+          "description": "Unique sgRNA guide identifier (the guide facet).",
+          "dtype": "object",
+          "n_unique": 26504,
+          "n_missing": 0,
+          "example": "ARMC5-1"
+        },
+        {
+          "name": "chromosome",
+          "facet_role": "design",
+          "description": "Chromosome of the guide target site.",
+          "dtype": "object",
+          "n_unique": 25,
+          "n_missing": 992,
+          "example": "chr16"
+        },
+        {
+          "name": "pos",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "float64",
+          "n_unique": 25474,
+          "n_missing": 992,
+          "example": 31459566.0
+        },
+        {
+          "name": "seq_last19bp",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 25512,
+          "n_missing": 992,
+          "example": "TGCCTCGCGCAGCTCGCGG"
+        },
+        {
+          "name": "strand",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 2,
+          "n_missing": 992,
+          "example": "+"
+        },
+        {
+          "name": "PAM",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 2,
+          "n_missing": 992,
+          "example": true
+        },
+        {
+          "name": "note",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 18,
+          "n_missing": 992,
+          "example": "unique alignment, aligned to target gene"
+        },
+        {
+          "name": "flag",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 2,
+          "n_missing": 992,
+          "example": false
+        },
+        {
+          "name": "seq",
+          "facet_role": "design",
+          "description": "Full guide RNA sequence.",
+          "dtype": "object",
+          "n_unique": 26504,
+          "n_missing": 0,
+          "example": "CTGCCTCGCGCAGCTCGCGG"
+        },
+        {
+          "name": "target_gene_name_from_sgRNA",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 12782,
+          "n_missing": 992,
+          "example": "ARMC5"
+        },
+        {
+          "name": "designed_target_gene_id",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 12779,
+          "n_missing": 992,
+          "example": "ENSG00000140691"
+        },
+        {
+          "name": "designed_target_gene_name",
+          "facet_role": "design",
+          "description": "Intended target gene (as designed).",
+          "dtype": "object",
+          "n_unique": 12779,
+          "n_missing": 992,
+          "example": "ARMC5"
+        },
+        {
+          "name": "target_gene_id",
+          "facet_role": "guide",
+          "description": "Ensembl ID of the validated target gene for this guide.",
+          "dtype": "object",
+          "n_unique": 12654,
+          "n_missing": 1307,
+          "example": "ENSG00000140691"
+        },
+        {
+          "name": "target_gene_name",
+          "facet_role": "guide",
+          "description": "Validated target gene symbol for this guide.",
+          "dtype": "object",
+          "n_unique": 12654,
+          "n_missing": 1307,
+          "example": "ARMC5"
+        },
+        {
+          "name": "distance_to_closest_target_tss",
+          "facet_role": "design",
+          "description": "Distance (bp) from guide to the closest target TSS.",
+          "dtype": "float64",
+          "n_unique": 644,
+          "n_missing": 1307,
+          "example": 65.0
+        },
+        {
+          "name": "nearby_gene_within_2kb",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 11835,
+          "n_missing": 992,
+          "example": "['ENSG00000140691']"
+        },
+        {
+          "name": "nearby_gene_within_10kb",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 11451,
+          "n_missing": 992,
+          "example": "['ENSG00000140691']"
+        },
+        {
+          "name": "nearby_gene_within_20kb",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 11072,
+          "n_missing": 992,
+          "example": "['ENSG00000176723' 'ENSG00000140691' 'ENSG00000140682']"
+        },
+        {
+          "name": "nearby_gene_within_30kb",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 10881,
+          "n_missing": 992,
+          "example": "['ENSG00000176723' 'ENSG00000140691' 'ENSG00000140682' 'E..."
+        },
+        {
+          "name": "nearest_within2kb_gene_id",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 12668,
+          "n_missing": 1207,
+          "example": "ENSG00000140691"
+        },
+        {
+          "name": "nearest_within2kb_gene_name",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 12658,
+          "n_missing": 1207,
+          "example": "ARMC5"
+        },
+        {
+          "name": "nearest_within2kb_gene_dist",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "float64",
+          "n_unique": 640,
+          "n_missing": 1207,
+          "example": 65.0
+        },
+        {
+          "name": "nearest_within2kb_nontarget_gene_id",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 2978,
+          "n_missing": 20555,
+          "example": "ENSG00000149476"
+        },
+        {
+          "name": "nearest_within2kb_nontarget_gene_name",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 2977,
+          "n_missing": 20555,
+          "example": "TKFC"
+        },
+        {
+          "name": "nearest_within2kb_nontarget_gene_dist",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "float64",
+          "n_unique": 1256,
+          "n_missing": 20555,
+          "example": 174.0
+        },
+        {
+          "name": "putative_bidirectional_promoter",
+          "facet_role": "quality",
+          "description": "Guide may hit a bidirectional promoter (multi-gene risk).",
+          "dtype": "object",
+          "n_unique": 2,
+          "n_missing": 992,
+          "example": false
+        },
+        {
+          "name": "other_alignment_chromosome",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 55,
+          "n_missing": 26291,
+          "example": "['chr10']"
+        },
+        {
+          "name": "other_alignment_pos",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 213,
+          "n_missing": 26291,
+          "example": "[73697647]"
+        },
+        {
+          "name": "nearest_nontarget_gene_id",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 10631,
+          "n_missing": 1018,
+          "example": "ENSG00000140682"
+        },
+        {
+          "name": "nearest_nontarget_gene_name",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "object",
+          "n_unique": 10626,
+          "n_missing": 1018,
+          "example": "TGFB1I1"
+        },
+        {
+          "name": "nearest_nontarget_gene_dist",
+          "facet_role": "unclassified",
+          "description": null,
+          "dtype": "float64",
+          "n_unique": 18796,
+          "n_missing": 1018,
+          "example": 12019.0
+        }
+      ]
+    }
+  },
+  "products_not_downloaded": {
+    "GWCD4i.DE_stats.h5ad": {
+      "downloaded": false,
+      "size": "15.6 GB",
+      "grain": "(target x condition), .obs = 33,983 rows",
+      "why_needed": "Holds the RELIABILITY fields absent from DE_stats.suppl_table.csv. Needed even for the heuristic MVP R_t.",
+      "documented_fields": [
+        {
+          "name": "guide_correlation_all",
+          "facet_role": "reliability",
+          "description": "Pearson r between the two guides' per-gene DE z-scores, all genes. NaN if only one guide. -> R_guide."
+        },
+        {
+          "name": "guide_correlation_signif",
+          "facet_role": "reliability",
+          "description": "Same, restricted to significant DE genes."
+        },
+        {
+          "name": "donor_correlation_all_mean",
+          "facet_role": "reliability",
+          "description": "Mean over donor-pair Pearson r of per-gene DE logFC (all genes). -> R_donor."
+        },
+        {
+          "name": "donor_correlation_all_min",
+          "facet_role": "reliability",
+          "description": "Min over donor-pairs (conservative R_donor)."
+        },
+        {
+          "name": "donor_correlation_hits_mean",
+          "facet_role": "reliability",
+          "description": "Mean cross-donor r on per-target hit genes."
+        },
+        {
+          "name": "donor_correlation_hits_min",
+          "facet_role": "reliability",
+          "description": "Min cross-donor r on hit genes."
+        },
+        {
+          "name": "n_guides",
+          "facet_role": "quality",
+          "description": "Number of guides aggregated into the per-target DE estimate."
+        },
+        {
+          "name": "single_guide_estimate",
+          "facet_role": "quality",
+          "description": "DE estimate came from a single guide only."
+        },
+        {
+          "name": "neighboring_gene_KD",
+          "facet_role": "quality",
+          "description": "Adjacent gene also knocked down (cis off-target)."
+        },
+        {
+          "name": "distal_offtarget_flag",
+          "facet_role": "quality",
+          "description": "Potential distal off-target (predicted alignment + down-regulation)."
+        },
+        {
+          "name": "low_target_gex",
+          "facet_role": "quality",
+          "description": "Target gene low baseline expression (KD estimate unreliable)."
+        },
+        {
+          "name": "log_fc",
+          "facet_role": "effect",
+          "description": "Log2 fold change (per perturbation x gene)."
+        },
+        {
+          "name": "zscore",
+          "facet_role": "effect",
+          "description": "DE z-score = logFC / lfcSE."
+        },
+        {
+          "name": "lfcSE",
+          "facet_role": "error",
+          "description": "Standard error of log fold change (the SE the G-study needs)."
+        },
+        {
+          "name": "adj_p_value",
+          "facet_role": "quality",
+          "description": "FDR-adjusted p-value."
+        }
+      ]
+    },
+    "GWCD4i.DE_stats.by_guide.h5mu": {
+      "downloaded": false,
+      "size": "27 GB",
+      "grain": "modalities guide_1 / guide_2, each (target x condition)",
+      "why_needed": "Per-guide DE effect vectors -> raw material to FIT the guide variance component (not just a precomputed correlation).",
+      "documented_fields": [
+        {
+          "name": "zscore",
+          "facet_role": "effect",
+          "description": "Per-guide DE z-score; same schema as DE_stats.h5ad."
+        }
+      ]
+    },
+    "GWCD4i.DE_stats.by_donors.h5mu": {
+      "downloaded": false,
+      "size": "15.7 GB",
+      "grain": "one modality per donor-pair, each (target x condition)",
+      "why_needed": "Per-donor-pair DE effect vectors -> raw material to FIT the donor variance component.",
+      "documented_fields": [
+        {
+          "name": "zscore",
+          "facet_role": "effect",
+          "description": "Per-donor-pair DE z-score; same schema as DE_stats.h5ad."
+        }
+      ]
+    },
+    "guide_kd_efficiency.suppl_table.csv": {
+      "downloaded": false,
+      "size": "small (companion GitHub repo emdann/GWT_perturbseq_analysis_2025, NOT this S3 bucket)",
+      "grain": "per sgRNA x condition",
+      "why_needed": "Per-guide knockdown efficiency (t-statistic vs NTC) -> feeds Q_t.",
+      "documented_fields": [
+        {
+          "name": "t_statistic",
+          "facet_role": "quality",
+          "description": "Welch t comparing guide vs NTC target expression (negative = knockdown)."
+        },
+        {
+          "name": "signif_knockdown",
+          "facet_role": "quality",
+          "description": "Significant knockdown (adj_p < 0.1 and t < 0)."
+        },
+        {
+          "name": "high_confidence_no_effect_guides",
+          "facet_role": "quality",
+          "description": "Guide with high-confidence no knockdown effect."
+        }
+      ]
+    }
+  }
+}

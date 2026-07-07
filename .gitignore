@@ -1,6 +1,8 @@
-# --- Data (large single-cell / genomic files are not committed) ---
+# --- Data (raw + large single-cell / genomic files are not committed) ---
 data/raw/
+analysis/data/raw/
 *.h5
+*.h5mu
 *.h5ad
 *.loom
 *.mtx
