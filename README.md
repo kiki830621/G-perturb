@@ -4,7 +4,7 @@
 
 > Built for **Built with Claude: Life Sciences** (Researcher track, 2026), in partnership with Gladstone Institutes. All work in this repository is done from scratch during the hackathon, per the event rules.
 
-> 📄 Design rationale ([`docs/`](./docs/)): the scalar reliability-weighted ranking ([`design.md`](./docs/design.md), #2) and the domain-specific generalizability profile ([`design_domain_specific.md`](./docs/design_domain_specific.md), #3).
+> 📄 Full design rationale and method write-up: [`docs/design.md`](./docs/design.md) — the single canonical design (per-domain generalizability profile + scalar ranking + criterion validation).
 
 ---
 
@@ -105,7 +105,7 @@ G-perturb/
 ├── analysis/
 │   ├── data/     # released summary statistics + CODEBOOK.json (large files gitignored)
 │   └── ...       # analysis scripts / notebooks
-├── docs/         # design rationale (design.md + design_domain_specific.md)
+├── docs/         # design rationale (single canonical design.md)
 ├── results/      # ranked tables and figures
 ├── LICENSE       # Apache-2.0
 └── NOTICE

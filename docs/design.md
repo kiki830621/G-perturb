@@ -1,720 +1,383 @@
-# Reliability-Weighted Target Ranking for T Cell Perturb-seq
+# Reliability-Weighted Target Ranking for CD4+ T Cell Perturb-seq
 
-**Track:** Researcher / Build From the Bench  
-**Tool context:** Claude Science  
-**Core discipline:** Measurement theory × functional genomics × target prioritization  
-**Status:** Project idea / analysis proposal
+**Track:** Researcher / Build From the Bench
+**Tool context:** Claude Science
+**Discipline:** Measurement theory (generalizability theory) × functional genomics × target prioritization
+**Status:** Design / analysis proposal — single canonical source
 
----
-
-## 1. One-Sentence Summary
-
-This project reframes CD4+ T cell Perturb-seq target ranking as a **measurement reliability problem**: instead of ranking perturbations only by differential-expression effect size or FDR, we estimate whether each candidate effect is stable across guides, donors, and stimulation contexts, then use that reliability evidence to prioritize targets for follow-up.
+> This is the **single source of truth** for the G-perturb design. It merges the two earlier drafts — the scalar reliability-weighted ranking (issue #2) and the domain-specific generalizability profile (issue #3) — into one coherent method, and integrates the methodology critique tracked in issue #4. The scalar ranking and the profile are **two deliverables of one design**, not two designs: the profile is the primary object, and the scalar score is an aggregation of it.
 
 ---
 
-## 2. Dataset
+## 1. One-sentence summary
 
-The proposed starting point is the **primary human CD4+ T cell Perturb-seq** dataset from the Marson and Pritchard labs.
+G-perturb reframes CD4+ T cell Perturb-seq target ranking as a **measurement-reliability problem**: rather than ranking perturbations by differential-expression (DE) effect size or FDR alone, we estimate whether each candidate effect is **dependable** — stable across guides, donors, and stimulation contexts — and use that reliability evidence, together with the dataset's own independent validation data, to prioritize targets for follow-up.
 
-The dataset is especially suitable because it has a naturally crossed measurement structure:
+---
 
-- approximately **22 million primary human CD4+ T cells**;
-- **4 human donors**;
-- **3 stimulation conditions**;
-- genome-scale CRISPRi perturbation of expressed genes;
-- generally **two guides per target gene**;
-- released cell-level, pseudobulk, target-level DE, guide-level DE, and donor-level / donor-pair summary outputs.
+## 2. Dataset and its crossed measurement structure
 
-The important design structure is:
+The starting point is the **Primary Human CD4+ T Cell Perturb-seq** resource (Zhu et al. 2025; Marson and Pritchard labs): genome-scale CRISPRi perturbation of expressed genes across ~22 million primary human CD4+ T cells, **4 donors**, **3 stimulation conditions**, generally **2 guides per target gene**.
+
+The dataset is well-suited because the same target is measured through several imperfect facets:
 
 ```text
-Target gene × Guide × Donor × Stimulation condition → Transcriptomic effect profile
+Target gene × Guide × Donor × Condition → genome-wide transcriptomic effect profile
 ```
 
-This is valuable because the same target is observed through multiple imperfect measurement facets: different guides, different human donors, and different cell-state contexts.
+### 2.1 Data products actually used (see `analysis/data/CODEBOOK.json`)
+
+| Product | Role |
+|---|---|
+| `GWCD4i.DE_stats.h5ad` (`.obs` + `.layers`) | **MVP driver.** `.obs` carries pre-computed reliability fields (`guide_correlation_all`, `donor_correlation_all_mean/min`, `donor_correlation_hits_mean/min`, `n_guides`, `single_guide_estimate`, `ontarget_effect_size`, `ontarget_significant`, `distal_offtarget_flag`, `low_target_gex`, …); `.layers` carries the genome-wide `zscore` / `log_fc` / `p_value` / `adj_p_value` vectors per target×condition (`n_obs` = 33,983 target×condition rows) |
+| `GWCD4i.DE_stats.by_guide.h5mu` | Guide-resolved effect vectors — needed for the full guide-facet variance component |
+| `GWCD4i.DE_stats.by_donors.h5mu` | Donor-resolved effect vectors — needed for the full donor-facet variance component |
+| `Th1Th2_validation_summary.suppl_table.csv` | **Independent arrayed validation** (bulk-RNA + flow cytometry) — the external criterion (§13) |
+| `K562_comparison.suppl_table.csv` | **Cross-cell-type replication** (`logfc_pearson_r`) — second external criterion (§13) |
+
+Note: the flat `DE_stats.suppl_table.csv` is a *reduced* 16-column release and does **not** carry the reliability correlation fields — even the MVP reads the h5ad.
 
 ---
 
-## 3. Original Scientific Problem
+## 3. The scientific problem: significant ≠ reproducible
 
-A standard Perturb-seq target ranking usually emphasizes:
-
-- effect size;
-- number of differentially expressed downstream genes;
-- z-scores;
-- p-values;
-- FDR-adjusted significance.
-
-These answer the question:
+Standard Perturb-seq ranking emphasizes effect size, number of downstream DE genes, z-scores, p-values, and FDR. These answer:
 
 > Did this perturbation produce a statistically detectable transcriptomic effect?
 
-But target discovery also needs another question:
+Target discovery also needs a second question:
 
-> Is this effect dependable enough to survive when the experiment is repeated with another guide, another donor, another stimulation context, or another lab?
+> Will this effect hold up when the experiment is repeated with another guide, another donor, another stimulation context, or another lab?
 
-Those are not the same question.
-
-A target can have a large effect but be unreliable if:
-
-- the two guides disagree;
-- the effect is driven by one donor;
-- the effect appears in only one condition without clear biological interpretation;
-- the on-target knockdown is weak;
-- an off-target flag is present;
-- the cell count is too low or imbalanced.
-
-Conversely, a target with a moderate effect may be more attractive if its perturbation signature is highly stable across guides and donors.
+These are not the same question. A target can have a large effect yet be fragile — the two guides disagree, the effect is carried by one donor, the on-target knockdown is weak, an off-target flag is present. Conversely a moderate-effect target can be more attractive if its signature is highly stable. Follow-up validation is expensive, so spending it on fragile hits is the concrete failure this project attacks.
 
 ---
 
-## 4. Key Reframing: This Is a Measurement Problem
+## 4. Key reframing: a measurement problem
 
-The dataset structure maps naturally onto a psychometric measurement framework.
+The dataset structure maps onto a psychometric measurement framework.
 
 | Perturb-seq component | Measurement-theory analogue |
 |---|---|
 | Target gene | Object of measurement |
 | Two guides for the same gene | Parallel forms / repeated indicators |
-| Donors | Occasions / sampled human backgrounds |
+| Donors | Sampled human backgrounds |
 | Stimulation conditions | Crossed context facet |
-| Transcriptomic effect profile | Observed score / observed response pattern |
+| Transcriptomic effect profile | Observed response pattern |
 | Guide disagreement | Measurement-form error |
 | Donor disagreement | Person-background generalization error |
-| Condition variation | Context dependence or context-specific biology |
+| Condition variation | Context dependence *or* context-specific biology |
 
-The core idea is not that Generalizability Theory discovers important biological targets by itself. Rather:
+The claim is deliberately narrow:
 
-> Generalizability Theory evaluates the dependability of evidence for candidate targets.
+> Generalizability theory does not discover important biology by itself. It evaluates the **dependability of the evidence** for candidate targets.
 
-That distinction is crucial.
-
----
-
-## 5. What G-Theory Can and Cannot Do
-
-### 5.1 What it can do
-
-Generalizability Theory can decompose observed perturbation-effect variability into multiple sources:
-
-- target-level signal;
-- guide-related variability;
-- donor-related variability;
-- condition-related variability;
-- interactions among target, guide, donor, and condition;
-- residual error.
-
-It can also support a Decision Study, asking how reliability would change if future screens used:
-
-- more guides per target;
-- more donors;
-- fewer or more stimulation conditions;
-- condition-specific decision universes.
-
-### 5.2 What it cannot do
-
-G-theory cannot, by itself, prove that a target is biologically important, druggable, safe, or clinically relevant.
-
-A reliable perturbation can still be biologically uninteresting. A biologically important target can still have unreliable evidence in this dataset.
-
-Therefore, the final target priority score should combine:
+So the full target-priority logic is a product of independent factors, of which reliability is one:
 
 ```text
-Biological effect magnitude × Biological relevance × Reliability evidence × QC evidence
-```
-
-G-theory contributes the **reliability evidence** component, not the entire discovery logic.
-
----
-
-## 6. G Study vs D Study
-
-### 6.1 G Study: diagnosis of error sources
-
-A **G study** asks:
-
-> In the current dataset, where does measurement variability come from?
-
-For a scalar perturbation score `y`, a simplified crossed model is:
-
-```text
-y_tgdc = μ + T_t + G_g + D_d + C_c
-          + TG_tg + TD_td + TC_tc
-          + TGD_tgd + TGC_tgc + TDC_tdc
-          + TGDC_tgdc + e_tgdc
-```
-
-where:
-
-- `t` = target;
-- `g` = guide;
-- `d` = donor;
-- `c` = condition;
-- `T_t` = target-level signal;
-- `TG_tg` = target-specific guide inconsistency;
-- `TD_td` = target-specific donor inconsistency;
-- `TC_tc` = target-specific condition dependence.
-
-The G study estimates variance components such as:
-
-```text
-σ²_T, σ²_TG, σ²_TD, σ²_TC, σ²_TGD, σ²_TGC, σ²_TDC, σ²_residual
-```
-
-These components tell us whether unreliability is mainly driven by guide disagreement, donor heterogeneity, condition dependence, or residual noise.
-
-### 6.2 D Study: projected reliability under alternative designs
-
-A **D study** asks:
-
-> If we changed the future measurement design, how would reliability change?
-
-For example, suppose the current screen uses two guides per target. A D study can ask what would happen if future experiments used:
-
-```text
-n_g = 2, 3, 4, 5
-```
-
-This does not mean the current dataset secretly contains five guides. It means:
-
-> Using G-study variance components, project how much guide-related error would be averaged down if future screens used more guides per target.
-
-For a simplified target × guide design:
-
-```text
-Φ(n_g) = σ²_T / (σ²_T + σ²_TG / n_g)
-```
-
-If `σ²_TG` is large, increasing the number of guides will improve dependability. If `σ²_TG` is small, more guides will have little benefit.
-
-For the richer target × guide × donor × condition design, the absolute error term can be projected as:
-
-```text
-σ²_Δ(n_g, n_d, n_c)
-  = σ²_TG  / n_g
-  + σ²_TD  / n_d
-  + σ²_TC  / n_c
-  + σ²_TGD / (n_g n_d)
-  + σ²_TGC / (n_g n_c)
-  + σ²_TDC / (n_d n_c)
-  + σ²_res / (n_g n_d n_c)
-```
-
-Then:
-
-```text
-Φ(n_g, n_d, n_c)
-  = σ²_T / (σ²_T + σ²_Δ(n_g, n_d, n_c))
-```
-
-This gives a design-level answer such as:
-
-> Would target dependability improve more by adding guides, adding donors, or separating condition-specific analyses?
-
----
-
-## 7. G-Coefficient vs Phi Coefficient
-
-G-theory usually distinguishes two design-level coefficients.
-
-### 7.1 G-coefficient
-
-The **G-coefficient** is used for relative decisions.
-
-It asks:
-
-> Can we trust the relative ordering of targets?
-
-It uses **relative error variance**.
-
-A high G-coefficient means that target ranking is stable, even if absolute scores shift across a facet.
-
-### 7.2 Phi coefficient / dependability coefficient
-
-The **Phi coefficient** is used for absolute decisions.
-
-It asks:
-
-> Can we trust the decision that a target is a dependable hit, above a criterion?
-
-It uses **absolute error variance**.
-
-A high Phi coefficient means that hit calls or threshold-based decisions are less sensitive to guide, donor, condition, or other measurement facets.
-
-### 7.3 Why both matter here
-
-In this project:
-
-- **G-coefficient** evaluates whether relative target rankings are stable.
-- **Phi** evaluates whether absolute hit decisions are stable.
-
-However, both are traditionally design-level coefficients. They are not automatically one coefficient per target.
-
----
-
-## 8. Important Correction: Do Not Call the Target-Specific Score Classical Phi
-
-A key methodological point:
-
-> Classical G-theory does not naturally estimate one traditional Phi coefficient for every target.
-
-Classical G-theory usually produces a design-level coefficient:
-
-```text
-Φ = σ²_T / (σ²_T + σ²_Δ)
-```
-
-This describes the reliability of the measurement design as a whole.
-
-But the proposed target-ranking application needs one reliability-like score per target. Therefore, the proposal should distinguish:
-
-1. **Design-level coefficients**:
-   - G-coefficient `Eρ²`;
-   - Phi coefficient `Φ`.
-
-2. **Target-specific empirical dependability score**:
-   - `R_dep,t`.
-
-The target-specific score is inspired by G-theory, but it should not be presented as a classical textbook Phi coefficient.
-
-Recommended notation:
-
-```text
-R_dep,t
-```
-
-or:
-
-```text
-Φ_emp,t
-```
-
-The cleaner option is:
-
-```text
-R_dep,t
+biological effect magnitude × biological relevance × reliability evidence × QC evidence
 ```
 
 ---
 
-## 9. Target-Specific Empirical Dependability Score
+## 5. Generalizability theory: G-study vs D-study
 
-For each target `t`, define a reliability-like score using observed consistency evidence.
+Generalizability theory (G-theory) decomposes observed variation into sources called **facets**. A **G-study** estimates variance components; a **D-study** uses them to project reliability under alternative designs.
 
-### 9.1 Guide consistency
+### 5.1 G-study — where does error come from?
 
-Let `z_t,g,c` be the DE z-score profile for target `t`, guide `g`, and condition `c`.
+For a scalar perturbation score `y`, a crossed target × guide × donor × condition model:
 
-For two guides:
+$$
+y_{tgdc} = \mu + T_t + G_g + D_d + C_c
++ TG_{tg} + TD_{td} + TC_{tc}
++ TGD_{tgd} + TGC_{tgc} + TDC_{tdc}
++ TGDC_{tgdc} + \varepsilon_{tgdc}
+$$
 
-```text
-R_guide,t,c = cor(z_t,g1,c, z_t,g2,c)
-```
+with `t` = target, `g` = guide, `d` = donor, `c` = condition. The G-study estimates variance components `σ²_T`, `σ²_TG`, `σ²_TD`, `σ²_TC`, `σ²_TGD`, … , `σ²_residual`. The components involving `T` are the ones that matter here: they say **where target evidence fails to generalize** — guide disagreement (`σ²_TG`), donor heterogeneity (`σ²_TD`), or condition dependence (`σ²_TC`).
 
-This measures whether two guides targeting the same gene produce similar downstream transcriptomic signatures.
+### 5.2 D-study — reliability under alternative designs
 
-### 9.2 Donor consistency
+Using the G-study components, project how error would average down under a future design with `n_g` guides, `n_d` donors, `n_c` conditions:
 
-Using donor-specific or donor-pair DE profiles:
+$$
+\sigma^2_\Delta(n_g, n_d, n_c)
+= \frac{\sigma^2_{TG}}{n_g}
++ \frac{\sigma^2_{TD}}{n_d}
++ \frac{\sigma^2_{TC}}{n_c}
++ \frac{\sigma^2_{TGD}}{n_g n_d}
++ \frac{\sigma^2_{TGC}}{n_g n_c}
++ \frac{\sigma^2_{TDC}}{n_d n_c}
++ \frac{\sigma^2_{res}}{n_g n_d n_c}
+$$
 
-```text
-R_donor,t,c = mean pairwise correlation among donor-specific / donor-pair effect profiles
-```
-
-This measures whether the perturbation effect is stable across the donor panel.
-
-Because the dataset has only four donors, this should be described as:
-
-```text
-donor-panel consistency
-```
-
-not:
-
-```text
-population-level generalizability
-```
-
-### 9.3 Condition stability
-
-There are two possible definitions.
-
-#### Global target reliability
-
-If the desired target should be robust across stimulation contexts:
-
-```text
-R_condition,t = consistency across Rest, Stim8hr, Stim48hr
-```
-
-#### Context-specific target reliability
-
-If the target may be biologically important only in a specific stimulation state:
-
-```text
-R_dep,t,c = dependability within condition c
-```
-
-This distinction is important because condition variation may be real biology, not noise.
-
-### 9.4 QC evidence
-
-The score should also include perturbation-quality evidence:
-
-- on-target knockdown effect;
-- on-target significance;
-- number of guides available;
-- single-guide estimate flag;
-- off-target flags;
-- neighboring-gene knockdown flags;
-- low target expression flag;
-- cell count / pseudobulk eligibility.
-
-Define:
-
-```text
-Q_t = QC penalty or QC weight
-```
+The design-level coefficient is then `σ²_T / (σ²_T + σ²_Δ)`. This answers a design question: would dependability improve more by adding guides, adding donors, or analyzing conditions separately? Because `σ²_TD` is estimated from only 4 donors (3 df), the D-study curves **must carry uncertainty bands** (§6.3, §12) — a projection off a noisy variance component is itself noisy.
 
 ---
 
-## 10. Proposed Reliability-Weighted Target Score
+## 6. Fixed vs random facets — what "generalization" actually means
 
-A simple first version:
+G-theory only supports *generalization* over facets treated as **random** samples from a universe. Whether a facet is random or fixed changes what a coefficient means, so this must be stated explicitly per facet.
 
-```text
-Priority_t = Effect_t × R_dep,t × Q_t
-```
+| Facet | Random or fixed | What a high domain score means |
+|---|---|---|
+| **Guide** | Random (2 guides ≈ sample from a guide-design universe) | Effect generalizes to other guides → genuine target effect, not a reagent artifact |
+| **Donor** | Random, but **only 4 donors** | Effect is stable across the *available donor panel* — **not** population-level human generalizability |
+| **Condition** | **Fixed** (3 named, biologically meaningful states) | Descriptive **consistency** across 3 specific states — *not* generalization to unobserved conditions |
 
-where:
+Consequences:
 
-- `Effect_t` = perturbation effect magnitude, e.g. norm of DE z-score profile, number of DE genes, or biologically selected signature effect;
-- `R_dep,t` = empirical dependability score;
-- `Q_t` = perturbation-quality score or penalty.
-
-A more complete version:
-
-```text
-Priority_t = Effect_t × Biology_t × R_dep,t × Q_t
-```
-
-where:
-
-- `Biology_t` = pathway relevance, T cell state relevance, cytokine-program relevance, immune-trait relevance, disease genetics relevance, or expert biological annotation.
-
-This prevents the reliability score from being mistaken for biological importance.
+- Guide and donor D-study projections (§5.2) are legitimate generalization statements (with the 4-donor caveat).
+- "Condition generalizability" is a slight misnomer: condition is fixed, so `R^condition` is a descriptive consistency profile axis, and condition-specificity is a discovery target rather than an error to be averaged away (§8.3).
 
 ---
 
-## 11. Minimal Viable Analysis
+## 7. Design-level coefficients vs the target-specific score (naming discipline)
 
-A practical first version can be done entirely from released summary statistics.
+G-theory's classical coefficients are **design-level** — one per measurement design, not one per target:
 
-### 11.1 Inputs
+- `Eρ²` — generalizability coefficient (relative decisions: is the *ranking* of targets stable?);
+- `Φ` — dependability coefficient (absolute decisions: is a threshold *hit call* stable?).
 
-Use target-level and guide-level / donor-level summaries, such as:
+Both are reported to characterize the overall design (or a specified decision universe). The per-target ranking application needs one reliability-like number **per target**, which classical G-theory does not naturally provide. So we keep two distinct objects and never conflate them:
 
-- target-level DE statistics;
-- guide-level DE statistics;
-- donor-pair DE statistics;
-- guide correlation fields;
-- donor correlation fields;
-- on-target knockdown fields;
-- off-target and QC flags.
+- **Design-level:** `Eρ²`, `Φ`.
+- **Target-specific empirical dependability:** `R_dep,t` (scalar) or the profile `(R^guide_t, R^donor_t, R^condition_t)`.
 
-### 11.2 Steps
-
-1. Load target-level DE summary.
-2. Compute effect magnitude per target-condition.
-3. Extract or compute guide consistency.
-4. Extract or compute donor-panel consistency.
-5. Define QC penalty.
-6. Construct `R_dep,t`.
-7. Construct reliability-weighted priority score.
-8. Compare standard DE ranking vs reliability-weighted ranking.
-9. Identify disagreement cases.
+`R_dep,t` is *inspired by* G-theory but is **not** a classical per-target `Φ_t`. We never write `Φ_t`.
 
 ---
 
-## 12. Key Output Tables
+## 8. The per-domain generalizability profile (primary object)
 
-### 12.1 Main ranking table
+Rather than collapsing to one scalar, each target `t` gets a **profile**:
 
-| target | condition | effect_score | FDR_summary | guide_consistency | donor_consistency | QC_score | R_dep | priority_score |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Gene A | Stim8hr | high | low | high | high | pass | high | high |
-| Gene B | Rest | very high | low | low | low | warning | low | lower |
+$$
+R_t = \left( R^{guide}_t,\; R^{donor}_t,\; R^{condition}_t \right)
+$$
 
-### 12.2 Disagreement table
+which diagnoses *why* a target is fragile or dependable. Each domain needs a reliability coefficient that measures **agreement, not mere linear association**, and that is **de-confounded from effect size**. Two design decisions apply to all three domains:
 
-The most important result is not merely the new ranking. It is the disagreement between standard and reliability-weighted ranking.
+- **Use an agreement coefficient, not Pearson r.** Two guides can correlate `r = 0.9` while one has 3× the effect magnitude (differing knockdown efficiency). For reproducibility we want agreement in magnitude, so use an **intraclass correlation (ICC)** or **Lin's concordance correlation coefficient (CCC)**, consistent with G-theory's variance-based dependability. Pearson (consistency) is reported only as a secondary diagnostic. The released `guide_correlation_*` / `donor_correlation_*` fields are Pearson-type and are used as a *first-pass* proxy, upgraded to ICC/CCC in the full analysis.
+- **De-confound from effect magnitude.** A raw correlation of two near-zero noise profiles is ~0 regardless of true reliability, so weak-but-real effects look "unreliable" and a naive `E × R` product penalizes effect size twice. Mitigations: restrict the agreement computation to the gene set that is DE in at least one guide; condition on an effect-magnitude stratum; or move to the signal-to-noise / hierarchical formulation (§10) where shrinkage handles low-signal targets naturally.
+- **Report a null.** The ~10,000 genes in each profile are not independent (co-expression, pathway structure), so the effective df is far below the gene count and raw sampling variability is understated. Anchor every domain score against a **permutation null** built from agreement between *different-gene* guide pairs.
 
-| category | interpretation |
-|---|---|
-| high effect / high reliability | strongest candidates |
-| high effect / low reliability | fragile hits; likely validation risk |
-| moderate effect / high reliability | potentially under-ranked robust targets |
-| low effect / low reliability | low priority |
+### 8.1 Guide domain — `R^guide_t`
 
----
+> If we use another guide for the same gene, do we recover the same signature?
 
-## 13. Recommended Figures
+The domain closest to classical measurement reliability (two guides ≈ two parallel forms). Base metric on the DE z-score profile `z_{t,g,c}`, computed as an agreement coefficient (ICC/CCC) between the two guides' profiles, condition-averaged. Low guide generalizability is a **measurement-quality** signal (guide artifact, efficiency difference, off-target), not biological heterogeneity.
 
-### Figure 1. Dataset-as-measurement-design diagram
+### 8.2 Donor domain — `R^donor_t`
 
-Show:
+> Does the effect generalize across donors?
 
-```text
-Target → measured through guides × donors × conditions → transcriptomic effect profile
-```
+Agreement across donor / donor-pair effect profiles (`donor_correlation_*` fields as first pass; ICC across donor-resolved vectors from `by_donors.h5mu` in the full version). With only 4 donors this is **donor-panel consistency**, never population-level generalizability. Donor variation is **not pure error** — it can be real precision-immunology biology, so low `R^donor` is flagged as "needs more donor validation" rather than discarded.
 
-### Figure 2. Standard ranking vs reliability-weighted ranking
+### 8.3 Condition domain — `R^condition_t` (fixed facet, two universes)
 
-Scatter plot:
+Because condition is fixed (§6), there are two distinct questions, and we report both:
 
-```text
-x-axis: standard DE/effect ranking
- y-axis: reliability-weighted ranking
-```
+- **Cross-condition (broad regulators):** agreement of `z_{t,c}` across the 3 states — identifies core regulators.
+- **Within-condition (context-specific regulators):** dependability *inside* a state, `R^dep_{t,c} = f(R^guide_{t,c}, R^donor_{t,c}, Q_{t,c})` — identifies context-specific regulators.
 
-Highlight targets that move strongly upward or downward.
-
-### Figure 3. Effect size vs dependability
-
-Scatter plot:
-
-```text
-x-axis: effect magnitude
- y-axis: R_dep,t
-```
-
-Quadrants:
-
-- large and dependable;
-- large but fragile;
-- moderate but dependable;
-- small and fragile.
-
-### Figure 4. D-study design curve
-
-Plot projected design-level `Φ` or `Eρ²` across:
-
-```text
-n_guides = 1, 2, 3, 4, 5
-```
-
-Optionally repeat for different `n_donor` settings.
-
-### Figure 5. Condition-specific reliability heatmap
-
-Rows = targets.  
-Columns = Rest, Stim8hr, Stim48hr.  
-Cell value = condition-specific `R_dep,t,c`.
-
-This separates global robust regulators from context-specific regulators.
+Key principle: **condition disagreement may be the biological signal, not noise.** A context-specific regulator is a discovery, not a failure.
 
 ---
 
-## 14. Why This Is Worth Doing
+## 9. The scalar score and ranking (deliverable for #2)
 
-The project is valuable because it targets a real bottleneck in perturbation-based target discovery:
-
-```text
-Significant does not necessarily mean reproducible.
-```
-
-Traditional DE / FDR ranking answers:
+For ranking, aggregate the profile into a scalar. The simplest form:
 
 ```text
-Did the perturbation move the transcriptome?
+Priority_t = E_t × R_dep,t × Q_t          (× optional Biology_t)
 ```
 
-The proposed reliability layer asks:
+- `E_t` — effect magnitude (z-norm, mean |z|, or number of downstream DE genes; normalized by knockdown efficiency, §10.3);
+- `R_dep,t` — empirical dependability, either the scalar aggregate of the profile or a per-domain product;
+- `Q_t` — perturbation-quality weight;
+- `Biology_t` (optional) — pathway / cell-state / disease-genetics relevance, kept explicit so dependability is never mistaken for importance.
 
-```text
-Will the observed effect hold up across measurement facets?
-```
+Two composite variants:
 
-This is especially important in this dataset because:
+$$
+S^{broad}_t = E_t \times R^{guide}_t \times R^{donor}_t \times R^{condition}_t \times Q_t
+$$
 
-- primary human T cells are biologically variable;
-- only four donors are available;
-- guide-level disagreement can indicate reagent problems or off-target effects;
-- condition dependence may represent either unreliability or real context-specific biology;
-- follow-up validation is expensive.
+$$
+S^{condition}_{t,c} = E_{t,c} \times R^{guide}_{t,c} \times R^{donor}_{t,c} \times Q_{t,c}
+$$
 
-Thus, the project should be framed as:
+`S^broad` prioritizes broadly dependable targets; `S^condition` deliberately does **not** penalize cross-condition instability, because context specificity is the discovery goal. The scalar is a convenience for ordering; it does **not** replace the profile (§8).
 
-> A reliability-aware target prioritization framework, not a standalone biological discovery engine.
+### 9.1 Why the multiplicative form is a heuristic, not the objective
+
+The product `E × R × Q` imposes a strong, unmotivated trade-off (any zero factor zeroes the target) and the weights (`guide 0.4, donor 0.4, condition 0.2` in the first-pass code) are arbitrary. The principled target is a **decision-theoretic** quantity (§10.2): the posterior probability that the target's universe-score effect exceeds a decision threshold, `P(τ_t > c | data)`. The multiplicative score is retained only as an interpretable first-pass ranking; the reported ranking should converge to the decision-theoretic one.
 
 ---
 
-## 15. Limitations and Necessary Cautions
+## 10. Hierarchical model — the primary method (not "optional")
 
-### 15.1 Four donors are not enough for population-level generalization
+The correlation heuristic is a shadow of the proper model. The hierarchical / empirical-Bayes fit is what (a) yields a per-target reliability **with uncertainty**, (b) dissolves the 2-guide/4-donor sparsity by borrowing strength across targets, and (c) removes the effect-size confound via shrinkage of low-signal targets. It is the primary deliverable; the released correlation fields are the quick-look sanity check, not the reverse.
 
-The donor facet can detect obvious donor-panel instability, but it cannot precisely estimate human population heterogeneity.
+### 10.1 Model and reliability definition
 
-Use cautious language:
+For a target effect (per gene, or a well-chosen scalar summary):
 
-```text
-donor-panel consistency
-```
+$$
+y_{tgdc} = \theta_t + u_{tg} + v_{td} + w_{tc} + e_{tgdc}
+$$
 
-not:
+with `θ_t` the latent target effect and `u_tg` / `v_td` / `w_tc` the guide / donor / condition deviations for target `t`. Fit by partial-pooling REML or a Bayesian hierarchical model. Define target-specific reliability as a posterior quantity, which carries its own credible interval:
 
-```text
-generalizability to all humans
-```
+$$
+R_{dep,t} = \frac{\lVert \mathbb{E}[\theta_t \mid \text{data}] \rVert^2}{\lVert \mathbb{E}[\theta_t \mid \text{data}] \rVert^2 + \widehat{\text{err}}_t}
+$$
 
-### 15.2 Condition variation may be biology, not error
+### 10.2 Decision-theoretic ranking
 
-Rest, Stim8hr, and Stim48hr may represent distinct biological decision contexts. Therefore, condition should not always be treated as error.
+From the same posterior, rank by `P(τ_t > c | data)` where `τ_t` is the universe (fully-generalized) target effect and `c` a decision threshold. This is the absolute-decision (`Φ`) idea turned into an actual per-target decision rule, and it replaces the ad-hoc product of §9.
 
-Report both:
+### 10.3 Coherence gap to close, and KD normalization
 
-- global cross-condition dependability;
-- condition-specific dependability.
-
-### 15.3 Reliability is not biological importance
-
-A stable perturbation effect may still be irrelevant to drug discovery. A complete target priority score should include biological relevance and QC.
-
-### 15.4 Classical Phi is design-level
-
-Do not claim that every target has a classical G-theory Phi coefficient unless a target-specific hierarchical model is explicitly defined.
-
-Use:
-
-```text
-R_dep,t = target-specific empirical dependability score
-```
-
-### 15.5 More guides in D study are projections
-
-D-study guide-number projections assume that additional guides are exchangeable measurements drawn from the same guide design universe.
-
-This is a useful design approximation, not a substitute for actually generating new guides.
+The reliability metric uses the genome-wide **vector** (profile agreement) while the variance-component model above is written for a **scalar** `y`. Reconcile by either (a) decomposing per-gene then aggregating, (b) using a profile-level (multivariate / distance-based) generalizability formulation, or (c) defining an explicit scalar summary (e.g. projection onto the target's own leading effect direction). Separately, because a weak effect may reflect poor knockdown rather than no downstream role, `E_t` is normalized to **effect per unit on-target knockdown**, and QC enters the model as a **covariate**, not as a hard multiplicative gate (§11).
 
 ---
 
-## 16. Pseudocode
+## 11. QC as a soft, model-level adjustment
+
+Available QC evidence: on-target knockdown effect and significance, `n_guides`, single-guide-estimate flag, distal off-target flag, neighboring-gene knockdown flag, low target-expression flag, cell count / pseudobulk eligibility.
+
+A hard product of indicator functions (`Q = I(sig) × I(¬off-target) × …`) is brittle: one noisy flag zeroes a target. Instead treat QC as **covariates / soft weights** in the model (adjust the effect estimate for knockdown efficiency, down-weight low cell support) and report the flags alongside the ranking rather than multiplying them in. Hard filtering discards information that the model can use.
+
+---
+
+## 12. G-study / D-study outputs
+
+- **G-study:** variance components `σ²_T`, `σ²_TG`, `σ²_TD`, `σ²_TC`, … with standard errors. The `T`-interaction components localize the dominant error source.
+- **D-study:** projected design-level `Eρ²` / `Φ` across `n_guides = 1..5` and `n_donor` settings, **with confidence bands** (the `σ²_TD` estimate from 4 donors is unstable). Deliverable: a design recommendation — add guides vs add donors vs stratify by condition — per target class.
+
+---
+
+## 13. Criterion validation — does reliability predict independent replication?
+
+This is the highest-value addition and the data is already in hand. The framework claims `R_dep` predicts follow-up success; the dataset lets us **test that claim in-sample** against independent measurements:
+
+- `Th1Th2_validation_summary.suppl_table.csv` pairs, in one table, the perturb-seq reliability metrics (`pseq_crossguide_corr_signif`, `pseq_crossdonor_corr_hits_mean`) with **independent arrayed outcomes** (bulk-RNA z-scores `bulkRNA_*`, flow-cytometry `flow_*_log2FC`).
+- `K562_comparison.suppl_table.csv` gives **cross-cell-type** replication (`logfc_pearson_r`).
+
+Analysis: stratify targets by `R_dep` (and by each domain score) and test whether high-reliability targets replicate better in the arrayed / bulk / flow / K562 data — a reliability→replication curve or AUC. This converts the project from "a proposed score" into "a score shown to predict independent replication," which is the credibility centerpiece. It also lets us **calibrate** the domain weights and the decision threshold `c` against real replication outcomes instead of choosing them arbitrarily.
+
+---
+
+## 14. Target typology (fingerprint)
+
+Assign each target `G_t = (E_t, R^guide_t, R^donor_t, R^condition_t, Q_t)` and classify:
+
+| Target type | Guide | Donor | Condition | Interpretation |
+|---|---:|---:|---:|---|
+| Broadly dependable | high | high | high | robust candidate |
+| Guide-fragile | low | high | high | likely guide artifact / poor guide design |
+| Donor-fragile | high | low | high | donor-specific; needs more donor validation |
+| Context-specific | high | high | low | stable within a state, not across — a discovery, not a failure |
+| Globally fragile | low | low | low | weak follow-up candidate |
+
+This **domain-specific evidence map** is the core deliverable; the scalar ranking is its summary.
+
+---
+
+## 15. Deliverables
+
+1. **Domain-specific target evidence table** — per target × condition: effect, FDR, `R^guide`, `R^donor`, `R^condition`, QC, classification, and `R_dep` with its uncertainty.
+2. **Broad dependable ranking** (#2) — targets stable across guides, donor panel, and conditions.
+3. **Condition-specific dependable ranking** — targets stable within a state.
+4. **Fragile high-effect list** — strong by standard DE but weak in ≥1 domain (the validation-risk list).
+5. **Criterion-validation result** (§13) — reliability→replication curve against arrayed / K562 data.
+6. **Design recommendation** (D-study) — add guides vs donors vs stratify, per target class.
+
+---
+
+## 16. Minimal viable analysis and staging
+
+| Stage | Inputs | Notes |
+|---|---|---|
+| **MVP** | `DE_stats.h5ad` (`.obs` correlations + `.layers` z-vectors) | First-pass `R_dep,t` from released Pearson-type correlation fields + QC flags; ranking vs standard DE; disagreement table |
+| **Criterion check** | `Th1Th2_validation`, `K562_comparison` CSVs | §13 — cheap join + correlation/AUC; run early, it is the headline result |
+| **Full** | `by_guide.h5mu`, `by_donors.h5mu` | Hierarchical variance-component fit (§10); ICC/CCC upgrade; D-study with bands |
+
+Raw data is not committed (rights + size); see `analysis/data/CODEBOOK.json` and `fetch_data.sh`.
+
+Pseudocode (MVP, first pass):
 
 ```python
-# Pseudocode only
+stats = load_de_stats_h5ad()                       # .obs + .layers
 
-# 1. Load released target-level summary statistics
-stats = load_target_level_de_stats()
+stats["effect"]     = effect_magnitude(stats)       # z-norm or #DE genes, KD-normalized
+stats["R_guide"]    = guide_agreement(stats)        # released corr → ICC/CCC in full version
+stats["R_donor"]    = donor_agreement(stats)        # donor-panel consistency
+stats["R_condition"]= condition_consistency(stats)  # fixed facet: cross- and within-condition
+stats["Q"]          = qc_weight(stats)              # soft weight, not hard gate
 
-# 2. Define effect magnitude
-stats["effect_score"] = compute_effect_magnitude(
-    zscore_profile=stats["zscore_profile"],
-    method="l2_norm_or_num_de_genes"
-)
+stats["R_dep"]      = aggregate_profile(stats)      # or per-domain product
+stats["priority"]   = stats.effect * stats.R_dep * stats.Q
 
-# 3. Define guide consistency
-stats["R_guide"] = compute_or_extract_guide_correlation(stats)
+# disagreement is the point, not just the new order
+stats["rank_shift"] = rank(stats.effect) - rank(stats.priority)
 
-# 4. Define donor consistency
-stats["R_donor"] = compute_or_extract_donor_correlation(stats)
-
-# 5. Define condition-specific or global consistency
-stats["R_condition"] = compute_condition_consistency(stats)
-
-# 6. Define QC score
-stats["Q"] = compute_qc_weight(
-    ontarget_effect=stats["ontarget_effect_size"],
-    ontarget_significant=stats["ontarget_significant"],
-    off_target_flag=stats["distal_offtarget_flag"],
-    single_guide_flag=stats["single_guide_estimate"],
-    low_expression_flag=stats["low_target_gex"]
-)
-
-# 7. Define empirical dependability score
-stats["R_dep"] = combine_reliability_components(
-    R_guide=stats["R_guide"],
-    R_donor=stats["R_donor"],
-    R_condition=stats["R_condition"],
-    weights={"guide": 0.4, "donor": 0.4, "condition": 0.2}
-)
-
-# 8. Define reliability-weighted priority
-stats["priority_score"] = (
-    stats["effect_score"]
-    * stats["R_dep"]
-    * stats["Q"]
-)
-
-# 9. Compare standard vs reliability-weighted ranking
-stats["standard_rank"] = rank_descending(stats["effect_score"])
-stats["reliability_rank"] = rank_descending(stats["priority_score"])
-stats["rank_shift"] = stats["standard_rank"] - stats["reliability_rank"]
-
-# 10. Report moved-up and moved-down targets
-moved_up = stats.sort_values("rank_shift", ascending=False).head(50)
-moved_down = stats.sort_values("rank_shift", ascending=True).head(50)
+# criterion validation (the headline)
+val = join(stats, load_arrayed_validation())        # Th1/Th2 bulk + flow, K562
+reliability_predicts_replication = auc(val.R_dep, val.replicated)
 ```
 
 ---
 
-## 17. Optional Hierarchical Model Extension
+## 17. Figures
 
-A more formal extension would estimate target-specific reliability using a hierarchical model.
-
-For a scalar effect score:
-
-```text
-y_tgdc = θ_t + u_tg + v_td + w_tc + e_tgdc
-```
-
-where:
-
-- `θ_t` = latent target effect;
-- `u_tg` = guide-specific deviation for target `t`;
-- `v_td` = donor-specific deviation for target `t`;
-- `w_tc` = condition-specific deviation for target `t`;
-- `e_tgdc` = residual.
-
-Then define target-specific empirical reliability from signal-to-error ratio or posterior uncertainty:
-
-```text
-R_dep,t = ||E(θ_t | data)||² / (||E(θ_t | data)||² + estimated_error_t)
-```
-
-or:
-
-```text
-R_dep,t = 1 - posterior_uncertainty_t / prior_or_marginal_uncertainty
-```
-
-This is more rigorous but also more model-dependent.
+1. **Design diagram** — target measured through guides × donors × conditions → effect profile.
+2. **Standard vs reliability-weighted ranking** — scatter; highlight large rank shifts.
+3. **Effect vs dependability** — scatter with quadrants (large/dependable, large/fragile, moderate/dependable, small/fragile).
+4. **Generalizability fingerprint heatmap** — targets × {effect, `R^guide`, `R^donor`, `R^condition`, QC}.
+5. **Domain-failure typology** — panels for guide-fragile / donor-fragile / context-specific / broadly dependable.
+6. **D-study design curves** — projected `Φ` / `Eρ²` vs `n_guides`, `n_donors`, with confidence bands.
+7. **Criterion-validation curve** — reliability stratum vs independent replication rate (§13).
 
 ---
 
-## 18. Final Claim
+## 18. Limitations and cautions
 
-The strongest version of the project claim is:
+- **Four donors** detect obvious donor-panel instability but cannot estimate human population heterogeneity — say "donor-panel consistency," not "generalizability to all humans."
+- **Condition is biology, not just error** — report both cross-condition and within-condition dependability.
+- **Reliability is not importance** — a stable effect can be biologically uninteresting; keep `Biology_t` explicit.
+- **Classical `Φ` is design-level** — never claim a per-target `Φ_t`; use `R_dep,t`.
+- **D-study projections assume exchangeable future guides/donors** — a design approximation, not a substitute for generating them; carry uncertainty bands.
+- **Selection / winner's curse** — ranking ~12k targets by a product of noisy quantities inflates the top; empirical-Bayes shrinkage mitigates but should be stated.
+- **Released correlations are pre-computed Pearson** — the genuinely new computation is the variance-component fit and the criterion validation; lead with those.
 
-> This project does not use G-theory to discover biologically important targets by itself. Instead, it uses G-theory and target-specific empirical dependability scores to evaluate whether existing perturbation-effect evidence is stable enough to support target prioritization.
+---
 
-In shorter form:
+## 19. What this project does not claim
+
+It does **not** claim G-theory alone discovers important biology, that high reliability implies importance or druggability, that 4 donors give population generalizability, that condition-specific effects are unreliable, or that CRISPRi knockdown fully predicts pharmacological inhibition. It claims only:
+
+> G-theory and target-specific empirical dependability evaluate the **stability of the evidence** for candidate targets — and, here, that this stability predicts independent replication.
+
+In short:
 
 ```text
 DE tells us what moved.
 Reliability tells us whether we should trust that it moved.
+Validation tells us whether that trust is earned.
 Biology tells us whether the movement matters.
 ```
 
-The project contribution is the middle layer.
+The project contribution is the middle two layers.
 
 ---
 
-## 19. Source Notes
+## 20. Source notes
 
-Key factual sources used to frame the proposal:
-
-1. Chan Zuckerberg Initiative / Virtual Cell Models dataset page: **Primary Human CD4+ T Cell Perturb-seq**, describing genome-scale Perturb-seq in primary human CD4+ T cells, approximately 22 million cells, four donors, and three stimulation conditions.
-2. BioRxiv preprint: **Genome-scale Perturb-seq in primary human CD4+ T cells**, describing perturbation of all expressed genes across 22 million primary human CD4+ T cells from four donors.
-3. Generalizability Theory literature distinguishing G studies, D studies, variance components, G-coefficient for relative decisions, and Phi coefficient for absolute decisions.
-
+1. **Primary Human CD4+ T Cell Perturb-seq** — CZI Virtual Cell Models dataset page (~22M primary human CD4+ T cells, 4 donors, 3 stimulation conditions).
+2. **Zhu et al. 2025**, *Genome-scale Perturb-seq in primary human CD4+ T cells* (Marson & Pritchard labs) — perturbs all expressed genes; releases target-/guide-/donor-resolved DE plus reliability/QC fields and independent arrayed + K562 validation tables.
+3. **Brennan, R. L.**, *Generalizability Theory*; **Shavelson & Webb**, *Generalizability Theory: A Primer*; **Monteiro et al. 2019**, *Generalizability Theory Made Simple(r)* — G-/D-studies, variance components, `Eρ²` (relative) vs `Φ` (absolute), fixed vs random facets.
+4. Reliability-coefficient choice: **ICC** (agreement) and **Lin's concordance correlation** vs Pearson (consistency).
