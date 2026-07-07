@@ -4,7 +4,7 @@
 
 > Built for **Built with Claude: Life Sciences** (Researcher track, 2026), in partnership with Gladstone Institutes. All work in this repository is done from scratch during the hackathon, per the event rules.
 
-> 📄 Full design rationale and method write-up: [`docs/design.md`](./docs/design.md).
+> 📄 Design rationale ([`docs/`](./docs/)): the scalar reliability-weighted ranking ([`design.md`](./docs/design.md), #2) and the domain-specific generalizability profile ([`design_domain_specific.md`](./docs/design_domain_specific.md), #3).
 
 ---
 
@@ -48,26 +48,29 @@ y[t,g,d,c] = μ + T_t + G_g + D_d + C_c
              + (TG) + (TD) + (TC) + (GD) + (GC) + (DC) + (TGDC)
 ```
 
-with a per-target dependability coefficient
+with a per-target empirical dependability score
 
 ```
-Φ_t = σ²_signal,t / ( σ²_signal,t + σ²_error,t )
+R_dep,t = σ²_signal,t / ( σ²_signal,t + σ²_error,t )
 ```
+
+`R_dep,t` is a target-specific quantity *inspired by* G-theory. The classical G-theory coefficients — `Eρ²` (relative decisions) and `Φ` (absolute decisions) — are design-level: one per measurement design, not one per target. So the per-target score is named `R_dep,t`, not classical `Φ_t`.
 
 Two honest constraints shape how this is estimated (not optional caveats — they drive the method):
 
-- **Only 2 guides / 4 donors.** Per-target variance components are under-identified (2 guides = 1 df). The estimable "complete" decomposition is a **hierarchical / partial-pooling REML** with target as a random facet, so `σ²_guide`, `σ²_donor`, … are estimated by borrowing strength across targets, and `Φ_t` is an empirical-Bayes–shrunk quantity. Not per-target ANOVA.
+- **Only 2 guides / 4 donors.** Per-target variance components are under-identified (2 guides = 1 df). The estimable "complete" decomposition is a **hierarchical / partial-pooling REML** with target as a random facet, so `σ²_guide`, `σ²_donor`, … are estimated by borrowing strength across targets, and `R_dep,t` is an empirical-Bayes–shrunk quantity. Not per-target ANOVA.
 - **Condition is biology, not just error.** Rest / Stim8hr / Stim48hr are real T-cell states. So the project reports **two rankings**: a *global* one (condition treated as a random facet, entering error) and a *context-specific* one (condition treated as a fixed stratifier, one universe per state).
 
 ## The score
 
 ```
-S_t = E_t × R_t × Q_t
+Priority_t = E_t × R_dep,t × Q_t          (× optional Biology_t)
 ```
 
 - `E_t` — effect magnitude (effect-norm, mean |z|, or number of downstream DE genes)
-- `R_t` — dependability (first-pass from released guide/donor correlation fields; full version from the variance components above)
+- `R_dep,t` — empirical dependability (first-pass from released guide/donor correlation fields; full version from the variance components above). Reported as a scalar for ranking (#2), or as a per-domain profile `(R^guide, R^donor, R^condition)` for a diagnostic evidence map (#3).
 - `Q_t` — quality penalty: weak on-target knockdown, single-guide estimate, off-target/neighbor flags, low cell support
+- `Biology_t` (optional) — pathway / cell-state / disease-genetics relevance, kept explicit so dependability is never mistaken for importance
 
 ## Data
 
@@ -79,11 +82,12 @@ s3://genome-scale-tcell-perturb-seq/marson2025_data/
 
 | Stage | Files | Size |
 |---|---|---|
-| Heuristic MVP (first-pass `R_t`) | `suppl_tables/DE_stats.suppl_table.csv` + `sgrna_library_metadata.suppl_table.csv` | 4.6 MB + 9.5 MB |
-| **Full variance decomposition** | `GWCD4i.DE_stats.by_guide.h5mu` + `GWCD4i.DE_stats.by_donors.h5mu` | 27 GB + 15.7 GB |
+| Metadata + QC | `suppl_tables/{DE_stats, sgrna_library_metadata, sample_metadata}.suppl_table.csv` | ~14 MB |
+| **Heuristic MVP** (`R_dep,t` from pre-computed correlations) | `GWCD4i.DE_stats.h5ad` (`.obs` guide/donor correlations + `.layers` z-scores) | 16.8 GB |
+| **Full variance decomposition** | `GWCD4i.DE_stats.by_guide.h5mu` + `GWCD4i.DE_stats.by_donors.h5mu` | 29 GB + 16 GB |
 | Not needed | `D*_*.assigned_guide.h5ad` ×12 (cell-level) | 110–161 GB each (~1.6 TB) — **do not download** |
 
-The flat CSV carries pre-computed guide/donor correlations (enough for the heuristic `R_t`); the per-facet `.h5mu` files carry the raw guide-/donor-resolved effect vectors needed to actually fit the crossed variance-component model. Raw data is not committed to this repo.
+Note: the flat `DE_stats.suppl_table.csv` is a *reduced* 16-column release — it does **not** carry the reliability correlation fields (`guide_correlation_all`, `donor_correlation_*`). Those live in `GWCD4i.DE_stats.h5ad` `.obs`, so even the heuristic MVP reads the h5ad. The per-facet `.h5mu` files carry the raw guide-/donor-resolved effect vectors needed to fit the crossed variance-component model. Raw data is not committed to this repo (see `analysis/data/CODEBOOK.json` + `fetch_data.sh`).
 
 ## Deliverables
 
@@ -101,7 +105,7 @@ G-perturb/
 ├── analysis/
 │   ├── data/     # released summary statistics + CODEBOOK.json (large files gitignored)
 │   └── ...       # analysis scripts / notebooks
-├── docs/         # design rationale + method write-up (design.md)
+├── docs/         # design rationale (design.md + design_domain_specific.md)
 ├── results/      # ranked tables and figures
 ├── LICENSE       # Apache-2.0
 └── NOTICE
