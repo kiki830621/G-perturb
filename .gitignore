@@ -1,0 +1,44 @@
+# --- Data (large single-cell / genomic files are not committed) ---
+data/raw/
+*.h5
+*.h5ad
+*.loom
+*.mtx
+*.mtx.gz
+*.npz
+*.npy
+*.parquet
+*.feather
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- R ---
+.Rhistory
+.RData
+.Rproj.user/
+renv/library/
+renv/local/
+renv/cellar/
+renv/staging/
+
+# --- Environment / secrets ---
+.env
+.env.*
+!.env.example
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Editor / tooling caches ---
+.impeccable/
