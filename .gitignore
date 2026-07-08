@@ -1,5 +1,4 @@
 # --- Data (raw + large single-cell / genomic files are not committed) ---
-data/raw/
 analysis/data/raw/
 *.h5
 *.h5mu
@@ -44,3 +43,5 @@ Thumbs.db
 
 # --- Editor / tooling caches ---
 .impeccable/
+.spectra/
+openspec/.vector-search.db*
