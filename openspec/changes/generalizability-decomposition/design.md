@@ -67,8 +67,13 @@ Name the deliverable a "distribution-light / assumption-lean generalizability de
 
 Greenfield analysis — no deploy / rollback surface. The reframe edits `docs/design.md`, `analysis/data/DATA_AND_ASSUMPTIONS.md`, and `README.md`; rollback is a git revert of those edits. The retired heuristic is kept in the design as the labelled sanity-check stepping-stone, not deleted, so nothing downstream breaks silently.
 
-## Open Questions
+## Open Questions — resolved at the 2026-07 apply checkpoint
 
-- Language for the reference implementation: Python (h5py-native ingest) vs R (mature `vegan`/`lme4`/`relaimpo`) vs a hybrid (Python ingest → R stats). Decide at apply.
-- Exact dissimilarity metric (1 − CCC vs 1 − Pearson vs Euclidean-on-z) and the scalar summary used for the Gaussian baseline.
-- Whether to fetch the companion-repo validation CSVs now, pending the `Th1Th2` reconciliation from #7.
+- **Language: R-primary for the statistics** (`vegan::adonis2` distance decomposition, `lme4::lmer` Gaussian baseline, hand-rolled moment-based Fay–Herriot), `jsonlite` export. **I/O deviation**: the h5→matrix extraction stays in **Python `h5py`** (already working; reading the 46 GB h5mu in R would need Bioconductor `zellkonverter`/`rhdf5` + basilisk — too heavy under deadline). `sae` and `relaimpo` are **not needed for the cut** (FH is hand-rolled; importance-under-collinearity is a paper nicety). R env confirmed: `vegan` / `lme4` / `jsonlite` present.
+- **Dissimilarity metric: `1 − CCC`** (Lin's concordance — agreement in magnitude, de-confounds effect scale, matches design §8). Pearson kept only as a secondary diagnostic. Gaussian-baseline scalar summary fixed at build time (leading-effect-direction projection or effect-norm).
+- **Companion-repo CSVs: fetched** (task 1.1) — `K562_comparison` + `guide_kd_efficiency` are in `analysis/data/raw/`. `Th1Th2_validation_summary` confirmed unavailable (404 on S3, absent by name in the companion repo) → criterion validation is **K562-only, marked partial**.
+- **Tractability: per-target facet distances, not a global matrix.** The design-level decomposition is `1−CCC(guide_1, guide_2)` per target and `1−CCC` across donor split-halves per target, aggregated into facet variance shares — **never** a global 33,983² distance matrix (~35 GB, infeasible).
+
+## Resume note (apply checkpoint, 2026-07)
+
+4/13 tasks done (1.1, 1.2, 6.1, 6.2 — the reframe landed in `docs/design.md` / `README.md` / `analysis/data/DATA_AND_ASSUMPTIONS.md`; commit `3410fc2`). The remaining 9 (2.x / 3.x / 4.1 / 5.x = the statistical core) are deferred to a dedicated session. Resume with `/spectra-apply generalizability-decomposition` (next task = index 3 = task 2.1). Suggested first slice: the Python extractor + the replication floor + per-target guide/donor `1−CCC` — the cheapest, highest-signal pieces that also give #5's demo its first real numbers.
