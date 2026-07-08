@@ -10,6 +10,7 @@ G-perturb analyses. The **raw data itself is not committed** (it lives in gitign
 | `build_codebook.py` | Auto-profiles the downloaded CSV columns and reads the `.h5ad`/`.h5mu` structure (`.obs` columns, `.layers`, modalities) → writes `CODEBOOK.json` |
 | `validate_codebook.py` | Independent check that `CODEBOOK.json` documents every column + records the reliability-field gap |
 | `CODEBOOK.json` | Field-level codebook: every column's dtype, cardinality, description, and G-theory facet role |
+| `DATA_AND_ASSUMPTIONS.md` | Readable narrative over `CODEBOOK.json`: what the data is, the **download-scope decision** (MVP needs only the `h5ad`), and the **statistical assumptions** with `docs/design.md` pointers |
 | `raw/` | *(gitignored)* the downloaded data + `data_sharing_readme.md` |
 
 ## Source
@@ -51,8 +52,12 @@ model (see [`docs/design.md`](../../docs/design.md)):
 - **`GWCD4i.DE_stats.by_guide.h5mu`** (29.42 GB) — 2 modalities `guide_1` / `guide_2` → the guide facet.
 - **`GWCD4i.DE_stats.by_donors.h5mu`** (16.87 GB) — 6 modalities, one per donor-pair (the C(4,2) pairs of the 4 donors) → the donor facet.
 
-Only `guide_kd_efficiency` remains not-downloaded (companion GitHub repo
-`emdann/GWT_perturbseq_analysis_2025`, not this S3 bucket).
+The S3 bucket carries only **3** supplementary CSVs (confirmed by bucket listing). Not downloaded —
+all served from the companion GitHub repo `emdann/GWT_perturbseq_analysis_2025`
+(`metadata/suppl_tables/`), not this S3 bucket: `guide_kd_efficiency` (§11 covariate) and the
+criterion-validation tables `K562_comparison` + the arrayed bulk/flow validation (§13). See
+[`DATA_AND_ASSUMPTIONS.md`](./DATA_AND_ASSUMPTIONS.md) §4 for the full download-scope decision and an
+important `Th1Th2_validation_summary` naming/location gap that #2 must reconcile.
 
 ## Rebuild
 
