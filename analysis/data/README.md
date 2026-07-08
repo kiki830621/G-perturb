@@ -7,7 +7,7 @@ G-perturb analyses. The **raw data itself is not committed** (it lives in gitign
 | Tracked file | What it is |
 |---|---|
 | `fetch_data.sh` | Downloads the released summary statistics from public S3 into `raw/` |
-| `build_codebook.py` | Reads the downloaded CSVs, auto-profiles columns, merges the readme field dictionary → writes `CODEBOOK.json` |
+| `build_codebook.py` | Auto-profiles the downloaded CSV columns and reads the `.h5ad`/`.h5mu` structure (`.obs` columns, `.layers`, modalities) → writes `CODEBOOK.json` |
 | `validate_codebook.py` | Independent check that `CODEBOOK.json` documents every column + records the reliability-field gap |
 | `CODEBOOK.json` | Field-level codebook: every column's dtype, cardinality, description, and G-theory facet role |
 | `raw/` | *(gitignored)* the downloaded data + `data_sharing_readme.md` |
@@ -40,13 +40,19 @@ The flat **`DE_stats.suppl_table.csv`** is a **reduced 16-column** release: it c
 magnitude + basic QC (`ontarget_effect_size`, `n_total_de_genes`, `n_downstream`,
 `ontarget_significant`, `offtarget_flag`) but **not** the reliability correlations. Those —
 `guide_correlation_all`, `donor_correlation_all_mean/min`, `donor_correlation_hits_*`,
-`n_guides`, `single_guide_estimate` — live in `GWCD4i.DE_stats.h5ad` `.obs` (15.6 GB).
+`n_guides`, `single_guide_estimate` — live in `GWCD4i.DE_stats.h5ad` `.obs` (**now downloaded**, 16.79 GB).
 
-Consequence: even the heuristic-MVP dependability `R_t` needs the 15.6 GB h5ad (or the
-per-facet `by_guide` / `by_donors` h5mu), **not** just the 4.6 MB CSV. The full
-variance-component model (issue #2) needs the per-facet h5mu effect vectors regardless.
-`CODEBOOK.json` documents these deferred fields from the readme so the modelling issue can
-plan against them.
+Consequence: even the heuristic-MVP dependability `R_dep,t` reads the h5ad `.obs`, **not**
+just the flat CSV. `CODEBOOK.json` documents these fields from the actual file.
+
+The two per-facet products carry the raw effect vectors for the full variance-component
+model (see [`docs/design.md`](../../docs/design.md)):
+
+- **`GWCD4i.DE_stats.by_guide.h5mu`** (29.42 GB) — 2 modalities `guide_1` / `guide_2` → the guide facet.
+- **`GWCD4i.DE_stats.by_donors.h5mu`** (16.87 GB) — 6 modalities, one per donor-pair (the C(4,2) pairs of the 4 donors) → the donor facet.
+
+Only `guide_kd_efficiency` remains not-downloaded (companion GitHub repo
+`emdann/GWT_perturbseq_analysis_2025`, not this S3 bucket).
 
 ## Rebuild
 

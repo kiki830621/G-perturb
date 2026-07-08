@@ -60,6 +60,9 @@ def main() -> int:
     for prod in cb.get("products_not_downloaded", {}).values():
         for fld in prod.get("documented_fields", []):
             all_roles.add(fld.get("facet_role"))
+    for prod in cb.get("h5_products_downloaded", {}).values():
+        for fld in prod.get("obs_fields", []) + prod.get("layer_fields", []):
+            all_roles.add(fld.get("facet_role"))
     for facet in ("target", "guide", "donor", "condition"):
         if facet not in all_roles:
             fail(f"facet '{facet}' has no column with facet_role='{facet}'")
@@ -67,23 +70,24 @@ def main() -> int:
         else:
             print(f"  ✓ facet '{facet}' reachable")
 
-    # 3. Reliability gap must be documented (the key #1 finding).
+    # 3. Reliability gap must be documented (the key #1 finding): the reliability
+    #    correlation fields live in the (now downloaded) DE_stats.h5ad .obs, NOT the flat CSV.
     reliability_cols = {
         f["name"]
-        for prod in cb.get("products_not_downloaded", {}).values()
-        for f in prod.get("documented_fields", [])
+        for prod in cb.get("h5_products_downloaded", {}).values()
+        for f in prod.get("obs_fields", [])
         if f.get("facet_role") == "reliability"
     }
     flat = downloaded.get("DE_stats.suppl_table.csv", {})
     flat_cols = {fld["name"] for fld in flat.get("fields", [])}
     if not reliability_cols:
-        fail("no reliability fields documented in products_not_downloaded")
+        fail("no reliability fields documented in h5_products_downloaded .obs")
         errors += 1
     elif reliability_cols & flat_cols:
         fail(f"reliability fields unexpectedly present in flat CSV: {reliability_cols & flat_cols}")
         errors += 1
     else:
-        print(f"  ✓ reliability gap recorded ({len(reliability_cols)} fields live outside the flat CSV)")
+        print(f"  ✓ reliability gap recorded ({len(reliability_cols)} fields live in h5ad .obs, not the flat CSV)")
 
     gaps = cb.get("known_gaps", [])
     if not any("reduced" in g.lower() or "reliability" in g.lower() for g in gaps):

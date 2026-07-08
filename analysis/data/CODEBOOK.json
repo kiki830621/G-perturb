@@ -13,7 +13,7 @@
     ],
     "s3": "s3://genome-scale-tcell-perturb-seq/marson2025_data/",
     "geo": "GSE314342 / SRP643211 (raw reads)",
-    "note": "Field descriptions taken from the dataset's data_sharing_readme.md; profiles from the actual downloaded CSVs."
+    "note": "Field descriptions from data_sharing_readme.md; CSV profiles and .h5ad/.h5mu structure read from the actual downloaded files."
   },
   "facet_design": {
     "target": {
@@ -30,7 +30,7 @@
     "donor": {
       "role": "occasion facet",
       "available": true,
-      "source": "donor_id",
+      "source": "donor_id / by_donors.h5mu modalities",
       "n_levels": 4
     },
     "condition": {
@@ -38,7 +38,7 @@
       "available": true,
       "source": "culture_condition",
       "n_levels": 3,
-      "note": "Two rankings planned: global (condition random) vs context-specific (condition fixed)."
+      "note": "Fixed facet: report both cross-condition (broad) and within-condition (context-specific) dependability."
     },
     "effect_and_SE": {
       "logFC/zscore": "DE_stats.h5ad .layers (log_fc, zscore)",
@@ -47,9 +47,9 @@
     }
   },
   "known_gaps": [
-    "DE_stats.suppl_table.csv is a reduced 16-col release: it lacks guide_correlation_*, donor_correlation_*, n_guides, single_guide_estimate, neighboring_gene_KD, distal_offtarget_flag. Those live in GWCD4i.DE_stats.h5ad .obs (15.6 GB).",
-    "guide_kd_efficiency + several suppl tables are on the companion GitHub repo (emdann/GWT_perturbseq_analysis_2025), not this S3 bucket.",
-    "Two guides / four donors -> per-target variance components under-identified; the full G-study uses partial-pooling REML (see repo README / issue #2)."
+    "DE_stats.suppl_table.csv is a reduced 16-col release: it lacks guide_correlation_*, donor_correlation_*, n_guides, single_guide_estimate, neighboring_gene_KD, distal_offtarget_flag. Those live in GWCD4i.DE_stats.h5ad .obs (now downloaded).",
+    "guide_kd_efficiency + several suppl tables are on the companion GitHub repo (emdann/GWT_perturbseq_analysis_2025), not this S3 bucket — the only product not downloaded.",
+    "Two guides / four donors -> per-target variance components under-identified; the full G-study uses partial-pooling REML (see docs/design.md / issue #2)."
   ],
   "files_downloaded": {
     "sample_metadata.suppl_table.csv": {
@@ -668,27 +668,45 @@
       ]
     }
   },
-  "products_not_downloaded": {
+  "h5_products_downloaded": {
     "GWCD4i.DE_stats.h5ad": {
-      "downloaded": false,
-      "size": "15.6 GB",
-      "grain": "(target x condition), .obs = 33,983 rows",
-      "why_needed": "Holds the RELIABILITY fields absent from DE_stats.suppl_table.csv. Needed even for the heuristic MVP R_t.",
-      "documented_fields": [
+      "downloaded": true,
+      "size_bytes": 16786240107,
+      "size": "16.79 GB",
+      "why_needed": "Primary MVP driver. .obs holds the RELIABILITY fields absent from the reduced CSV; .layers holds the genome-wide effect vectors per target x condition.",
+      "top_level_keys": [
+        "X",
+        "layers",
+        "obs",
+        "obsm",
+        "obsp",
+        "uns",
+        "var",
+        "varm",
+        "varp"
+      ],
+      "n_obs": 33983,
+      "grain": "(target x condition)",
+      "obs_fields": [
         {
-          "name": "guide_correlation_all",
-          "facet_role": "reliability",
-          "description": "Pearson r between the two guides' per-gene DE z-scores, all genes. NaN if only one guide. -> R_guide."
+          "name": "chunk",
+          "facet_role": "meta",
+          "description": "DE processing group identifier."
         },
         {
-          "name": "guide_correlation_signif",
-          "facet_role": "reliability",
-          "description": "Same, restricted to significant DE genes."
+          "name": "culture_condition",
+          "facet_role": "condition",
+          "description": "Stimulation condition facet: Rest / Stim8hr / Stim48hr."
+        },
+        {
+          "name": "distal_offtarget_flag",
+          "facet_role": "quality",
+          "description": "Potential distal off-target (predicted alignment + down-regulation)."
         },
         {
           "name": "donor_correlation_all_mean",
           "facet_role": "reliability",
-          "description": "Mean over donor-pair Pearson r of per-gene DE logFC (all genes). -> R_donor."
+          "description": "Mean over donor-pair Pearson r of per-gene DE logFC (all genes). -> first-pass R_donor."
         },
         {
           "name": "donor_correlation_all_min",
@@ -706,24 +724,34 @@
           "description": "Min cross-donor r on hit genes."
         },
         {
-          "name": "n_guides",
-          "facet_role": "quality",
-          "description": "Number of guides aggregated into the per-target DE estimate."
+          "name": "guide_correlation_all",
+          "facet_role": "reliability",
+          "description": "Pearson r between the two guides' per-gene DE z-scores, all genes. NaN if only one guide. -> first-pass R_guide."
         },
         {
-          "name": "single_guide_estimate",
-          "facet_role": "quality",
-          "description": "DE estimate came from a single guide only."
+          "name": "guide_correlation_all_pval",
+          "facet_role": "reliability",
+          "description": "p-value for guide_correlation_all."
         },
         {
-          "name": "neighboring_gene_KD",
-          "facet_role": "quality",
-          "description": "Adjacent gene also knocked down (cis off-target)."
+          "name": "guide_correlation_signif",
+          "facet_role": "reliability",
+          "description": "Same guide correlation, restricted to significant DE genes."
         },
         {
-          "name": "distal_offtarget_flag",
+          "name": "guide_correlation_signif_pval",
+          "facet_role": "reliability",
+          "description": "p-value for guide_correlation_signif."
+        },
+        {
+          "name": "guide_n_signif_ontarget",
           "facet_role": "quality",
-          "description": "Potential distal off-target (predicted alignment + down-regulation)."
+          "description": "Number of guides with a significant on-target effect."
+        },
+        {
+          "name": "index",
+          "facet_role": "id",
+          "description": "Observation key `{target_contrast}_{culture_condition}`."
         },
         {
           "name": "low_target_gex",
@@ -731,14 +759,86 @@
           "description": "Target gene low baseline expression (KD estimate unreliable)."
         },
         {
-          "name": "log_fc",
-          "facet_role": "effect",
-          "description": "Log2 fold change (per perturbation x gene)."
+          "name": "n_cells_target",
+          "facet_role": "quality",
+          "description": "Number of cells with a targeting guide for this perturbation."
         },
         {
-          "name": "zscore",
+          "name": "n_down_genes",
           "facet_role": "effect",
-          "description": "DE z-score = logFC / lfcSE."
+          "description": "Count of significantly downregulated genes (10% FDR)."
+        },
+        {
+          "name": "n_downstream",
+          "facet_role": "effect",
+          "description": "Downstream (trans) DE genes, excluding the on-target effect."
+        },
+        {
+          "name": "n_guides",
+          "facet_role": "quality",
+          "description": "Number of guides aggregated into the per-target DE estimate."
+        },
+        {
+          "name": "n_total_de_genes",
+          "facet_role": "effect",
+          "description": "Total significantly DE genes at 10% FDR (a candidate E_t)."
+        },
+        {
+          "name": "n_total_genes_category",
+          "facet_role": "effect",
+          "description": "Category based on number of trans-effects."
+        },
+        {
+          "name": "n_up_genes",
+          "facet_role": "effect",
+          "description": "Count of significantly upregulated genes (10% FDR)."
+        },
+        {
+          "name": "neighboring_gene_KD",
+          "facet_role": "quality",
+          "description": "Adjacent gene also knocked down (cis off-target)."
+        },
+        {
+          "name": "ontarget_effect_size",
+          "facet_role": "effect",
+          "description": "Effect size of the perturbation on its intended target gene."
+        },
+        {
+          "name": "ontarget_significant",
+          "facet_role": "quality",
+          "description": "On-target knockdown significant (10% FDR)?"
+        },
+        {
+          "name": "single_guide_estimate",
+          "facet_role": "quality",
+          "description": "DE estimate came from a single guide only."
+        },
+        {
+          "name": "target_baseMean",
+          "facet_role": "effect",
+          "description": "Mean baseline expression of the target gene."
+        },
+        {
+          "name": "target_contrast",
+          "facet_role": "target",
+          "description": "Ensembl gene ID of the perturbed gene (object of measurement)."
+        },
+        {
+          "name": "target_contrast_gene_name",
+          "facet_role": "target",
+          "description": "Symbol of the perturbed gene."
+        }
+      ],
+      "layer_fields": [
+        {
+          "name": "adj_p_value",
+          "facet_role": "quality",
+          "description": "FDR-adjusted p-value."
+        },
+        {
+          "name": "baseMean",
+          "facet_role": "effect",
+          "description": "Mean normalized expression per gene (DE baseline)."
         },
         {
           "name": "lfcSE",
@@ -746,38 +846,424 @@
           "description": "Standard error of log fold change (the SE the G-study needs)."
         },
         {
-          "name": "adj_p_value",
+          "name": "log_fc",
+          "facet_role": "effect",
+          "description": "Log2 fold change (per perturbation x gene)."
+        },
+        {
+          "name": "p_value",
           "facet_role": "quality",
-          "description": "FDR-adjusted p-value."
+          "description": "Raw DE p-value."
+        },
+        {
+          "name": "zscore",
+          "facet_role": "effect",
+          "description": "DE z-score = logFC / lfcSE (the effect-profile vector)."
         }
       ]
     },
     "GWCD4i.DE_stats.by_guide.h5mu": {
-      "downloaded": false,
-      "size": "27 GB",
-      "grain": "modalities guide_1 / guide_2, each (target x condition)",
-      "why_needed": "Per-guide DE effect vectors -> raw material to FIT the guide variance component (not just a precomputed correlation).",
-      "documented_fields": [
+      "downloaded": true,
+      "size_bytes": 29424424894,
+      "size": "29.42 GB",
+      "why_needed": "Per-guide DE effect vectors (one modality per guide) -> raw material to FIT the guide variance component, not just read a precomputed correlation.",
+      "top_level_keys": [
+        "mod",
+        "obs",
+        "obsm",
+        "obsmap",
+        "obsp",
+        "uns",
+        "var",
+        "varm",
+        "varmap",
+        "varp"
+      ],
+      "n_obs": 33488,
+      "modalities": [
+        "guide_1",
+        "guide_2"
+      ],
+      "grain": "2 modalities, each (target x condition)",
+      "obs_fields": [
+        {
+          "name": "chunk",
+          "facet_role": "meta",
+          "description": "DE processing group identifier."
+        },
+        {
+          "name": "culture_condition",
+          "facet_role": "condition",
+          "description": "Stimulation condition facet: Rest / Stim8hr / Stim48hr."
+        },
+        {
+          "name": "distal_offtarget_flag",
+          "facet_role": "quality",
+          "description": "Potential distal off-target (predicted alignment + down-regulation)."
+        },
+        {
+          "name": "donor_correlation_all_mean",
+          "facet_role": "reliability",
+          "description": "Mean over donor-pair Pearson r of per-gene DE logFC (all genes). -> first-pass R_donor."
+        },
+        {
+          "name": "donor_correlation_all_min",
+          "facet_role": "reliability",
+          "description": "Min over donor-pairs (conservative R_donor)."
+        },
+        {
+          "name": "donor_correlation_hits_mean",
+          "facet_role": "reliability",
+          "description": "Mean cross-donor r on per-target hit genes."
+        },
+        {
+          "name": "donor_correlation_hits_min",
+          "facet_role": "reliability",
+          "description": "Min cross-donor r on hit genes."
+        },
+        {
+          "name": "guide_correlation_all",
+          "facet_role": "reliability",
+          "description": "Pearson r between the two guides' per-gene DE z-scores, all genes. NaN if only one guide. -> first-pass R_guide."
+        },
+        {
+          "name": "guide_correlation_all_pval",
+          "facet_role": "reliability",
+          "description": "p-value for guide_correlation_all."
+        },
+        {
+          "name": "guide_correlation_signif",
+          "facet_role": "reliability",
+          "description": "Same guide correlation, restricted to significant DE genes."
+        },
+        {
+          "name": "guide_correlation_signif_pval",
+          "facet_role": "reliability",
+          "description": "p-value for guide_correlation_signif."
+        },
+        {
+          "name": "guide_n_signif_ontarget",
+          "facet_role": "quality",
+          "description": "Number of guides with a significant on-target effect."
+        },
+        {
+          "name": "low_target_gex",
+          "facet_role": "quality",
+          "description": "Target gene low baseline expression (KD estimate unreliable)."
+        },
+        {
+          "name": "n_cells_target",
+          "facet_role": "quality",
+          "description": "Number of cells with a targeting guide for this perturbation."
+        },
+        {
+          "name": "n_down_genes",
+          "facet_role": "effect",
+          "description": "Count of significantly downregulated genes (10% FDR)."
+        },
+        {
+          "name": "n_downstream",
+          "facet_role": "effect",
+          "description": "Downstream (trans) DE genes, excluding the on-target effect."
+        },
+        {
+          "name": "n_guides",
+          "facet_role": "quality",
+          "description": "Number of guides aggregated into the per-target DE estimate."
+        },
+        {
+          "name": "n_total_de_genes",
+          "facet_role": "effect",
+          "description": "Total significantly DE genes at 10% FDR (a candidate E_t)."
+        },
+        {
+          "name": "n_total_genes_category",
+          "facet_role": "effect",
+          "description": "Category based on number of trans-effects."
+        },
+        {
+          "name": "n_up_genes",
+          "facet_role": "effect",
+          "description": "Count of significantly upregulated genes (10% FDR)."
+        },
+        {
+          "name": "neighboring_gene_KD",
+          "facet_role": "quality",
+          "description": "Adjacent gene also knocked down (cis off-target)."
+        },
+        {
+          "name": "ontarget_effect_size",
+          "facet_role": "effect",
+          "description": "Effect size of the perturbation on its intended target gene."
+        },
+        {
+          "name": "ontarget_significant",
+          "facet_role": "quality",
+          "description": "On-target knockdown significant (10% FDR)?"
+        },
+        {
+          "name": "single_guide_estimate",
+          "facet_role": "quality",
+          "description": "DE estimate came from a single guide only."
+        },
+        {
+          "name": "target_baseMean",
+          "facet_role": "effect",
+          "description": "Mean baseline expression of the target gene."
+        },
+        {
+          "name": "target_condition",
+          "facet_role": "id",
+          "description": "Observation key `{target_contrast}_{culture_condition}` in the per-guide / per-donor-pair modalities."
+        },
+        {
+          "name": "target_contrast",
+          "facet_role": "target",
+          "description": "Ensembl gene ID of the perturbed gene (object of measurement)."
+        },
+        {
+          "name": "target_contrast_gene_name",
+          "facet_role": "target",
+          "description": "Symbol of the perturbed gene."
+        }
+      ],
+      "layer_fields": [
+        {
+          "name": "adj_p_value",
+          "facet_role": "quality",
+          "description": "FDR-adjusted p-value."
+        },
+        {
+          "name": "baseMean",
+          "facet_role": "effect",
+          "description": "Mean normalized expression per gene (DE baseline)."
+        },
+        {
+          "name": "lfcSE",
+          "facet_role": "error",
+          "description": "Standard error of log fold change (the SE the G-study needs)."
+        },
+        {
+          "name": "log_fc",
+          "facet_role": "effect",
+          "description": "Log2 fold change (per perturbation x gene)."
+        },
+        {
+          "name": "p_value",
+          "facet_role": "quality",
+          "description": "Raw DE p-value."
+        },
         {
           "name": "zscore",
           "facet_role": "effect",
-          "description": "Per-guide DE z-score; same schema as DE_stats.h5ad."
+          "description": "DE z-score = logFC / lfcSE (the effect-profile vector)."
         }
       ]
     },
     "GWCD4i.DE_stats.by_donors.h5mu": {
-      "downloaded": false,
-      "size": "15.7 GB",
-      "grain": "one modality per donor-pair, each (target x condition)",
-      "why_needed": "Per-donor-pair DE effect vectors -> raw material to FIT the donor variance component.",
-      "documented_fields": [
+      "downloaded": true,
+      "size_bytes": 16866278447,
+      "size": "16.87 GB",
+      "why_needed": "Per-donor-pair DE effect vectors (one modality per donor-pair) -> raw material to FIT the donor variance component.",
+      "top_level_keys": [
+        "mod",
+        "obs",
+        "obsm",
+        "obsmap",
+        "obsp",
+        "uns",
+        "var",
+        "varm",
+        "varmap",
+        "varp"
+      ],
+      "n_obs": 4880,
+      "modalities": [
+        "CE0006864_CE0008162",
+        "CE0006864_CE0008678",
+        "CE0006864_CE0010866",
+        "CE0008162_CE0008678",
+        "CE0008162_CE0010866",
+        "CE0008678_CE0010866"
+      ],
+      "grain": "6 modalities, each (target x condition)",
+      "obs_fields": [
+        {
+          "name": "chunk",
+          "facet_role": "meta",
+          "description": "DE processing group identifier."
+        },
+        {
+          "name": "culture_condition",
+          "facet_role": "condition",
+          "description": "Stimulation condition facet: Rest / Stim8hr / Stim48hr."
+        },
+        {
+          "name": "distal_offtarget_flag",
+          "facet_role": "quality",
+          "description": "Potential distal off-target (predicted alignment + down-regulation)."
+        },
+        {
+          "name": "donor_correlation_all_mean",
+          "facet_role": "reliability",
+          "description": "Mean over donor-pair Pearson r of per-gene DE logFC (all genes). -> first-pass R_donor."
+        },
+        {
+          "name": "donor_correlation_all_min",
+          "facet_role": "reliability",
+          "description": "Min over donor-pairs (conservative R_donor)."
+        },
+        {
+          "name": "donor_correlation_hits_mean",
+          "facet_role": "reliability",
+          "description": "Mean cross-donor r on per-target hit genes."
+        },
+        {
+          "name": "donor_correlation_hits_min",
+          "facet_role": "reliability",
+          "description": "Min cross-donor r on hit genes."
+        },
+        {
+          "name": "guide_correlation_all",
+          "facet_role": "reliability",
+          "description": "Pearson r between the two guides' per-gene DE z-scores, all genes. NaN if only one guide. -> first-pass R_guide."
+        },
+        {
+          "name": "guide_correlation_all_pval",
+          "facet_role": "reliability",
+          "description": "p-value for guide_correlation_all."
+        },
+        {
+          "name": "guide_correlation_signif",
+          "facet_role": "reliability",
+          "description": "Same guide correlation, restricted to significant DE genes."
+        },
+        {
+          "name": "guide_correlation_signif_pval",
+          "facet_role": "reliability",
+          "description": "p-value for guide_correlation_signif."
+        },
+        {
+          "name": "guide_n_signif_ontarget",
+          "facet_role": "quality",
+          "description": "Number of guides with a significant on-target effect."
+        },
+        {
+          "name": "low_target_gex",
+          "facet_role": "quality",
+          "description": "Target gene low baseline expression (KD estimate unreliable)."
+        },
+        {
+          "name": "n_cells_target",
+          "facet_role": "quality",
+          "description": "Number of cells with a targeting guide for this perturbation."
+        },
+        {
+          "name": "n_down_genes",
+          "facet_role": "effect",
+          "description": "Count of significantly downregulated genes (10% FDR)."
+        },
+        {
+          "name": "n_downstream",
+          "facet_role": "effect",
+          "description": "Downstream (trans) DE genes, excluding the on-target effect."
+        },
+        {
+          "name": "n_guides",
+          "facet_role": "quality",
+          "description": "Number of guides aggregated into the per-target DE estimate."
+        },
+        {
+          "name": "n_total_de_genes",
+          "facet_role": "effect",
+          "description": "Total significantly DE genes at 10% FDR (a candidate E_t)."
+        },
+        {
+          "name": "n_total_genes_category",
+          "facet_role": "effect",
+          "description": "Category based on number of trans-effects."
+        },
+        {
+          "name": "n_up_genes",
+          "facet_role": "effect",
+          "description": "Count of significantly upregulated genes (10% FDR)."
+        },
+        {
+          "name": "neighboring_gene_KD",
+          "facet_role": "quality",
+          "description": "Adjacent gene also knocked down (cis off-target)."
+        },
+        {
+          "name": "ontarget_effect_size",
+          "facet_role": "effect",
+          "description": "Effect size of the perturbation on its intended target gene."
+        },
+        {
+          "name": "ontarget_significant",
+          "facet_role": "quality",
+          "description": "On-target knockdown significant (10% FDR)?"
+        },
+        {
+          "name": "single_guide_estimate",
+          "facet_role": "quality",
+          "description": "DE estimate came from a single guide only."
+        },
+        {
+          "name": "target_baseMean",
+          "facet_role": "effect",
+          "description": "Mean baseline expression of the target gene."
+        },
+        {
+          "name": "target_condition",
+          "facet_role": "id",
+          "description": "Observation key `{target_contrast}_{culture_condition}` in the per-guide / per-donor-pair modalities."
+        },
+        {
+          "name": "target_contrast",
+          "facet_role": "target",
+          "description": "Ensembl gene ID of the perturbed gene (object of measurement)."
+        },
+        {
+          "name": "target_contrast_gene_name",
+          "facet_role": "target",
+          "description": "Symbol of the perturbed gene."
+        }
+      ],
+      "layer_fields": [
+        {
+          "name": "adj_p_value",
+          "facet_role": "quality",
+          "description": "FDR-adjusted p-value."
+        },
+        {
+          "name": "baseMean",
+          "facet_role": "effect",
+          "description": "Mean normalized expression per gene (DE baseline)."
+        },
+        {
+          "name": "lfcSE",
+          "facet_role": "error",
+          "description": "Standard error of log fold change (the SE the G-study needs)."
+        },
+        {
+          "name": "log_fc",
+          "facet_role": "effect",
+          "description": "Log2 fold change (per perturbation x gene)."
+        },
+        {
+          "name": "p_value",
+          "facet_role": "quality",
+          "description": "Raw DE p-value."
+        },
         {
           "name": "zscore",
           "facet_role": "effect",
-          "description": "Per-donor-pair DE z-score; same schema as DE_stats.h5ad."
+          "description": "DE z-score = logFC / lfcSE (the effect-profile vector)."
         }
       ]
-    },
+    }
+  },
+  "products_not_downloaded": {
     "guide_kd_efficiency.suppl_table.csv": {
       "downloaded": false,
       "size": "small (companion GitHub repo emdann/GWT_perturbseq_analysis_2025, NOT this S3 bucket)",
