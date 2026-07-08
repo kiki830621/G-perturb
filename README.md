@@ -1,10 +1,10 @@
 # G-perturb
 
-**Reliability-weighted target ranking for CD4+ T cell Perturb-seq — a generalizability-theory framework for target prioritization.**
+**A distribution-light generalizability decomposition of CD4+ T cell Perturb-seq — how much of each perturbation's effect is dependable (across guides, donors, conditions) versus irreducible idiosyncrasy, with a reliability-weighted target ranking as a by-product.**
 
 > Built for **Built with Claude: Life Sciences** (Researcher track, 2026), in partnership with Gladstone Institutes. All work in this repository is done from scratch during the hackathon, per the event rules.
 
-> 📄 Full design rationale and method write-up: [`docs/design.md`](./docs/design.md) — the single canonical design (per-domain generalizability profile + scalar ranking + criterion validation).
+> 📄 Full design rationale and method write-up: [`docs/design.md`](./docs/design.md) — the single canonical design. **Headline deliverable (2026-07 reframe, issue #8): the design-level generalizability decomposition** — facet variance shares plus an irreducible replication floor, estimated distribution-light — with the scalar ranking demoted to a sanity-check stepping-stone and criterion validation as corroboration.
 
 ---
 
@@ -18,7 +18,7 @@ It does **not** answer the question target discovery actually depends on:
 
 > Will the effect **hold up** with another guide, another donor, another cell-state context?
 
-These are different questions. A target can have a large apparent effect but be fragile (two guides disagree, one donor drives it, weak knockdown, off-target flag). A moderate-effect target that is consistent across guides and donors may be the better validation bet. **G-perturb treats each perturbation effect as a measured score and ranks targets by effect magnitude × measurement dependability × perturbation quality.**
+These are different questions. A target can have a large apparent effect but be fragile (two guides disagree, one donor drives it, weak knockdown, off-target flag). A moderate-effect target that is consistent across guides and donors may be the better validation bet. **G-perturb treats each perturbation effect as a measured score and decomposes its variance across guide, donor, and condition facets — reporting how much of the effect is dependable versus irreducible idiosyncrasy, distribution-light.** The reliability-weighted target ranking (effect magnitude × dependability × quality) falls out as a by-product / sanity-check, not the headline.
 
 ## Why it's a measurement problem
 

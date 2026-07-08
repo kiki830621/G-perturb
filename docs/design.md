@@ -7,6 +7,8 @@
 
 > This is the **single source of truth** for the G-perturb design. It merges the two earlier drafts — the scalar reliability-weighted ranking (issue #2) and the domain-specific generalizability profile (issue #3) — into one coherent method, and integrates the methodology critique tracked in issue #4. The scalar ranking and the profile are **two deliverables of one design**, not two designs: the profile is the primary object, and the scalar score is an aggregation of it.
 
+> **Reframe (2026-07 · issue #8 → openspec change `generalizability-decomposition`).** The **headline deliverable** is the **design-level generalizability decomposition** — facet variance shares (guide / donor / condition / target × interactions) plus an **irreducible replication floor** — estimated **distribution-light** (no Gaussian random-effects assumption). The scalar `E × R × Q` ranking (§9) is retained as a **sanity-check stepping-stone**, not the deliverable; the per-target profile and criterion validation (§13) become the **shrunk view** and the **corroboration**, not the headline. Method (see §10.4; full contract in the openspec design): a **distance-based / permutational decomposition on the gene-expression profiles** as primary (closes the §10.3 coherence gap, reuses the §8 permutation null), with a **Gaussian crossed REML on a scalar summary as a shipped baseline comparator**; per-target dependability reconciled with 2-guide/4-donor sparsity via **moment-based / Fay–Herriot empirical-Bayes shrinkage** (not Gaussian REML); the **donor facet as split-half generalizability** (the release exposes disjoint-split-half correlations + overlapping C(4,2) pair modalities), never a one-way effect over 4 donors. **Terminology:** the deliverable is **"distribution-light / assumption-lean"**; "distribution-free" is reserved for the replication floor alone. The two per-facet `h5mu` are therefore **core inputs** (§16), not MVP-optional. The July-13 hackathon cut ships this with established methods only; the profile-native novel estimator and rigorous overlap-aware inference are the post-hackathon paper.
+
 ---
 
 ## 1. One-sentence summary
@@ -186,7 +188,9 @@ Key principle: **condition disagreement may be the biological signal, not noise.
 
 ---
 
-## 9. The scalar score and ranking (deliverable for #2)
+## 9. The scalar score and ranking (sanity-check stepping-stone)
+
+> **Demoted by the 2026-07 reframe.** This multiplicative ranking is now the fast sanity-check stepping-stone, not the headline deliverable. The headline is the distribution-light decomposition of §10.4. The section is kept because the ranking remains a useful first-pass ordering and the disagreement table it produces is still shown.
 
 For ranking, aggregate the profile into a scalar. The simplest form:
 
@@ -242,6 +246,18 @@ From the same posterior, rank by `P(τ_t > c | data)` where `τ_t` is the univer
 ### 10.3 Coherence gap to close, and KD normalization
 
 The reliability metric uses the genome-wide **vector** (profile agreement) while the variance-component model above is written for a **scalar** `y`. Reconcile by either (a) decomposing per-gene then aggregating, (b) using a profile-level (multivariate / distance-based) generalizability formulation, or (c) defining an explicit scalar summary (e.g. projection onto the target's own leading effect direction). Separately, because a weak effect may reflect poor knockdown rather than no downstream role, `E_t` is normalized to **effect per unit on-target knockdown**, and QC enters the model as a **covariate**, not as a hard multiplicative gate (§11).
+
+### 10.4 Distribution-light realization (the deliverable)
+
+The realized decomposition **drops the Gaussian random-effects assumption**; this subsection is the headline method (2026-07 reframe).
+
+- **Primary — distance-based / permutational decomposition on the profiles.** Define an agreement-based dissimilarity `d(i,j)` (for example `1 − CCC`) between target-resolved gene-expression profiles, decompose the total dispersion into facet-attributable shares for guide / donor / condition / target × interactions, and take inference from the §8 different-gene permutation null. This operates on the ~10k-gene profile directly (closing the §10.3 coherence gap) and needs no normality.
+- **Baseline comparator — Gaussian crossed REML.** The §10.1 scalar-summary REML is fit and reported **alongside** as a baseline, never as the primary result (mac-benchmark posture: a Gaussian core wrapped in distribution-free reporting).
+- **Per-target dependability — moment-based / Fay–Herriot empirical Bayes.** `R_dep,t` is the per-target distance statistic shrunk toward the pooled design-level value by its **measured sampling variance** — distribution-light, not Gaussian REML. Single-guide targets (undefined guide agreement) are handled by a QC covariate / donor fallback, not dropped.
+- **Irreducible replication floor.** Dispersion among identical-facet replicate profiles (the two guides of a target; the two halves of the donor split) is an **assumption-free lower bound** no facet model can cross. This floor is the **only** quantity the deliverable labels *distribution-free*.
+- **Donor facet — split-half generalizability.** Estimated from the released disjoint donor-pair splits (Spearman–Brown-projectable) or the overlapping pair modalities, never a one-way variance component over four individual donors.
+
+The novel profile-native estimator, rigorous overlap-aware permutation, and the full multivariate coherence formalization are the **post-hackathon paper**, out of scope for the July-13 cut.
 
 ---
 
@@ -302,9 +318,9 @@ This **domain-specific evidence map** is the core deliverable; the scalar rankin
 
 | Stage | Inputs | Notes |
 |---|---|---|
-| **MVP** | `DE_stats.h5ad` (`.obs` correlations + `.layers` z-vectors) | First-pass `R_dep,t` from released Pearson-type correlation fields + QC flags; ranking vs standard DE; disagreement table |
-| **Criterion check** | `Th1Th2_validation`, `K562_comparison` CSVs | §13 — cheap join + correlation/AUC; run early, it is the headline result |
-| **Full** | `by_guide.h5mu`, `by_donors.h5mu` | Hierarchical variance-component fit (§10); ICC/CCC upgrade; D-study with bands |
+| **Sanity-check stepping-stone** | `DE_stats.h5ad` (`.obs` correlations + `.layers` z-vectors) | First-pass `R_dep,t` from released Pearson-type correlation fields + QC flags; ranking vs standard DE; disagreement table. Not the deliverable (§9). |
+| **Headline decomposition (core)** | `by_guide.h5mu` + `by_donors.h5mu` (**core inputs**) | Distribution-light decomposition of §10.4: facet variance shares + replication floor; Fay–Herriot per-target `R_dep,t`; Gaussian REML baseline comparator. |
+| **Corroboration** | `K562_comparison` CSV (and the arrayed `Th1Th2` table **if available** — see `analysis/data/DATA_AND_ASSUMPTIONS.md`) | §13 — reliability→replication; degrades to K562-only + marked partial when the arrayed table is absent. |
 
 Raw data is not committed (rights + size); see `analysis/data/CODEBOOK.json` and `fetch_data.sh`.
 

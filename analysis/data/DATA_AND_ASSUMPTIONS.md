@@ -97,18 +97,24 @@ Effect + QC fields also live in `.obs`: `ontarget_effect_size`, `n_total_de_gene
 The scope is driven by the analysis goal, not by "grab everything". Mapping each goal to the minimum
 data:
 
+> **Updated by the 2026-07 reframe (issue #8 → change `generalizability-decomposition`).** The deliverable
+> is now the full **distribution-light decomposition** (design §10.4), so the two `h5mu` are **core inputs**,
+> not MVP-optional. The earlier "`h5ad` alone is sufficient" answer held only for the retired heuristic MVP.
+
 | Analysis goal | Needs | Have it? |
 |---|---|---|
-| **Heuristic MVP ranking** `Priority_t = E_t × R_dep,t × Q_t` (design §9, §16) | `DE_stats.h5ad` **only** (`.obs` reliability + `.layers` effect) | ✅ |
-| **The finding — criterion validation** (design §13) | `K562_comparison.suppl_table.csv` + an arrayed-validation table | ❌ companion repo / unresolved |
-| **Knockdown-normalized effect** `Q_t` covariate (design §11, §10.3) | `guide_kd_efficiency.suppl_table.csv` | ❌ companion repo |
-| **ICC / Lin's CCC upgrade + permutation null** (design §7, §8) | `by_guide.h5mu` (paired guide vectors) + `by_donors.h5mu` | ✅ |
-| **Full crossed variance-component / hierarchical model** (design §10) | `by_guide.h5mu` + `by_donors.h5mu` | ✅ |
+| **Headline: distribution-light decomposition** (design §10.4) | `by_guide.h5mu` + `by_donors.h5mu` (**core inputs** — the paired per-guide / per-donor-pair vectors) | ✅ |
+| **Corroboration: criterion validation** (design §13) | `K562_comparison.suppl_table.csv` (+ arrayed `Th1Th2` if available) | ✅ K562 fetched · ⚠ `Th1Th2` unavailable |
+| **Knockdown-normalized effect** `Q_t` covariate (design §11) | `guide_kd_efficiency.suppl_table.csv` | ✅ fetched |
+| **Sanity-check stepping-stone** `E × R × Q` (design §9) | `DE_stats.h5ad` only (`.obs` reliability + `.layers` effect) | ✅ |
 
-**Verdict.** For the finding-first submission MVP, **`DE_stats.h5ad` alone is sufficient** — the two
-46 GB `h5mu` are *not* required for the `E × R × Q` ranking; they are the raw material for the ICC/CCC
-upgrade and the full variance model (design §10, marked Depth / future work). So the honest answer to
-"did we need to download everything?" is **no for the MVP**: the ranking runs off the 16.8 GB `h5ad`.
+**Verdict.** The two 46 GB `h5mu` are **required** — they are the raw per-guide / per-donor-pair vectors the
+distribution-light decomposition (§10.4) consumes. The 16.8 GB `h5ad` alone runs only the retired heuristic
+(now the labelled sanity-check stepping-stone). So "did we need to download everything?" is now **yes for the
+core h5mu** (the h5ad-only path is the stepping-stone, not the deliverable). The criterion inputs
+`K562_comparison` and `guide_kd_efficiency` are **now fetched** from the companion repo; the arrayed
+`Th1Th2_validation_summary` remains **unavailable** (404 on S3, absent by name in the companion repo), so
+criterion validation is **K562-only and marked partial** (design §13).
 
 **Two gaps the download did not cover — and they are the important ones:**
 
