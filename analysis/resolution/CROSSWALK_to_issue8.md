@@ -11,7 +11,7 @@ manifest (B-001). Synthetic-stage outcomes already produced this turn are filled
 
 | #8 artifact | Action | Driven by | Status |
 |---|---|---|---|
-| `proposal.md` (h5mu-marginal, `1−CCC`, Fay–Herriot) | **replace** headline with the winning candidate + honest floor | synthetic recovery winner + identifiability | winner **pending-joint** (synthetic: PWM leads under Gaussian) |
+| `proposal.md` (h5mu-marginal, `1−CCC`, Fay–Herriot) | **replace** headline with the winning candidate + honest floor | synthetic recovery winner + identifiability | **method selected: PWM** (full synthetic recovery, only candidate PASSing both scenarios; KDP/RHF FAIL). Real-data application **pending-joint** |
 | `design.md` §9 scalar heuristic | **keep** as sanity-check stepping-stone | unchanged reframe | keep |
 | `design.md` §10.4 distribution-light core | **replace** the estimator with the selected candidate | `results/synthetic_recovery/` | **pending-joint** full verdict |
 | `design.md` replication floor | **replace** with `not_identifiable` unless a lane replicate exists | `results/identifiability.json` R1 | **resolved (synthetic)**: merged pseudobulk floor = `not_identifiable` |
@@ -27,7 +27,7 @@ manifest (B-001). Synthetic-stage outcomes already produced this turn are filled
 | B-001 | frozen manifest over real joint pseudobulk | `results/evidence.manifest.json` | **pending-joint** (builder ready, fail-closed) |
 | B-002/B-003 | design-rank + separability fail-closed | `results/identifiability.json` | **resolved (synthetic)** |
 | B-004/B-006 | type-I ∈ [0.04, 0.06] at full MC | `results/type_I_calibration.json` | smoke ok; **full → cluster** |
-| B-005/B-007 | bias ≤ 0.02, coverage ∈ [0.93,0.97], winner's-curse slope ∈ [0.9,1.1] | `results/synthetic_recovery/` | bias **resolved** (PWM 0.004 Gaussian); coverage/slope **pending full** |
+| B-005/B-007 | bias ≤ 0.02, coverage ∈ [0.93,0.97], winner's-curse slope ∈ [0.9,1.1] | `results/synthetic_recovery/` | bias/RMSE **resolved at full MC** (PWM PASS both: 0.001/0.005 bias, 0.025/0.045 rmse); coverage + winner's-curse slope **not yet implemented** (next metrics) |
 | B-008/B-009 | FDR ≤ 0.06, pathway nulls separated | `results/fdr_pathway.json` | **resolved (synthetic)** |
 | B-010 | leak-free validation manifest, honest taxonomy | `results/validation_manifest.json` | **resolved** |
 | B-011 | shard benchmark, no densify | `results/compute_benchmark.json` | **resolved (synthetic proxy)** |

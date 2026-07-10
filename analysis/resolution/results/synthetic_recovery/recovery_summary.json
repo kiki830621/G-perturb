@@ -1,0 +1,183 @@
+{
+  "frozen_gates_sha256": "98b23c441fd8866f87f3c5e61b7ff9c60720c04c9bcbf083815fc68be943f74c",
+  "scale": "full",
+  "reps": 2000,
+  "n_target": 400,
+  "full_reps_required": 2000,
+  "rmse_gate_note": "rmse precision is design-scale dependent (~1/sqrt(n_target)); frozen rmse_max assumes the real many-target design",
+  "selection_rule": "primary = min synthetic loss among gate-passing candidates; external validation never enters",
+  "candidate_disagreement": {
+    "value": 0.0864,
+    "trigger_gt": 0.05
+  },
+  "results": [
+    {
+      "scenario": "gaussian",
+      "candidate": "precision_weighted_multivariate",
+      "scale": "full",
+      "reps_effective": 2000,
+      "bias": {
+        "T": -0.0011,
+        "TG": 0.0004,
+        "TD": 0.0004,
+        "res": 0.0003
+      },
+      "rmse": {
+        "T": 0.0246,
+        "TG": 0.0115,
+        "TD": 0.0117,
+        "res": 0.0079
+      },
+      "max_abs_bias": 0.0011,
+      "max_rmse": 0.0246,
+      "gate": {
+        "bias_abs_max": 0.02,
+        "rmse_max": 0.05
+      },
+      "negative_component_reps": 0,
+      "fit_failures": 0,
+      "verdict": "PASS",
+      "elapsed_s": 107.7
+    },
+    {
+      "scenario": "gaussian",
+      "candidate": "kernel_distance_permutational",
+      "scale": "full",
+      "reps_effective": 2000,
+      "bias": {
+        "T": 0.1096,
+        "TG": -0.0593,
+        "TD": -0.0261,
+        "res": -0.0242
+      },
+      "rmse": {
+        "T": 0.111,
+        "TG": 0.0596,
+        "TD": 0.0277,
+        "res": 0.025
+      },
+      "max_abs_bias": 0.1096,
+      "max_rmse": 0.111,
+      "gate": {
+        "bias_abs_max": 0.02,
+        "rmse_max": 0.05
+      },
+      "negative_component_reps": 0,
+      "fit_failures": 0,
+      "verdict": "FAIL",
+      "elapsed_s": 107.7
+    },
+    {
+      "scenario": "gaussian",
+      "candidate": "robust_hierarchical_functional",
+      "scale": "full",
+      "reps_effective": 2000,
+      "bias": {
+        "T": 0.0158,
+        "TG": 0.0027,
+        "TD": 0.0027,
+        "res": -0.0212
+      },
+      "rmse": {
+        "T": 0.0293,
+        "TG": 0.0122,
+        "TD": 0.0125,
+        "res": 0.0224
+      },
+      "max_abs_bias": 0.0212,
+      "max_rmse": 0.0293,
+      "gate": {
+        "bias_abs_max": 0.02,
+        "rmse_max": 0.05
+      },
+      "negative_component_reps": 0,
+      "fit_failures": 0,
+      "verdict": "FAIL",
+      "elapsed_s": 107.7
+    },
+    {
+      "scenario": "heavy",
+      "candidate": "precision_weighted_multivariate",
+      "scale": "full",
+      "reps_effective": 2000,
+      "bias": {
+        "T": -0.0051,
+        "TG": 0.001,
+        "TD": 0.0018,
+        "res": 0.0022
+      },
+      "rmse": {
+        "T": 0.0454,
+        "TG": 0.0214,
+        "TD": 0.0238,
+        "res": 0.0159
+      },
+      "max_abs_bias": 0.0051,
+      "max_rmse": 0.0454,
+      "gate": {
+        "bias_abs_max": 0.02,
+        "rmse_max": 0.05
+      },
+      "negative_component_reps": 0,
+      "fit_failures": 0,
+      "verdict": "PASS",
+      "elapsed_s": 93.9
+    },
+    {
+      "scenario": "heavy",
+      "candidate": "kernel_distance_permutational",
+      "scale": "full",
+      "reps_effective": 2000,
+      "bias": {
+        "T": 0.1063,
+        "TG": -0.0589,
+        "TD": -0.0249,
+        "res": -0.0226
+      },
+      "rmse": {
+        "T": 0.1114,
+        "TG": 0.0599,
+        "TD": 0.031,
+        "res": 0.0261
+      },
+      "max_abs_bias": 0.1063,
+      "max_rmse": 0.1114,
+      "gate": {
+        "bias_abs_max": 0.02,
+        "rmse_max": 0.05
+      },
+      "negative_component_reps": 0,
+      "fit_failures": 0,
+      "verdict": "FAIL",
+      "elapsed_s": 93.9
+    },
+    {
+      "scenario": "heavy",
+      "candidate": "robust_hierarchical_functional",
+      "scale": "full",
+      "reps_effective": 2000,
+      "bias": {
+        "T": 0.0288,
+        "TG": 0.0065,
+        "TD": 0.0073,
+        "res": -0.0426
+      },
+      "rmse": {
+        "T": 0.0535,
+        "TG": 0.0235,
+        "TD": 0.0261,
+        "res": 0.0441
+      },
+      "max_abs_bias": 0.0426,
+      "max_rmse": 0.0535,
+      "gate": {
+        "bias_abs_max": 0.02,
+        "rmse_max": 0.05
+      },
+      "negative_component_reps": 0,
+      "fit_failures": 0,
+      "verdict": "FAIL",
+      "elapsed_s": 93.9
+    }
+  ]
+}
