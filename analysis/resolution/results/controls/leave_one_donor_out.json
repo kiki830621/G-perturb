@@ -1,0 +1,9 @@
+{
+  "control": "leave_one_donor_out",
+  "scale": "synthetic",
+  "n_donor": 4,
+  "min_rank_spearman": 0.986,
+  "mean_rank_spearman": 0.987,
+  "stable": true,
+  "note": "ranking rank-correlation across donor holdouts >= 0.8 (frozen control)"
+}

@@ -1,0 +1,58 @@
+{
+  "rule": "any source informing thresholds/weights/model-selection is TUNING and cannot be cited as untouched validation; independent claims require a reserved holdout or a separate source",
+  "taxonomy_legend": {
+    "internal": "same CD4 data / synthetic — in-sample or method-selection, never validation",
+    "internal_sensitivity": "same CD4 data, different analysis — sensitivity only",
+    "cross_cell_type_transportability": "K562 etc. — transportability, not replication",
+    "assay_translation": "arrayed bulk/flow — assay translation",
+    "t_cell_replication": "true independent T-cell replicate lane — the only 'independent replication' claim"
+  },
+  "sources": [
+    {
+      "id": "cd4_joint_pseudobulk",
+      "role": "primary_analysis",
+      "used_for_tuning": true,
+      "taxonomy": "internal",
+      "allowed_claim": "the estimand itself (in-sample decomposition)"
+    },
+    {
+      "id": "synthetic_recovery",
+      "role": "method_selection",
+      "used_for_tuning": true,
+      "taxonomy": "internal",
+      "allowed_claim": "method selection + calibration (pre-registered)"
+    },
+    {
+      "id": "cd4_pathway_same_data",
+      "role": "secondary_sensitivity",
+      "used_for_tuning": false,
+      "taxonomy": "internal_sensitivity",
+      "allowed_claim": "sensitivity, NOT independent validation"
+    },
+    {
+      "id": "k562_comparison",
+      "role": "external",
+      "used_for_tuning": false,
+      "taxonomy": "cross_cell_type_transportability",
+      "allowed_claim": "transportability, NOT T-cell replication"
+    },
+    {
+      "id": "arrayed_bulk_flow",
+      "role": "external",
+      "used_for_tuning": false,
+      "taxonomy": "assay_translation",
+      "allowed_claim": "assay translation"
+    },
+    {
+      "id": "t_cell_replicate_lane",
+      "role": "holdout_if_available",
+      "used_for_tuning": false,
+      "taxonomy": "t_cell_replication",
+      "allowed_claim": "independent T-cell replication (only if a true replicate lane exists)"
+    }
+  ],
+  "leak_check": {
+    "violations": 0,
+    "clean": true
+  }
+}

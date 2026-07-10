@@ -1,0 +1,58 @@
+{
+  "payload": {
+    "schema_version": "1.0",
+    "source": "docs/reviews/sol-pass-b-adversarial-statistical-review.md#7",
+    "findings_covered": ["B-001", "B-002", "B-003", "B-004", "B-005", "B-006", "B-007", "B-008", "B-009", "B-010", "B-011"],
+    "candidates": ["precision_weighted_multivariate", "kernel_distance_permutational", "robust_hierarchical_functional"],
+    "selection_rule": "primary method chosen ONLY by synthetic-recovery loss among gate-passing candidates; external validation never enters selection",
+    "fail_closed": "any quantity not identifiable from the real joint design is reported not_identifiable, never fabricated",
+    "thresholds": {
+      "monte_carlo": {
+        "null_reps_min": 5000,
+        "power_reps_min": 2000
+      },
+      "type_I": {
+        "target": 0.05,
+        "accept_lo": 0.04,
+        "accept_hi": 0.06
+      },
+      "fdr": {
+        "target": 0.05,
+        "accept_hi": 0.06
+      },
+      "false_sign_rate": {
+        "accept_hi": 0.01
+      },
+      "interval_coverage": {
+        "nominal": 0.95,
+        "accept_lo": 0.93,
+        "accept_hi": 0.97
+      },
+      "component_recovery": {
+        "bias_abs_max": 0.02,
+        "rmse_max": 0.05
+      },
+      "winners_curse": {
+        "slope_lo": 0.9,
+        "slope_hi": 1.1
+      },
+      "d_study": {
+        "monotone_in_reps": true
+      },
+      "candidate_disagreement": {
+        "trigger_gt": 0.05
+      },
+      "compute": {
+        "shard_benchmark_required": true,
+        "densify_full_matrix_forbidden": true
+      }
+    },
+    "controls": {
+      "ntc_vs_ntc": "NTC-vs-NTC null must fall within type_I accept band",
+      "guide_cross_fit": "held-out-guide effect estimates stable within component_recovery band",
+      "leave_one_donor_out": "ranking rank-correlation across donor holdouts >= 0.8",
+      "common_support": "condition contrasts restricted to R2-verified common support"
+    }
+  },
+  "sha256": "98b23c441fd8866f87f3c5e61b7ff9c60720c04c9bcbf083815fc68be943f74c"
+}

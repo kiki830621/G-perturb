@@ -1,0 +1,10 @@
+{
+  "control": "ntc_vs_ntc",
+  "scale": "smoke_reduced_mc",
+  "reps": 60,
+  "n_perm": 79,
+  "rejection_rate": 0.067,
+  "accept_band": [0.04, 0.06],
+  "within_band": false,
+  "note": "full scale (n_perm>=5000, real NTC targets) runs on the joint pseudobulk"
+}

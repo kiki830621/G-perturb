@@ -1,0 +1,26 @@
+{
+  "scale": "synthetic_demo",
+  "genewise": {
+    "scheme": "single atlas-wide BH over the target-blind gene universe, then stage-wise",
+    "target_gene_pairs": 80000,
+    "nonnull_fraction": 0.1,
+    "atlas_wide_realized_fdr": 0.0415,
+    "naive_per_target_realized_fdr": 0.0492,
+    "gate_fdr_max": 0.06,
+    "atlas_within_gate": true,
+    "demonstrates": "single atlas-wide control holds FDR; naive per-target control inflates it"
+  },
+  "pathway": {
+    "set_size": 40,
+    "competitive": {
+      "test": "CAMERA-like rank-sum (set vs rest)",
+      "p": 0.3381
+    },
+    "self_contained": {
+      "test": "ROAST-like permutation (set mean-square)",
+      "p": 0.587
+    },
+    "reported_separately": true,
+    "note": "competitive and self-contained answer different questions; both on signed all-gene stats, pinned gene-set version"
+  }
+}

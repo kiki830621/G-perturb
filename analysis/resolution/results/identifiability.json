@@ -1,0 +1,65 @@
+{
+  "regime_1_merged_pseudobulk": {
+    "describe": "joint design, one row per target-guide-donor-cond (the real merged pseudobulk)",
+    "design_rank": {
+      "term_status": {
+        "T": "empirically_passed",
+        "TG": "empirically_passed",
+        "TD": "empirically_passed",
+        "TGD": "empirically_passed"
+      },
+      "n": 720,
+      "n_finest_cells": 240,
+      "df_resid": 480
+    },
+    "replication_floor": {
+      "spec": ["target", "guide", "donor", "cond"],
+      "max_replicate": 1,
+      "status": "not_identifiable",
+      "note": "no identical-spec replicate: floor not_identifiable; combine highest-order interaction with sampling residual"
+    }
+  },
+  "regime_2_lane_replicate": {
+    "describe": "joint design plus a second lane per spec",
+    "design_rank": {
+      "term_status": {
+        "T": "empirically_passed",
+        "TG": "empirically_passed",
+        "TD": "empirically_passed",
+        "TGD": "empirically_passed"
+      },
+      "n": 1440,
+      "n_finest_cells": 240,
+      "df_resid": 1200
+    },
+    "replication_floor": {
+      "spec": ["target", "guide", "donor", "cond"],
+      "max_replicate": 2,
+      "status": "empirically_passed",
+      "note": "identical-spec replicate present"
+    }
+  },
+  "regime_3_marginal_over_guide": {
+    "describe": "guide aggregated away (h5mu marginal product)",
+    "design_rank": {
+      "term_status": {
+        "T": "empirically_passed",
+        "TG": "not_identifiable",
+        "TD": "empirically_passed"
+      },
+      "n": 360,
+      "n_finest_cells": 120,
+      "df_resid": 240
+    }
+  },
+  "regime_4_run_aliased_donor": {
+    "describe": "sequencing run perfectly aliased with donor",
+    "separability": {
+      "pair": ["donor", "run"],
+      "aliased": true,
+      "status": "not_identifiable",
+      "max_b_per_a": 1,
+      "max_a_per_b": 1
+    }
+  }
+}

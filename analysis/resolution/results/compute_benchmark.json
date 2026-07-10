@@ -1,0 +1,36 @@
+{
+  "scale": "synthetic_proxy_shards",
+  "shards": [
+    {
+      "n_target": 60,
+      "n_rows": 1440,
+      "fit_seconds": 0.043,
+      "df_mb": 0.1
+    },
+    {
+      "n_target": 200,
+      "n_rows": 4800,
+      "fit_seconds": 0.058,
+      "df_mb": 0.2
+    },
+    {
+      "n_target": 600,
+      "n_rows": 14400,
+      "fit_seconds": 0.108,
+      "df_mb": 0.7
+    },
+    {
+      "n_target": 1200,
+      "n_rows": 28800,
+      "fit_seconds": 0.226,
+      "df_mb": 1.5
+    }
+  ],
+  "fit_seconds_per_row": 6.72e-06,
+  "extrapolated_full_fit_seconds": 1.9,
+  "invariants": {
+    "no_densify_full_gene_by_target": true,
+    "backed_sparse_required_on_real": true
+  },
+  "note": "single-fit extrapolation; the >=5000-MC gate runs are cluster jobs (hmque/mulque, $PBS_NP)"
+}

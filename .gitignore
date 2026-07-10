@@ -45,3 +45,8 @@ Thumbs.db
 .impeccable/
 .spectra/
 openspec/.vector-search.db*
+
+# resolution pipeline — ignore logs + large data, keep small JSON evidence
+analysis/resolution/results/logs/
+analysis/resolution/**/*.h5ad
+analysis/resolution/**/*.h5mu

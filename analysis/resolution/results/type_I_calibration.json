@@ -1,0 +1,12 @@
+{
+  "alpha": 0.05,
+  "n_data": 25,
+  "n_perm": 59,
+  "rejection_rate": 0.08,
+  "mean_p": 0.6113,
+  "elapsed_s": 29.3,
+  "scale": "smoke_reduced_mc",
+  "accept_band": [0.04, 0.06],
+  "within_band": false,
+  "verdict": "smoke_only_not_a_gate_pass"
+}

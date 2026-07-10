@@ -1,0 +1,8 @@
+{
+  "control": "guide_cross_fit",
+  "scale": "synthetic",
+  "reps": 100,
+  "mean_cross_guide_cor": 0.795,
+  "stable": true,
+  "note": "held-out-guide target means should correlate; low correlation flags guide-driven artifacts"
+}

@@ -1,0 +1,8 @@
+{
+  "control": "common_support",
+  "scale": "synthetic",
+  "n_targets_intersection": 100,
+  "n_targets_union": 100,
+  "support_fraction": 1,
+  "note": "condition contrasts restricted to the R2-verified common support; real data may drop cells"
+}
