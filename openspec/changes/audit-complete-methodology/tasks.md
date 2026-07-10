@@ -1,0 +1,27 @@
+## 1. 證據與 Sol 審查輸入
+
+- [x] 1.1 交付 `Frozen evidence bundle`／`Evidence bundle is frozen before review` 契約：在方法文件建立版本化 manifest，列出每個 repo path、Git commit、issue comment URL、dataset metadata 與外部來源，且 Pass A/B 引用同一版本；驗證方式為逐項對照 issue #9 Diagnosis 的 evidence list，確認無缺項、無未版本化來源。
+- [x] 1.2 交付 `Three-pass GPT-5.6 Sol audit`、`Finding severity and adjudication gate` 與 `Sol review uses three isolated passes and fixed adjudication` 契約：在文件固定三份 exact prompts、`gpt-5.6-sol`、reasoning effort `max`、P0–P3 定義、九欄 finding schema 與 disposition 規則；驗證方式為內容審查確認三份 prompt 互不引用 A/B 輸出，且模型不可用時明確產生 blocked 狀態。
+- [x] [P] 1.3 執行隔離的 Sol Pass A architecture/identifiability review，產出包含 task identifier、timestamp、model config、evidence version 與完整 finding rows 的紀錄；驗證方式為檢查每個 finding 都有 evidence、affected claim、correction、severity，且 Pass A 看不到 Pass B 結果。
+- [x] [P] 1.4 執行隔離的 Sol Pass B adversarial statistical review，產出包含 task identifier、timestamp、model config、evidence version 與完整 finding rows 的紀錄；驗證方式為檢查 coverage 包含 exchangeability、measurement error、high-dimensional dependence、selection/FDR、validation leakage 與 compute，且 Pass B 看不到 Pass A 結果。
+
+## 2. 雙層方法契約
+
+- [x] 2.1 交付 `Estimand registry precedes estimator selection`／`Estimands precede estimators`：先在文件定義 condition-specific、fixed-domain average、relative ranking、absolute hit-call、donor-panel、guide-universe、T-cell replication 與 transportability estimands，再允許 estimator comparison；驗證方式為每個後續 estimator 都可回指一個 registry entry，且 allowed wording 未超出 decision universe。
+- [x] 2.2 交付 `Claim-to-data identifiability crosswalk`／`Data identifiability is a hard gate`：為每個 variance、reliability、floor、ranking、validation claim 填入 observation unit、required variation、available evidence、schema/rank gate、assumptions、status 與 allowed wording；驗證方式為 h5mu-only joint interaction 顯示 `marginal-only`/`not-identifiable`，未檢查 pseudobulk 的 gate 顯示 `design-specified` 而非 `empirically-passed`。
+- [x] 2.3 交付 `Profile primary and secondary interpretation layers`／`Profile primary and gene/pathway secondary are distinct`：比較三類 profile estimator，並完整定義 gene-wise two-stage/covariance/FDR 與 pathway CAMERA/ROAST-FRY/pinned-library 契約；驗證方式為 candidate comparison table 覆蓋 identifiability、additivity、gene dependence、sampling uncertainty、exchangeability、compute、synthetic recovery，且同一 CD4 資料產生的 secondary layer 未標為 independent validation。
+- [x] 2.4 交付 `Replication floor requires identical-spec replicates`：在文件以 target、guide、donor、condition 與其他 specification 相同定義 replicate，並建立 lane-available／lane-unavailable 兩條資料分支；驗證方式為 guide pair 與 donor split-half 明確不合格，merged pseudobulk 無 replicate 時 floor=`not_identifiable` 且最高階 interaction 與 sampling residual 合併。
+- [x] 2.5 交付 `Falsification and validation contract`／`Validation uses falsification and no leakage`：定義 synthetic scenarios、數值校準門檻、NTC controls、guide cross-fit、leave-one-donor-out、common-support sensitivity 與 external-evidence taxonomy；驗證方式為每個核心 claim 至少有一個 falsification test，K562 僅標 transportability，且任何調參來源都不再標 untouched validation。
+- [x] 2.6 將 2.1–2.5 組成具固定 16 章、finding ledger、estimand registry、identifiability crosswalk、method comparison、failure reason codes 與 quantitative verification targets 的 draft；驗證方式為 placeholder scan 不含任何未完成標記或空白模板，且每個 issue #9 acceptance criterion 都能定位到章節與驗證欄位。
+
+## 3. 整合、核准與交接
+
+- [ ] 3.1 執行 Sol Pass C integration/handoff review，以 frozen evidence、A/B findings 與完整 draft 為輸入，逐項檢查 cross-layer consistency 與 durable handoff；驗證方式為紀錄完整 provenance，並對 A/B 衝突各自產生 resolved、blocked 或 rejected-with-evidence disposition。
+- [ ] 3.2 交付 `Approval gate rejects unresolved P0/P1 findings`：整合三輪 findings，逐項補 verification，並將文件狀態設為 approved 或 blocked；驗證方式為 approved 文件沒有 unresolved/blocked P0/P1，blocked 文件列出每個解除條件且維持 #8 statistical core paused。
+- [ ] 3.3 交付 `Durable methodology document and downstream handoff`／`Handoff is a crosswalk, not a direct #8 rewrite`：建立 `docs/complete-methodology-review-and-upgrade-plan.md`，在 `docs/README.md` 加狀態標籤連結，並列出 #8 每個 proposal/design/spec/task 的 keep/replace/remove/add crosswalk；驗證方式為排除本 change 的 task-tracking artifacts 後，Git diff 只包含這兩個 docs artifacts，且 `openspec/changes/generalizability-decomposition/` 無差異。
+- [ ] 3.4 對最終文件做 requirement-by-requirement 驗收與 owner review handoff：核對所有 spec scenarios、16 章、三個 pass、P0/P1 gate、資料狀態與 #8 crosswalk；驗證方式為 `spectra analyze audit-complete-methodology --json` 無 Critical/Warning、`spectra validate audit-complete-methodology` 成功，並在交付摘要明確提示 owner 審閱後才可執行 `spectra-ingest`。
+
+## 4. Pass B 裁決與 paper-grade 解除條件（#10, CLAUDE.md）
+
+- [ ] 4.1 交付 `Paper-grade resolution of blocking findings`：在 methodology 文件的 finding ledger 記錄 Pass B **blocked** 裁決與 B-001…B-011 全部 11 條，並把 §7 falsification gates（MC 規模、type-I、FDR、coverage、component recovery、winner's-curse slope、D-study monotonicity、candidate-disagreement、compute）與 §8 controls（NTC-vs-NTC、guide cross-fit、leave-one-donor-out、R2 common-support、external-evidence taxonomy）逐項 pin 成帶數值門檻的 machine-checkable unblock-condition。驗證方式為每條 P0/P1 都對到一個具 pre-registered 數值門檻的解除條件，無門檻留白，且門檻值與 `docs/reviews/sol-pass-b-adversarial-statistical-review.md` §7 一致。
+- [ ] 4.2 落實設計決策「Paper-grade resolution is mandatory — a blocked audit triggers a resolution programme, not project completion」：在 methodology 文件與 #8 crosswalk（task 3.3）記錄：依 CLAUDE.md paper-grade 標準，`blocked` 不是終態；解除 P0/P1 需要一個 **follow-on empirical change**（下載 joint pseudobulk + 凍結新 evidence manifest + 三候選 synthetic recovery + 全部 §8 controls，通過全部 §7 gates），且該 follow-on 明列為 next step。驗證方式為 crosswalk 內有一列指向 follow-on resolution programme，並標明它 supersede 本 change 的 data/simulation Non-Goals；文件不得把 `blocked` 描述為可交付的最終狀態。
