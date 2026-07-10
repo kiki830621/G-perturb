@@ -1214,3 +1214,13 @@ A與B沒有對同一實證問題作相反判決：兩者都判定actual joint ob
 5. #8依§14.1順序執行；每次method或data scope改變都更新manifest並重跑受影響simulation／review，不沿用舊approval。
 
 Ingest完成的definition of done是：#8四個artifacts與project/data docs均能逐項回指本文件的estimand、gate、status、reason code與verification；沒有任何task把未下載、未驗證或不可識別的quantity寫成已承諾數值。
+
+### 16.7 Follow-on empirical resolution programme（`resolve-methodology-blockers`, #10）
+
+依`CLAUDE.md`的paper-grade標準，本文件的`blocked`**不是可交付的最終狀態**——它觸發一個follow-on empirical change：**`resolve-methodology-blockers`**（OpenSpec change，capability `methodology-resolution`，Refs #9／#10）。該change是解除B-001…B-011的唯一合法路徑：下載真實~44.6 GB joint pseudobulk並凍結新evidence manifest → fail-closed可識別性實測 → 三候選pre-registered synthetic recovery（滿足全部凍結§7 gates與§8 controls）→ 只由synthetic loss選定primary method → 產出本§16 crosswalk的實測gate結果。
+
+| Crosswalk 行 | 對象 | 狀態 |
+|---|---|---|
+| **follow-on resolution** | `openspec/changes/resolve-methodology-blockers/`（`methodology-resolution`）| 解除 P0/P1 的必經 change；通過全部 §7 gates 前，#8 統計核心維持 paused |
+
+該follow-on **supersede 本 audit change（`audit-complete-methodology`）的 data／simulation Non-Goals**：audit 明訂「不下載大型資料、不跑完整模型、不做 synthetic recovery」，這些在 follow-on 內反轉為**必做**工作。唯有 follow-on 的 gate 逐項通過（或誠實回報 `not_identifiable`），本文件才可由 `blocked` 轉 `approved`、#8 統計核心才可恢復。
