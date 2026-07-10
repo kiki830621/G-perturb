@@ -50,3 +50,4 @@ openspec/.vector-search.db*
 analysis/resolution/results/logs/
 analysis/resolution/**/*.h5ad
 analysis/resolution/**/*.h5mu
+analysis/data/logs/
