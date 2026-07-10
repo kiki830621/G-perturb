@@ -51,19 +51,23 @@ est_pwm <- function(df) {
 }
 
 # ---- KDP (distance/PERMANOVA SS partition; diagnostic) --------------------------------------
-# Euclidean univariate PERMANOVA pseudo-F reduces to ANOVA SS. We partition SS sequentially
-# (Type-I) over cond -> target -> target:guide -> target:donor and report the random-term SS
-# shares. This is the "1 - CCC / distance" family: a share, NOT a proven variance component.
+# Euclidean univariate PERMANOVA pseudo-F reduces to ANOVA SS. We partition the sequential
+# (Type-I) SS over cond -> target -> target:guide -> target:donor and report the random-term SS
+# shares. Computed by an O(N) group-mean SWEEP (residualize onto each factor's cell means in turn)
+# instead of aov()'s dense N x (~4200-column) design matrix — mathematically the same Type-I SS for
+# this hierarchical design, but seconds not minutes at n_target=600. This is the "1 - CCC / distance"
+# family: a share, NOT a proven variance component.
 est_kdp <- function(df) {
   ok <- tryCatch({
-    aov_fit <- aov(y ~ cond + target + target:guide + target:donor, data = df)
-    ss <- summary(aov_fit)[[1]][, "Sum Sq"]
-    labs <- trimws(rownames(summary(aov_fit)[[1]]))
-    pick <- function(p) { i <- which(labs == p); if (length(i)) ss[i] else 0 }
-    v <- c(T   = pick("target"),
-           TG  = pick("target:guide"),
-           TD  = pick("target:donor"),
-           res = pick("Residuals"))
+    ctr <- function(r, grp) r - ave(r, grp, FUN = mean)      # project out grp cell means
+    tg  <- interaction(df$target, df$guide, drop = TRUE)
+    td  <- interaction(df$target, df$donor, drop = TRUE)
+    r0 <- df$y - mean(df$y);         s0 <- sum(r0^2)
+    r1 <- ctr(r0, df$cond);          s1 <- sum(r1^2)
+    r2 <- ctr(r1, df$target);        s2 <- sum(r2^2)
+    r3 <- ctr(r2, tg);               s3 <- sum(r3^2)
+    r4 <- ctr(r3, td);               s4 <- sum(r4^2)
+    v <- c(T = s1 - s2, TG = s2 - s3, TD = s3 - s4, res = s4)
     list(shares = .shares(v), neg = FALSE, ok = TRUE)
   }, error = function(e) list(shares = c(T=NA,TG=NA,TD=NA,res=NA), neg = NA, ok = FALSE))
   ok

@@ -10,7 +10,8 @@
 # Academia Sinica cluster (see benchmark/). A local reduced-rep run is a HARNESS SMOKE and is
 # labelled as such in the output (`scale`), never reported as a passed full-scale gate.
 
-suppressWarnings(suppressMessages({ library(jsonlite) }))
+suppressWarnings(suppressMessages({ library(jsonlite); library(parallel) }))
+NCORES <- as.integer(Sys.getenv("RECOVERY_CORES", as.character(max(1, detectCores() - 2))))
 here <- dirname(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE)[1]))
 if (length(here) == 0 || is.na(here)) here <- "analysis/resolution"
 source(file.path(here, "lib", "synthetic.R"))
@@ -48,18 +49,28 @@ for (sc in names(scenarios)) {
   neg_ct <- setNames(integer(length(CANDIDATES)), names(CANDIDATES))
   fail_ct <- setNames(integer(length(CANDIDATES)), names(CANDIDATES))
 
-  t0 <- proc.time()[3]
-  for (r in seq_len(reps)) {
+  one_rep <- function(r) {
     sim <- simulate_gtheory(n_target = n_target, dist = dist, seed = r)
     truth <- sim$truth[comps]
-    for (nm in names(CANDIDATES)) {
+    lapply(names(CANDIDATES), function(nm) {
       out <- CANDIDATES[[nm]](sim$df)
-      if (!isTRUE(out$ok) || any(is.na(out$shares))) { fail_ct[nm] <- fail_ct[nm] + 1; next }
-      err[[nm]][r, ] <- out$shares[comps] - truth
-      if (isTRUE(out$neg)) neg_ct[nm] <- neg_ct[nm] + 1
+      bad <- !isTRUE(out$ok) || any(is.na(out$shares))
+      list(nm = nm, err = if (bad) rep(NA_real_, length(comps)) else unname(out$shares[comps] - truth),
+           neg = isTRUE(out$neg), fail = bad)
+    })
+  }
+  t0 <- proc.time()[3]
+  reps_out <- mclapply(seq_len(reps), one_rep, mc.cores = NCORES, mc.preschedule = TRUE)
+  el <- round(proc.time()[3] - t0, 1)
+  for (r in seq_along(reps_out)) {
+    rr <- reps_out[[r]]
+    if (!is.list(rr)) next                       # mclapply worker error -> skip rep
+    for (cr in rr) {
+      if (isTRUE(cr$fail)) { fail_ct[cr$nm] <- fail_ct[cr$nm] + 1; next }
+      err[[cr$nm]][r, ] <- cr$err
+      if (isTRUE(cr$neg)) neg_ct[cr$nm] <- neg_ct[cr$nm] + 1
     }
   }
-  el <- round(proc.time()[3] - t0, 1)
 
   for (nm in names(CANDIDATES)) {
     E <- err[[nm]]; E <- E[stats::complete.cases(E), , drop = FALSE]
