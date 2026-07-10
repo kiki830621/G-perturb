@@ -48,7 +48,7 @@ Confirmed against the S3 bucket listing and the companion-repo tree.
 | `K562_comparison.suppl_table.csv` | **companion repo** | small | ❌ | §13 cross-cell-type criterion (`logfc_pearson_r`) |
 | `guide_kd_efficiency.suppl_table.csv` | **companion repo** | small | ❌ | §11 knockdown covariate (`t_statistic`, `signif_knockdown`) |
 | `Th1Th2_validation_summary.suppl_table.csv` | **not found** (see §4) | — | ❌ | §13 arrayed bulk+flow criterion — **name/location unresolved** |
-| `GWCD4i.pseudobulk_merged.h5ad` | S3 | large | ❌ | guide×donor×condition pseudobulk (`n_vars=18,129`) — not needed |
+| `GWCD4i.pseudobulk_merged.h5ad` | S3 | 44.6 GB | ⏳ | **the JOINT** guide×donor×condition pseudobulk (`n_vars=18,129`) — under the paper-grade reframe this is **required** (B-001, `resolve-methodology-blockers`); `fetch_data.sh --joint`. The old "not needed" applied only to the abandoned MVP framing. |
 | `D*_*.assigned_guide.h5ad` ×12 | S3 | ~1.6 TB | ❌ **never** | raw cell-level counts — out of scope |
 
 ---

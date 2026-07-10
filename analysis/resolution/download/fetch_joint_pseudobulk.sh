@@ -1,48 +1,38 @@
 #!/usr/bin/env bash
-# fetch_joint_pseudobulk.sh  —  task 1.1: download the ~44.6 GB JOINT pseudobulk and verify it.
+# fetch_joint_pseudobulk.sh  —  task 1.1: download the JOINT pseudobulk and verify it.
 #
-# The joint target x guide x donor x condition pseudobulk is the minimum data unit for the complete
-# decomposition (B-001). Marginal by_guide.h5mu / by_donors.h5mu are already local (#7) and are NOT
-# a substitute. Because it is large, it goes to cluster storage, not the repo working tree.
+# RESOLVED (2026-07, B-001 Open Question closed): the joint guide×donor×condition pseudobulk is
+#   GWCD4i.pseudobulk_merged.h5ad   (44,566,657,140 bytes = 44.6 GB, n_vars=18,129)
+# on the public S3 bucket s3://genome-scale-tcell-perturb-seq/marson2025_data/ (Zhu et al. 2025,
+# bioRxiv 2025.12.23.696273, Marson & Pritchard labs). No credentials; HTTPS mirror. Because it is
+# large it lands in analysis/data/raw/ (gitignored), not the repo tree; the download itself does not
+# require the Academia Sinica network — only the heavy Monte-Carlo compute does.
 #
-# Source resolution (fill JOINT_URL once confirmed):
-#   - companion analysis repo: github.com/emdann/GWT_perturbseq_analysis_2025 (data-availability section)
-#   - Zhu et al. 2025 CD4+ Perturb-seq GEO/Zenodo record (the study's primary deposit)
-# The exact record + file split are an Open Question in design.md; resolve, then set JOINT_URL.
+# The canonical, resumable fetcher is analysis/data/fetch_data.sh --joint (curl -C -). This script
+# delegates to it so there is one source of truth for the URL and resume logic.
 #
 # Usage:
-#   JOINT_URL="https://.../joint_pseudobulk.h5ad" DEST=/path/on/cluster/NA ./fetch_joint_pseudobulk.sh
+#   ./fetch_joint_pseudobulk.sh            # delegates to fetch_data.sh --joint (resumable)
 set -euo pipefail
 
-JOINT_URL="${JOINT_URL:-}"
-DEST="${DEST:-$HOME/NA/gperturb/joint}"
-EXPECT_SHA256="${EXPECT_SHA256:-}"     # set once known, to verify integrity (B-001)
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DATA_FETCH="$(cd "$HERE/../../data" && pwd)/fetch_data.sh"
+RAW="$(cd "$HERE/../../data" && pwd)/raw"
+EXPECT_BYTES=44566657140
+target="$RAW/GWCD4i.pseudobulk_merged.h5ad"
 
-if [[ -z "$JOINT_URL" ]]; then
-  echo "FAIL-CLOSED: JOINT_URL is unset."
-  echo "  Resolve the joint-pseudobulk record (companion repo data-availability / GEO / Zenodo),"
-  echo "  then re-run:  JOINT_URL=<url> DEST=<cluster path> $0"
-  echo "  Do NOT proceed with marginal by_guide/by_donors as a stand-in."
-  exit 2
-fi
+echo "[fetch] joint pseudobulk via $DATA_FETCH --joint"
+bash "$DATA_FETCH" --joint
 
-mkdir -p "$DEST"
-fname="$(basename "${JOINT_URL%%\?*}")"
-out="$DEST/$fname"
-echo "[fetch] $JOINT_URL"
-echo "[fetch] -> $out"
-# resumable download; on the stat cluster prefer running this inside a qsub job, not the front-end
-curl -fL --retry 5 -C - -o "$out" "$JOINT_URL"
-
-if [[ -n "$EXPECT_SHA256" ]]; then
-  echo "[verify] sha256..."
-  got="$(shasum -a 256 "$out" | awk '{print $1}')"
-  if [[ "$got" != "$EXPECT_SHA256" ]]; then
-    echo "FAIL-CLOSED: checksum mismatch (got $got, expected $EXPECT_SHA256)"; exit 3
+# integrity: confirm the full expected byte count landed (B-001 requires a verified manifest input)
+if [[ -f "$target" ]]; then
+  got=$(stat -f%z "$target" 2>/dev/null || stat -c%s "$target")
+  if [[ "$got" == "$EXPECT_BYTES" ]]; then
+    echo "[verify] OK — $got bytes"
+    echo "[next] python3 ../manifest/build_manifest.py --joint $target"
+  else
+    echo "[verify] INCOMPLETE — $got / $EXPECT_BYTES bytes; re-run to resume (curl -C -)"; exit 3
   fi
-  echo "[verify] OK $got"
 else
-  shasum -a 256 "$out" | tee "$out.sha256"
-  echo "[verify] recorded sha256 (no EXPECT_SHA256 provided to check against)"
+  echo "FAIL-CLOSED: $target not present after fetch"; exit 2
 fi
-echo "[done] joint pseudobulk at $out — next: manifest/build_manifest.py --joint $out"

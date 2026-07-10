@@ -8,6 +8,8 @@
 #   bash fetch_data.sh            # MB-scale CSVs only (default; ~14 MB)
 #   bash fetch_data.sh --h5ad     # + GWCD4i.DE_stats.h5ad  (15.6 GB — reliability fields)
 #   bash fetch_data.sh --h5mu     # + by_guide + by_donors h5mu (27 + 15.7 GB — variance model)
+#   bash fetch_data.sh --joint    # + GWCD4i.pseudobulk_merged.h5ad (44.6 GB — the JOINT
+#                                 #   guide×donor×condition pseudobulk; B-001, resolve-methodology-blockers)
 set -euo pipefail
 
 BASE="https://genome-scale-tcell-perturb-seq.s3.amazonaws.com/marson2025_data"
@@ -51,6 +53,9 @@ for arg in "$@"; do
       echo "== per-facet h5mu (27 + 15.7 GB — raw guide-/donor-resolved effect vectors) =="
       getr "GWCD4i.DE_stats.by_guide.h5mu"  "GWCD4i.DE_stats.by_guide.h5mu"
       getr "GWCD4i.DE_stats.by_donors.h5mu" "GWCD4i.DE_stats.by_donors.h5mu" ;;
+    --joint)
+      echo "== JOINT pseudobulk (44.6 GB — guide×donor×condition, n_vars=18,129; B-001) =="
+      getr "GWCD4i.pseudobulk_merged.h5ad" "GWCD4i.pseudobulk_merged.h5ad" ;;
     *) echo "⚠ unknown flag: $arg (use --h5ad / --h5mu)" >&2 ;;
   esac
 done

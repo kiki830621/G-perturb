@@ -83,6 +83,6 @@ gene-wise 用 target-blind gene universe，atlas-wide 單一 FDR 控制後再 st
 
 ## Migration & Open Questions
 
-- **下載來源／頻寬**：joint pseudobulk 的確切 URL 與檔案切分待 B-001 執行時確認（companion repo `emdann/GWT_perturbseq_analysis_2025` 或原始 GEO/Zenodo）。
+- **下載來源／頻寬**：~~待確認~~ **已解析（2026-07）**：joint = `GWCD4i.pseudobulk_merged.h5ad`（44,566,657,140 bytes = 44.6 GB，n_vars=18,129），公開 S3 `s3://genome-scale-tcell-perturb-seq/marson2025_data/`，HTTPS mirror，無需憑證。fetcher：`analysis/data/fetch_data.sh --joint`（resumable `curl -C -`）。下載本身不需統計所網路；只有重 MC 運算需要 cluster。
 - **Cluster 佈署細節**：R（lme4／vegan）vs Python（h5py extraction）在 cluster 上的環境版本，待 compute benchmark 階段定。
 - **gate 門檻微調**：§7 數值門檻沿用 review §7；若 synthetic 顯示某門檻不合理，須留 audit trail 修改凍結檔，不得事後無紀錄放寬。
