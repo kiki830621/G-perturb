@@ -1,0 +1,30 @@
+{
+  "n_signal_genes": 1813,
+  "conditions": ["Rest", "Stim8hr", "Stim48hr"],
+  "signal_quantile": 0.9,
+  "signal_threshold_s2T": 0.0516,
+  "elapsed_s": 745.8,
+  "cores": 16,
+  "note": "per-condition me-corrected variance components on a fixed pooled-signal gene set; feeds per-condition D-study",
+  "Rest": {
+    "n_fitted": 1813,
+    "median_s2_T": 0.0579,
+    "median_s2_TG": 0.0511,
+    "median_s2_TD": 0.018,
+    "median_s2_res_bio": 0.219
+  },
+  "Stim8hr": {
+    "n_fitted": 1813,
+    "median_s2_T": 0.0576,
+    "median_s2_TG": 0.0463,
+    "median_s2_TD": 0.0159,
+    "median_s2_res_bio": 0.2312
+  },
+  "Stim48hr": {
+    "n_fitted": 1813,
+    "median_s2_T": 0.0468,
+    "median_s2_TG": 0.0373,
+    "median_s2_TD": 0.0159,
+    "median_s2_res_bio": 0.2064
+  }
+}
