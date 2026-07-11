@@ -1,7 +1,7 @@
 ## 1. 凍結新證據 manifest（B-001）
 
-- [ ] 1.1 下載 joint target×guide×donor×condition pseudobulk（~44.6 GB），走中研院統計所 cluster 儲存；驗證方式為 checksum 與來源 URL 記錄齊全，且確認非 marginal `by_guide`／`by_donors` 的替身。
-- [ ] 1.2 交付 `Frozen empirical evidence manifest over the joint pseudobulk`：產出版本化 + checksummed `evidence.manifest.json`，逐 cell 記錄存在與否、per-cell library size／n_cells、NTC coverage 與 design-matrix rank；驗證方式為任何 modeling step 前 manifest 已凍結，缺格 cell 記錄而非 impute。
+- [x] 1.1 下載 joint target×guide×donor×condition pseudobulk（~44.6 GB），走中研院統計所 cluster 儲存；驗證方式為 checksum 與來源 URL 記錄齊全，且確認非 marginal `by_guide`／`by_donors` 的替身。
+- [x] 1.2 交付 `Frozen empirical evidence manifest over the joint pseudobulk`：產出版本化 + checksummed `evidence.manifest.json`，逐 cell 記錄存在與否、per-cell library size／n_cells、NTC coverage 與 design-matrix rank；驗證方式為任何 modeling step 前 manifest 已凍結，缺格 cell 記錄而非 impute。
 
 ## 2. 可識別性實測 fail-closed（B-002／B-003）
 
