@@ -51,3 +51,9 @@ analysis/resolution/results/logs/
 analysis/resolution/**/*.h5ad
 analysis/resolution/**/*.h5mu
 analysis/data/logs/
+
+# realdata pipeline — ignore large intermediates, keep scripts + result summaries
+analysis/resolution/realdata/effect.f32
+analysis/resolution/realdata/*.npy
+analysis/resolution/realdata/design.csv
+analysis/resolution/realdata/*.log
