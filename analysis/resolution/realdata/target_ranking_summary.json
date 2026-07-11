@@ -1,88 +1,115 @@
 {
   "n_targets": 12730,
-  "n_scored": 12219,
-  "n_not_identifiable": 511,
+  "n_scored": 7169,
+  "facet_medians": {
+    "R_guide": 0.0532,
+    "R_donor_shrunk": 0.0918,
+    "R_condition": 0.1292,
+    "Erho2_joint": 0.075
+  },
+  "donor_shrinkage_weight": 0.5,
   "top10_by_S": [
     {
       "target": "GFPT1",
-      "S_t": 1.42362,
-      "E_t": 2.24333,
-      "R_t": 0.6346,
+      "S": 0.7003,
+      "E": 2.2433,
+      "Rg": 0.6346,
+      "Rd": 0.3806,
+      "Rc": 0.6151,
+      "Erho2": 0.3122,
       "rank_E": 1
     },
     {
       "target": "POP1",
-      "S_t": 1.15321,
-      "E_t": 1.72088,
-      "R_t": 0.6701,
-      "rank_E": 15
-    },
-    {
-      "target": "RPL3",
-      "S_t": 1.04254,
-      "E_t": 1.59862,
-      "R_t": 0.6522,
-      "rank_E": 32
-    },
-    {
-      "target": "DUT",
-      "S_t": 1.01306,
-      "E_t": 1.65005,
-      "R_t": 0.614,
-      "rank_E": 24
-    },
-    {
-      "target": "QARS1",
-      "S_t": 0.98301,
-      "E_t": 1.48536,
-      "R_t": 0.6618,
-      "rank_E": 56
-    },
-    {
-      "target": "RPS3",
-      "S_t": 0.98165,
-      "E_t": 1.4005,
-      "R_t": 0.7009,
-      "rank_E": 87
+      "S": 0.5453,
+      "E": 1.7209,
+      "Rg": 0.6701,
+      "Rd": 0.3754,
+      "Rc": 0.5389,
+      "Erho2": 0.3169,
+      "rank_E": 14
     },
     {
       "target": "MED22",
-      "S_t": 0.98002,
-      "E_t": 1.95979,
-      "R_t": 0.5001,
+      "S": 0.4824,
+      "E": 1.9598,
+      "Rg": 0.5001,
+      "Rd": 0.3265,
+      "Rc": 0.4761,
+      "Erho2": 0.2461,
       "rank_E": 4
     },
     {
-      "target": "TBL3",
-      "S_t": 0.96609,
-      "E_t": 1.48953,
-      "R_t": 0.6486,
-      "rank_E": 52
+      "target": "RPS3",
+      "S": 0.4729,
+      "E": 1.4005,
+      "Rg": 0.7009,
+      "Rd": 0.3945,
+      "Rc": 0.5382,
+      "Erho2": 0.3376,
+      "rank_E": 79
     },
     {
-      "target": "TAF2",
-      "S_t": 0.952,
-      "E_t": 1.90568,
-      "R_t": 0.4996,
-      "rank_E": 8
+      "target": "QARS1",
+      "S": 0.4715,
+      "E": 1.4854,
+      "Rg": 0.6618,
+      "Rd": 0.3789,
+      "Rc": 0.4844,
+      "Erho2": 0.3175,
+      "rank_E": 53
+    },
+    {
+      "target": "RPL3",
+      "S": 0.467,
+      "E": 1.5986,
+      "Rg": 0.6522,
+      "Rd": 0.346,
+      "Rc": 0.511,
+      "Erho2": 0.2921,
+      "rank_E": 29
+    },
+    {
+      "target": "DUT",
+      "S": 0.4446,
+      "E": 1.6501,
+      "Rg": 0.614,
+      "Rd": 0.3244,
+      "Rc": 0.4809,
+      "Erho2": 0.2695,
+      "rank_E": 22
+    },
+    {
+      "target": "RPP21",
+      "S": 0.4359,
+      "E": 1.2897,
+      "Rg": 0.6936,
+      "Rd": 0.3973,
+      "Rc": 0.5168,
+      "Erho2": 0.338,
+      "rank_E": 124
+    },
+    {
+      "target": "CINP",
+      "S": 0.4322,
+      "E": 1.5125,
+      "Rg": 0.581,
+      "Rd": 0.3599,
+      "Rc": 0.4903,
+      "Erho2": 0.2857,
+      "rank_E": 40
     },
     {
       "target": "NOL11",
-      "S_t": 0.95085,
-      "E_t": 1.67254,
-      "R_t": 0.5685,
-      "rank_E": 19
+      "S": 0.432,
+      "E": 1.6725,
+      "Rg": 0.5685,
+      "Rd": 0.3212,
+      "Rc": 0.4486,
+      "Erho2": 0.2583,
+      "rank_E": 17
     }
   ],
-  "top100_effect_only_dropped_by_reliability": 55,
-  "examples_dropped": [
-    "AARS1",
-    "ACTR6",
-    "ATP6V1G1",
-    "BANF1",
-    "BTF3",
-    "C5orf22",
-    "CDC7",
-    "CENPC"
-  ]
+  "top100_effect_only_dropped": 49,
+  "note": "3 facet R's are a PROFILE (reported separately, never multiplied). Ranking uses the joint generalizability coefficient over the RANDOM facets guide+donor (error-to-signal ratios add); both required for a comparable joint. condition is a FIXED-facet consistency measure, reported alongside but NOT in the generalizability coefficient."
 }
