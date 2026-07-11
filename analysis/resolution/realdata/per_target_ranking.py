@@ -11,10 +11,10 @@ Per targeting target t, from its NTC-relative effect profiles:
 
 The three facet R's are a PROFILE — reported separately, NEVER multiplied (a product is systematically
 pessimistic, has an unmotivated 'any-zero-zeroes-all' pathology, and uses arbitrary weights; design §9).
-The ranking scalar is the principled JOINT generalizability coefficient over the two RANDOM facets
+The ranking scalar is R_dep,t — the JOINT generalizability over the two RANDOM facets
 (guide + donor), where error-to-signal ratios ADD:
-  Eρ²_t = 1 / (1 + (1−R^guide_t)/R^guide_t + (1−R^donor_t)/R^donor_t)
-  S_t   = E_t × Eρ²_t
+  R_dep,t = 1 / (1 + (1−R^guide_t)/R^guide_t + (1−R^donor_t)/R^donor_t)
+  S_t   = E_t × R_dep,t
 Condition is a FIXED facet → its consistency R^condition_t is reported alongside but NOT folded into the
 generalizability coefficient (you do not sample-generalize over fixed states). Both random facets must
 be identifiable for a comparable joint (else sparse targets would rank on one lucky facet). Higher-order
@@ -109,14 +109,14 @@ for r in recs:
 #     FIXED facet reported separately, NOT folded into generalizability. Error-to-signal ratios ADD.
 #     BOTH random facets must be identifiable for a comparable joint (else the coefficient would
 #     silently be over a different facet-set and sparse targets would rank on one lucky facet). ---
-def joint_erho2(rg, rd):
+def r_dep(rg, rd):
     if not (np.isfinite(rg) and rg > 0 and np.isfinite(rd) and rd > 0):
         return np.nan                                  # require both random facets — comparable ranking
     return 1.0 / (1.0 + (1.0 - rg) / rg + (1.0 - rd) / rd)
 
 for r in recs:
-    r["Erho2"] = joint_erho2(r["Rg"], r["Rd_shrunk"])
-    r["S_t"] = (r["E_t"] * r["Erho2"]) if np.isfinite(r["Erho2"]) else np.nan
+    r["R_dep"] = r_dep(r["Rg"], r["Rd_shrunk"])
+    r["S_t"] = (r["E_t"] * r["R_dep"]) if np.isfinite(r["R_dep"]) else np.nan
 
 def fmt(x): return round(x, 4) if isinstance(x, float) and np.isfinite(x) else "NA"
 scored = [r for r in recs if isinstance(r["S_t"], float) and np.isfinite(r["S_t"])]
@@ -127,11 +127,11 @@ for i, r in enumerate(by_S):
     r["rank_S"] = i + 1; r["rank_E"] = rankE[r["target"]] + 1
 
 with open(os.path.join(here, "target_ranking.csv"), "w", newline="") as fo:
-    cols = ["target","n_guides","n_donors","E_t","R_guide","R_donor_raw","R_donor_shrunk","R_condition","Erho2_joint","S_t","rank_S","rank_E"]
+    cols = ["target","n_guides","n_donors","E_t","R_guide","R_donor_raw","R_donor_shrunk","R_condition","R_dep","S_t","rank_S","rank_E"]
     w_ = csv.writer(fo); w_.writerow(cols)
     def row(r):
         return [r["target"], r["n_guides"], r["n_donors"], fmt(r["E_t"]), fmt(r["Rg"]), fmt(r["Rd"]),
-                fmt(r["Rd_shrunk"]), fmt(r["Rc"]), fmt(r["Erho2"]), fmt(r["S_t"]),
+                fmt(r["Rd_shrunk"]), fmt(r["Rc"]), fmt(r["R_dep"]), fmt(r["S_t"]),
                 r.get("rank_S","NA"), r.get("rank_E","NA")]
     for r in by_S: w_.writerow(row(r))
     for r in recs:
@@ -142,20 +142,20 @@ summ = dict(n_targets=len(recs), n_scored=len(scored),
             facet_medians=dict(R_guide=fmt(float(np.nanmedian([r["Rg"] for r in recs]))),
                                R_donor_shrunk=fmt(float(np.nanmedian([r["Rd_shrunk"] for r in recs]))),
                                R_condition=fmt(float(np.nanmedian([r["Rc"] for r in recs]))),
-                               Erho2_joint=fmt(float(np.nanmedian([r["Erho2"] for r in scored])))),
+                               R_dep=fmt(float(np.nanmedian([r["R_dep"] for r in scored])))),
             donor_shrinkage_weight=round(w, 3),
             top10_by_S=[dict(target=r["target"], S=fmt(r["S_t"]), E=fmt(r["E_t"]),
                              Rg=fmt(r["Rg"]), Rd=fmt(r["Rd_shrunk"]), Rc=fmt(r["Rc"]),
-                             Erho2=fmt(r["Erho2"]), rank_E=r["rank_E"]) for r in by_S[:10]],
+                             R_dep=fmt(r["R_dep"]), rank_E=r["rank_E"]) for r in by_S[:10]],
             top100_effect_only_dropped=len(topE - topS),
             note="3 facet R's are a PROFILE (reported separately, never multiplied). Ranking uses the joint generalizability coefficient over the RANDOM facets guide+donor (error-to-signal ratios add); both required for a comparable joint. condition is a FIXED-facet consistency measure, reported alongside but NOT in the generalizability coefficient.")
 json.dump(summ, open(os.path.join(here, "target_ranking_summary.json"), "w"), indent=2)
 
-print(f"\nprofile + joint-Eρ² ranking: {len(scored):,} scored")
-print(f"facet medians: R_guide={summ['facet_medians']['R_guide']} R_donor(shrunk)={summ['facet_medians']['R_donor_shrunk']} R_condition={summ['facet_medians']['R_condition']} | joint Eρ²={summ['facet_medians']['Erho2_joint']}")
+print(f"\nprofile + R_dep ranking: {len(scored):,} scored")
+print(f"facet medians: R_guide={summ['facet_medians']['R_guide']} R_donor(shrunk)={summ['facet_medians']['R_donor_shrunk']} R_condition={summ['facet_medians']['R_condition']} | R_dep={summ['facet_medians']['R_dep']}")
 print(f"donor EB shrinkage weight toward pooled: {w:.3f}")
-print("top 10 by S = E x joint-Eρ²  (target | S | Rguide | Rdonor | Rcond | Eρ² | effect-only rank):")
+print("top 10 by S = E x R_dep  (target | S | Rguide | Rdonor | Rcond | R_dep | effect-only rank):")
 for r in by_S[:10]:
-    print(f"  {r['target']:16} S={r['S_t']:.3f}  Rg={fmt(r['Rg'])} Rd={fmt(r['Rd_shrunk'])} Rc={fmt(r['Rc'])}  Eρ²={fmt(r['Erho2'])}  (eff #{r['rank_E']})")
+    print(f"  {r['target']:16} S={r['S_t']:.3f}  Rg={fmt(r['Rg'])} Rd={fmt(r['Rd_shrunk'])} Rc={fmt(r['Rc'])}  R_dep={fmt(r['R_dep'])}  (eff #{r['rank_E']})")
 print(f"\n{len(topE-topS)}/100 effect-only top-100 drop out of the reliability-weighted top-100")
 print("wrote target_ranking.csv + target_ranking_summary.json")

@@ -1,4 +1,4 @@
-target,n_guides,n_donors,E_t,R_guide,R_donor_raw,R_donor_shrunk,R_condition,Erho2_joint,S_t,rank_S,rank_E
+target,n_guides,n_donors,E_t,R_guide,R_donor_raw,R_donor_shrunk,R_condition,R_dep,S_t,rank_S,rank_E
 GFPT1,2,3,2.2433,0.6346,0.6578,0.3806,0.6151,0.3122,0.7003,1,1
 POP1,2,4,1.7209,0.6701,0.6475,0.3754,0.5389,0.3169,0.5453,2,14
 MED22,2,3,1.9598,0.5001,0.5496,0.3265,0.4761,0.2461,0.4824,3,4
