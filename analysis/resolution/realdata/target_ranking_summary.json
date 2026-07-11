@@ -1,115 +1,234 @@
 {
   "n_targets": 12730,
-  "n_scored": 7169,
-  "facet_medians": {
-    "R_guide": 0.0532,
-    "R_donor_shrunk": 0.0918,
-    "R_condition": 0.1292,
-    "R_dep": 0.075
+  "n_scored_overall": 7169,
+  "per_view": {
+    "overall": {
+      "n_scored": 7169,
+      "median_R_dep": 0.075,
+      "donor_shrink_w": 0.5
+    },
+    "Rest": {
+      "n_scored": 6884,
+      "median_R_dep": 0.0413,
+      "donor_shrink_w": 0.5
+    },
+    "Stim8hr": {
+      "n_scored": 7181,
+      "median_R_dep": 0.0367,
+      "donor_shrink_w": 0.5
+    },
+    "Stim48hr": {
+      "n_scored": 7062,
+      "median_R_dep": 0.0343,
+      "donor_shrink_w": 0.5
+    }
   },
-  "donor_shrinkage_weight": 0.5,
-  "top10_by_S": [
+  "overall_top10": [
     {
       "target": "GFPT1",
       "S": 0.7003,
-      "E": 2.2433,
-      "Rg": 0.6346,
-      "Rd": 0.3806,
-      "Rc": 0.6151,
       "R_dep": 0.3122,
       "rank_E": 1
     },
     {
       "target": "POP1",
       "S": 0.5453,
-      "E": 1.7209,
-      "Rg": 0.6701,
-      "Rd": 0.3754,
-      "Rc": 0.5389,
       "R_dep": 0.3169,
       "rank_E": 14
     },
     {
       "target": "MED22",
       "S": 0.4824,
-      "E": 1.9598,
-      "Rg": 0.5001,
-      "Rd": 0.3265,
-      "Rc": 0.4761,
       "R_dep": 0.2461,
       "rank_E": 4
     },
     {
       "target": "RPS3",
       "S": 0.4729,
-      "E": 1.4005,
-      "Rg": 0.7009,
-      "Rd": 0.3945,
-      "Rc": 0.5382,
       "R_dep": 0.3376,
       "rank_E": 79
     },
     {
       "target": "QARS1",
       "S": 0.4715,
-      "E": 1.4854,
-      "Rg": 0.6618,
-      "Rd": 0.3789,
-      "Rc": 0.4844,
       "R_dep": 0.3175,
       "rank_E": 53
     },
     {
       "target": "RPL3",
       "S": 0.467,
-      "E": 1.5986,
-      "Rg": 0.6522,
-      "Rd": 0.346,
-      "Rc": 0.511,
       "R_dep": 0.2921,
       "rank_E": 29
     },
     {
       "target": "DUT",
       "S": 0.4446,
-      "E": 1.6501,
-      "Rg": 0.614,
-      "Rd": 0.3244,
-      "Rc": 0.4809,
       "R_dep": 0.2695,
       "rank_E": 22
     },
     {
       "target": "RPP21",
       "S": 0.4359,
-      "E": 1.2897,
-      "Rg": 0.6936,
-      "Rd": 0.3973,
-      "Rc": 0.5168,
       "R_dep": 0.338,
       "rank_E": 124
     },
     {
       "target": "CINP",
       "S": 0.4322,
-      "E": 1.5125,
-      "Rg": 0.581,
-      "Rd": 0.3599,
-      "Rc": 0.4903,
       "R_dep": 0.2857,
       "rank_E": 40
     },
     {
       "target": "NOL11",
       "S": 0.432,
-      "E": 1.6725,
-      "Rg": 0.5685,
-      "Rd": 0.3212,
-      "Rc": 0.4486,
       "R_dep": 0.2583,
       "rank_E": 17
     }
   ],
-  "top100_effect_only_dropped": 49,
-  "note": "3 facet R's are a PROFILE (reported separately, never multiplied). Ranking uses the joint generalizability coefficient over the RANDOM facets guide+donor (error-to-signal ratios add); both required for a comparable joint. condition is a FIXED-facet consistency measure, reported alongside but NOT in the generalizability coefficient."
+  "context_specific": {
+    "n_flagged": 100,
+    "best_state_counts": {
+      "Stim48hr": 19,
+      "Stim8hr": 43,
+      "Rest": 38
+    },
+    "top15": [
+      {
+        "target": "RPP21",
+        "best_state": "Stim48hr",
+        "best_Rdep": 0.2544,
+        "cs_spread": 0.2383,
+        "Rdep_Rest": 0.0161,
+        "Rdep_Stim8hr": 0.1846,
+        "Rdep_Stim48hr": 0.2544
+      },
+      {
+        "target": "CD3D",
+        "best_state": "Stim8hr",
+        "best_Rdep": 0.2812,
+        "cs_spread": 0.2273,
+        "Rdep_Rest": 0.0539,
+        "Rdep_Stim8hr": 0.2812,
+        "Rdep_Stim48hr": 0.2038
+      },
+      {
+        "target": "CD3G",
+        "best_state": "Stim8hr",
+        "best_Rdep": 0.247,
+        "cs_spread": 0.2221,
+        "Rdep_Rest": 0.0248,
+        "Rdep_Stim8hr": 0.247,
+        "Rdep_Stim48hr": 0.1185
+      },
+      {
+        "target": "AAMP",
+        "best_state": "Stim8hr",
+        "best_Rdep": 0.2045,
+        "cs_spread": 0.1869,
+        "Rdep_Rest": 0.1419,
+        "Rdep_Stim8hr": 0.2045,
+        "Rdep_Stim48hr": 0.0176
+      },
+      {
+        "target": "QARS1",
+        "best_state": "Stim8hr",
+        "best_Rdep": 0.2629,
+        "cs_spread": 0.184,
+        "Rdep_Rest": 0.0789,
+        "Rdep_Stim8hr": 0.2629,
+        "Rdep_Stim48hr": "NA"
+      },
+      {
+        "target": "CD247",
+        "best_state": "Stim8hr",
+        "best_Rdep": 0.2312,
+        "cs_spread": 0.1827,
+        "Rdep_Rest": 0.0485,
+        "Rdep_Stim8hr": 0.2312,
+        "Rdep_Stim48hr": 0.091
+      },
+      {
+        "target": "TMX1",
+        "best_state": "Stim8hr",
+        "best_Rdep": 0.1922,
+        "cs_spread": 0.1806,
+        "Rdep_Rest": 0.0116,
+        "Rdep_Stim8hr": 0.1922,
+        "Rdep_Stim48hr": 0.135
+      },
+      {
+        "target": "TRMT5",
+        "best_state": "Stim48hr",
+        "best_Rdep": 0.2636,
+        "cs_spread": 0.1743,
+        "Rdep_Rest": 0.1461,
+        "Rdep_Stim8hr": 0.0893,
+        "Rdep_Stim48hr": 0.2636
+      },
+      {
+        "target": "TRIP12",
+        "best_state": "Stim8hr",
+        "best_Rdep": 0.195,
+        "cs_spread": 0.1697,
+        "Rdep_Rest": 0.0253,
+        "Rdep_Stim8hr": 0.195,
+        "Rdep_Stim48hr": 0.1401
+      },
+      {
+        "target": "ZAP70",
+        "best_state": "Stim8hr",
+        "best_Rdep": 0.2049,
+        "cs_spread": 0.1692,
+        "Rdep_Rest": 0.0357,
+        "Rdep_Stim8hr": 0.2049,
+        "Rdep_Stim48hr": 0.1486
+      },
+      {
+        "target": "WAPL",
+        "best_state": "Rest",
+        "best_Rdep": 0.2213,
+        "cs_spread": 0.1638,
+        "Rdep_Rest": 0.2213,
+        "Rdep_Stim8hr": 0.1101,
+        "Rdep_Stim48hr": 0.0575
+      },
+      {
+        "target": "ABCF1",
+        "best_state": "Rest",
+        "best_Rdep": 0.1963,
+        "cs_spread": 0.1625,
+        "Rdep_Rest": 0.1963,
+        "Rdep_Stim8hr": 0.0987,
+        "Rdep_Stim48hr": 0.0338
+      },
+      {
+        "target": "HECTD4",
+        "best_state": "Stim48hr",
+        "best_Rdep": 0.1681,
+        "cs_spread": 0.1601,
+        "Rdep_Rest": 0.008,
+        "Rdep_Stim8hr": 0.0635,
+        "Rdep_Stim48hr": 0.1681
+      },
+      {
+        "target": "APAF1",
+        "best_state": "Rest",
+        "best_Rdep": 0.1614,
+        "cs_spread": 0.1572,
+        "Rdep_Rest": 0.1614,
+        "Rdep_Stim8hr": 0.0042,
+        "Rdep_Stim48hr": "NA"
+      },
+      {
+        "target": "VMA21",
+        "best_state": "Stim8hr",
+        "best_Rdep": 0.21,
+        "cs_spread": 0.1529,
+        "Rdep_Rest": 0.0571,
+        "Rdep_Stim8hr": 0.21,
+        "Rdep_Stim48hr": "NA"
+      }
+    ]
+  },
+  "note": "4 views (overall + Rest/Stim8hr/Stim48hr). condition is a FIXED facet, analysed within-level. R_dep is joint generalizability over the RANDOM facets guide+donor; both required. Per-slice R_dep runs lower than overall (fewer cells) so slices are compared to EACH OTHER; a large across-slice spread = context-specific-but-reliable target (real signal, not noise)."
 }
