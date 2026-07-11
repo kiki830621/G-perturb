@@ -1,0 +1,12 @@
+{
+  "method": "me-removal via NTC negative-control variance",
+  "n_genes": 18129,
+  "median_s2_me": 0.2895,
+  "median_residual_removed": 0.2886,
+  "median_share_T_raw": 0.0186,
+  "median_share_T_meCorrected": 0.0812,
+  "genes_share_T_gt_0.10_raw": 40,
+  "genes_share_T_gt_0.10_meCorrected": 7674,
+  "genes_share_T_gt_0.30_meCorrected": 633,
+  "note": "residual deflated by per-gene NTC measurement-error floor; target ranking preserved, absolute signal share rises"
+}
