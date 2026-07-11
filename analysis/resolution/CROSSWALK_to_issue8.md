@@ -26,7 +26,8 @@ manifest (B-001). Synthetic-stage outcomes already produced this turn are filled
 |---|---|---|---|
 | B-001 | frozen manifest over real joint pseudobulk | `results/evidence.manifest.json` | **resolved**: 44.6 GB downloaded + verified; manifest frozen (sha256 `aa6d03dd`); grid 44.7% complete |
 | B-002/B-003 | design-rank + separability fail-closed | `results/{identifiability,evidence.manifest}.json` | **resolved on real joint**: TG/TD/TC identifiable (96–97%), floor `not_identifiable` (max_rep=1), run×donor `partially_confounded` |
-| B-004/B-006 | type-I ∈ [0.04, 0.06] at full MC | `results/type_I_calibration.json` | smoke ok; **full → cluster** |
+| B-004/B-006 | type-I ∈ [0.04, 0.06] at full MC | `results/type_I_calibration.json`; `realdata/real_controls.json` | synthetic type-I smoke ok (full → cluster); **real NTC-vs-NTC negative control clean** (median r = −0.008, no fabricated signal) |
+| §8 controls on real data | NTC-null / guide cross-fit / common-support | `realdata/real_controls.json` | **run on real joint** (task 6.3): NTC-null r≈0 ✅; guide cross-fit r=0.32 on top-300 signal genes (reproducible above null, moderate — matches σ²_TG); common-support 98.7% ✅; **leave-one-donor-out (4× decomposition) pending** |
 | B-005/B-007 | bias ≤ 0.02, coverage ∈ [0.93,0.97], winner's-curse slope ∈ [0.9,1.1] | `results/{synthetic_recovery,coverage}.json` | bias/RMSE **resolved at full MC** (PWM PASS both: 0.001/0.005 bias, 0.025/0.045 rmse); **coverage in-band** (N=500/B=99: T/TG/TD/res = 0.954/0.942/0.952/0.938, all ∈ [0.93,0.97]); winner's-curse slope **not yet implemented**; frozen-full coverage (N=2000/B=199) → cluster |
 | B-008/B-009 | FDR ≤ 0.06, pathway nulls separated | `results/fdr_pathway.json` | **resolved (synthetic)** |
 | B-010 | leak-free validation manifest, honest taxonomy | `results/validation_manifest.json` | **resolved** |

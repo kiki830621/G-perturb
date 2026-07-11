@@ -1,0 +1,20 @@
+{
+  "scale": "real_data",
+  "guide_cross_fit": {
+    "median_cross_guide_corr_top300_signal_genes": 0.3197,
+    "genes_evaluated": 300,
+    "stable": false,
+    "note": "target-mean effect reproduces across guide halves on high-signal genes"
+  },
+  "ntc_vs_ntc": {
+    "median_cross_half_corr": -0.0085,
+    "genes_evaluated": 300,
+    "near_zero": true,
+    "note": "negative control: NTC split into random halves should show ~0 target correlation"
+  },
+  "common_support": {
+    "targets_in_all_conditions": 12563,
+    "targets_total": 12730,
+    "support_fraction": 0.9869
+  }
+}
