@@ -1,0 +1,88 @@
+{
+  "n_targets": 12730,
+  "n_scored": 12219,
+  "n_not_identifiable": 511,
+  "top10_by_S": [
+    {
+      "target": "GFPT1",
+      "S_t": 1.42362,
+      "E_t": 2.24333,
+      "R_t": 0.6346,
+      "rank_E": 1
+    },
+    {
+      "target": "POP1",
+      "S_t": 1.15321,
+      "E_t": 1.72088,
+      "R_t": 0.6701,
+      "rank_E": 15
+    },
+    {
+      "target": "RPL3",
+      "S_t": 1.04254,
+      "E_t": 1.59862,
+      "R_t": 0.6522,
+      "rank_E": 32
+    },
+    {
+      "target": "DUT",
+      "S_t": 1.01306,
+      "E_t": 1.65005,
+      "R_t": 0.614,
+      "rank_E": 24
+    },
+    {
+      "target": "QARS1",
+      "S_t": 0.98301,
+      "E_t": 1.48536,
+      "R_t": 0.6618,
+      "rank_E": 56
+    },
+    {
+      "target": "RPS3",
+      "S_t": 0.98165,
+      "E_t": 1.4005,
+      "R_t": 0.7009,
+      "rank_E": 87
+    },
+    {
+      "target": "MED22",
+      "S_t": 0.98002,
+      "E_t": 1.95979,
+      "R_t": 0.5001,
+      "rank_E": 4
+    },
+    {
+      "target": "TBL3",
+      "S_t": 0.96609,
+      "E_t": 1.48953,
+      "R_t": 0.6486,
+      "rank_E": 52
+    },
+    {
+      "target": "TAF2",
+      "S_t": 0.952,
+      "E_t": 1.90568,
+      "R_t": 0.4996,
+      "rank_E": 8
+    },
+    {
+      "target": "NOL11",
+      "S_t": 0.95085,
+      "E_t": 1.67254,
+      "R_t": 0.5685,
+      "rank_E": 19
+    }
+  ],
+  "top100_effect_only_dropped_by_reliability": 55,
+  "examples_dropped": [
+    "AARS1",
+    "ACTR6",
+    "ATP6V1G1",
+    "BANF1",
+    "BTF3",
+    "C5orf22",
+    "CDC7",
+    "CENPC"
+  ]
+}
