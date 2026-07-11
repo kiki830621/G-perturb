@@ -1,0 +1,65 @@
+{
+  "raw": {
+    "n_genes": 18129,
+    "R_guide_profile": {
+      "median": 0.3663,
+      "p25": 0.1556,
+      "p75": 0.4327,
+      "p90": 0.4987,
+      "p95": 1.0
+    },
+    "R_donor_profile": {
+      "median": 0.3996,
+      "p25": 0.2043,
+      "p75": 0.4667,
+      "p90": 1.0,
+      "p95": 1.0
+    },
+    "Erho2_design_profile": {
+      "median": 0.1121,
+      "p25": 0.0001,
+      "p75": 0.2297,
+      "p90": 0.272,
+      "p95": 0.2931
+    },
+    "on_top_decile_signal_genes": {
+      "R_guide_median": 0.4341,
+      "R_donor_median": 0.4736,
+      "Erho2_median": 0.2874
+    }
+  },
+  "me_corrected": {
+    "n_genes": 17792,
+    "R_guide_profile": {
+      "median": 0.3663,
+      "p25": 0.1556,
+      "p75": 0.4327,
+      "p90": 0.4987,
+      "p95": 1.0
+    },
+    "R_donor_profile": {
+      "median": 0.3996,
+      "p25": 0.2043,
+      "p75": 0.4667,
+      "p90": 1.0,
+      "p95": 1.0
+    },
+    "Erho2_design_profile": {
+      "median": 0.2933,
+      "p25": 0.0191,
+      "p75": 0.3926,
+      "p90": 0.4422,
+      "p95": 0.4853
+    },
+    "on_top_decile_signal_genes": {
+      "R_guide_median": 0.4347,
+      "R_donor_median": 0.474,
+      "Erho2_median": 0.4459
+    }
+  },
+  "design": {
+    "n_guides": 2,
+    "n_donors": 4,
+    "caveat": "s2_TD has 3 df (4 donors); donor coefficient is noisy \u2014 read the profile, not point values (design.md \u00a75.2)"
+  }
+}
