@@ -1,0 +1,65 @@
+{
+  "payload": {
+    "schema_version": "1.0",
+    "joint_source": "GWCD4i.pseudobulk_merged.h5ad",
+    "n_obs": 278684,
+    "grid": {
+      "n_targets": 12731,
+      "n_guides": 25954,
+      "n_donors": 4,
+      "n_conditions": 3,
+      "n_runs": 2,
+      "completeness_guide_donor_cond_run": 0.4474
+    },
+    "identifiability": {
+      "T": {
+        "status": "empirically_passed",
+        "fraction_identifiable": 1.0
+      },
+      "TG": {
+        "status": "empirically_passed",
+        "fraction_identifiable": 0.9599
+      },
+      "TD": {
+        "status": "empirically_passed",
+        "fraction_identifiable": 0.9745
+      },
+      "TC": {
+        "status": "empirically_passed",
+        "fraction_identifiable": 0.9579
+      }
+    },
+    "replication_floor": {
+      "max_rows_per_spec": 1,
+      "status": "not_identifiable",
+      "note": "run does not create identical-spec replicates"
+    },
+    "separability_run_donor": {
+      "status": "partially_confounded",
+      "donors_single_run": {
+        "CE0006864": [
+          "CD4i_R2"
+        ],
+        "CE0008678": [
+          "CD4i_R2"
+        ]
+      },
+      "note": "run partially confounded with donor"
+    },
+    "ntc": {
+      "n_ntc_cells": 11018,
+      "fraction": 0.0395
+    },
+    "measurement_error": {
+      "n_cells_min": 1.0,
+      "n_cells_median": 49.0,
+      "n_cells_max": 10717.0,
+      "n_singleton_cells": 10583
+    },
+    "qc": {
+      "keep_for_DE_true": 235064,
+      "fraction": 0.8435
+    }
+  },
+  "sha256": "aa6d03dd99c949d7dd7a0d9a841332b7c2f32a7abbbfb6c6e9c6af9b8ad379e8"
+}

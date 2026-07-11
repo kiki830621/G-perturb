@@ -1,112 +1,137 @@
 #!/usr/bin/env python3
 """build_manifest.py  —  task 1.2 (spec: "Frozen empirical evidence manifest over the joint pseudobulk").
 
-Reads the JOINT target x guide x donor x condition pseudobulk and emits a versioned, checksummed
-evidence manifest recording, per cell: presence, n_cells, library size, NTC coverage, and the rank
-of the associated design matrix. Marginal by_guide/by_donors products are NOT accepted here.
+Reads the JOINT pseudobulk GWCD4i.pseudobulk_merged.h5ad and emits a versioned, checksummed evidence
+manifest of the REAL target×guide×donor×condition design: grid, completeness, per-component
+identifiability (fail-closed), run×donor separability, replication-floor status, NTC coverage, the
+measurement-error (n_cells) distribution, and QC. Marginal by_guide/by_donors are NOT accepted here.
 
-FAIL-CLOSED: if the joint file is absent this script prints exactly what is required and exits
-non-zero. It never fabricates a grid, never substitutes a marginal product for the joint design.
+FAIL-CLOSED: absent file → non-zero exit, no fabrication. A component whose facet does not vary within
+its parent grouping is recorded `not_identifiable`, never zero-filled or renamed.
 
-Usage:
-    python3 build_manifest.py --joint /path/to/joint_pseudobulk.h5ad \
-        [--obs-target target --obs-guide guide --obs-donor donor --obs-condition condition \
-         --obs-ncells n_cells --ntc-label NTC]
-
-The .obs column names default to the Zhu-et-al schema; override if the download differs.
+Confirmed schema (h5py inspection, 2026-07): target=perturbed_gene_name, guide=guide_id,
+donor=donor_id, condition=culture_condition, run=10xrun_id, NTC=guide_type=="non-targeting",
+measurement error via n_cells; QC via keep_for_DE.
 """
 import argparse, json, hashlib, os, sys
-from itertools import combinations
+from collections import defaultdict
 
 def die(msg, code=2):
     print(f"[build_manifest] FAIL-CLOSED: {msg}", file=sys.stderr); sys.exit(code)
 
-def load_obs(path, cols):
-    """Return a list-of-dicts for the requested .obs columns from an h5ad/h5mu via h5py."""
+def read_obs(path, cols):
     import h5py, numpy as np
     if not os.path.exists(path):
-        die(f"joint pseudobulk not found at {path}. Download it first (see download/fetch_joint_pseudobulk.sh); "
-            f"marginal by_guide.h5mu / by_donors.h5mu are NOT acceptable substitutes for the joint design.")
+        die(f"joint pseudobulk not found at {path}. Run download/fetch_joint_pseudobulk.sh first; "
+            f"marginal by_guide/by_donors are NOT acceptable substitutes.")
     out = {}
     with h5py.File(path, "r") as f:
-        obs = f["obs"] if "obs" in f else die("no /obs group; is this an AnnData/MuData file?")
-        def read_col(name):
-            if name not in obs:
-                die(f"required .obs column '{name}' missing; pass the correct --obs-* name for this download.")
+        if "obs" not in f: die("no /obs group; not an AnnData file?")
+        obs = f["obs"]
+        for key, name in cols.items():
+            if name is None: continue
+            if name not in obs: die(f".obs column '{name}' missing; pass the right --obs-{key}.")
             node = obs[name]
-            # categorical stored as group with 'categories' + 'codes'
-            if isinstance(node, h5py.Group) and "categories" in node and "codes" in node:
+            if isinstance(node, h5py.Group) and "categories" in node:
                 cats = [c.decode() if isinstance(c, bytes) else str(c) for c in node["categories"][:]]
                 codes = node["codes"][:]
-                return [cats[i] if i >= 0 else None for i in codes]
-            arr = node[:]
-            return [x.decode() if isinstance(x, bytes) else x for x in arr]
-        for key, name in cols.items():
-            if name is not None:
-                out[key] = read_col(name)
-    n = len(next(iter(out.values())))
-    return [{k: out[k][i] for k in out} for i in range(n)]
+                out[key] = np.array([cats[i] if i >= 0 else None for i in codes], dtype=object)
+            else:
+                out[key] = node[:]
+    return out
 
-def design_rank_ok(levels_present):
-    """A component is separable if its interaction has >1 realized level beyond its parent."""
-    return len(levels_present) >= 2
+def identifiable_within(anchor_cols, vary_col, rows):
+    """Fraction of anchor groups in which `vary_col` takes >=2 values. Identifiable iff > 0; the
+    fraction reports the STRENGTH of identification (fail-closed on 0)."""
+    seen = defaultdict(set)
+    for i in range(len(rows[vary_col])):
+        key = tuple(rows[c][i] for c in anchor_cols)
+        seen[key].add(rows[vary_col][i])
+    counts = [len(v) for v in seen.values()]
+    frac = sum(c >= 2 for c in counts) / max(1, len(counts))
+    return frac
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--joint", required=True)
-    ap.add_argument("--obs-target", default="target"); ap.add_argument("--obs-guide", default="guide")
-    ap.add_argument("--obs-donor", default="donor");  ap.add_argument("--obs-condition", default="condition")
-    ap.add_argument("--obs-ncells", default="n_cells"); ap.add_argument("--ntc-label", default="NTC")
+    ap.add_argument("--obs-target", default="perturbed_gene_name")
+    ap.add_argument("--obs-guide", default="guide_id")
+    ap.add_argument("--obs-donor", default="donor_id")
+    ap.add_argument("--obs-condition", default="culture_condition")
+    ap.add_argument("--obs-run", default="10xrun_id")
+    ap.add_argument("--obs-ncells", default="n_cells")
+    ap.add_argument("--obs-guidetype", default="guide_type")
+    ap.add_argument("--obs-keep", default="keep_for_DE")
     ap.add_argument("--out", default=os.path.join(os.path.dirname(__file__), "..", "results", "evidence.manifest.json"))
     a = ap.parse_args()
+    import numpy as np
 
-    rows = load_obs(a.joint, dict(target=a.obs_target, guide=a.obs_guide, donor=a.obs_donor,
-                                  condition=a.obs_condition, n_cells=a.obs_ncells))
-    cells = {}
-    for r in rows:
-        key = (r["target"], r["guide"], r["donor"], r["condition"])
-        cells.setdefault(key, {"n_cells": 0, "rows": 0})
-        cells[key]["rows"] += 1
-        try: cells[key]["n_cells"] += int(float(r.get("n_cells") or 0))
-        except (TypeError, ValueError): pass
+    r = read_obs(a.joint, dict(target=a.obs_target, guide=a.obs_guide, donor=a.obs_donor,
+                               condition=a.obs_condition, run=a.obs_run, n_cells=a.obs_ncells,
+                               guide_type=a.obs_guidetype, keep=a.obs_keep))
+    N = len(r["target"])
+    U = lambda k: sorted(set(r[k]))
+    targets, guides, donors, conds, runs = U("target"), U("guide"), U("donor"), U("condition"), U("run")
 
-    targets = sorted({k[0] for k in cells}); guides = sorted({k[1] for k in cells})
-    donors  = sorted({k[2] for k in cells}); conds  = sorted({k[3] for k in cells})
-    ntc_targets = [t for t in targets if a.ntc_label.lower() in str(t).lower()]
-    max_rep = max((v["rows"] for v in cells.values()), default=0)
+    # per-component identifiability (fail-closed parent check) with strength fraction
+    def gate(frac): return {"status": "empirically_passed" if frac > 0 else "not_identifiable",
+                            "fraction_identifiable": round(frac, 4)}
+    ident = {
+        "T":  {"status": "empirically_passed" if len(targets) >= 2 else "not_identifiable", "fraction_identifiable": 1.0},
+        "TG": gate(identifiable_within(["target"], "guide", r)),
+        "TD": gate(identifiable_within(["target", "guide"], "donor", r)),
+        "TC": gate(identifiable_within(["target", "guide", "donor"], "condition", r)),
+    }
 
-    # per-target realized guide/donor/condition presence -> component identifiability
-    comp_status = {"T": design_rank_ok(targets),
-                   "TG": all_or_any_guide_varies(cells, idx_a=0, idx_b=1),
-                   "TD": all_or_any_guide_varies(cells, idx_a=0, idx_b=2),
-                   "TC": all_or_any_guide_varies(cells, idx_a=0, idx_b=3)}
+    # replication floor: does any (target,guide,donor,condition) spec have >1 row (across runs = lane)?
+    spec_rows = defaultdict(int)
+    for i in range(N):
+        spec_rows[(r["target"][i], r["guide"][i], r["donor"][i], r["condition"][i])] += 1
+    max_rep = max(spec_rows.values()) if spec_rows else 0
+    floor = "empirically_passed" if max_rep >= 2 else "not_identifiable"
+
+    # run x donor separability: is run aliased within donor (each donor in one run only)?
+    run_by_donor = defaultdict(set)
+    for i in range(N): run_by_donor[r["donor"][i]].add(r["run"][i])
+    donors_single_run = {d: sorted(v) for d, v in run_by_donor.items() if len(v) == 1}
+    run_donor_status = "not_identifiable" if all(len(v) <= 1 for v in run_by_donor.values()) else \
+                       ("partially_confounded" if donors_single_run else "empirically_passed")
+
+    # measurement error (n_cells) + NTC + QC
+    nc = np.asarray(r["n_cells"], dtype=float)
+    ntc = np.array([str(x) == "non-targeting" for x in r["guide_type"]])
+    keep = np.asarray(r["keep"]).astype(bool)
+    poss = len(guides) * len(donors) * len(conds) * len(runs)
 
     payload = {
         "schema_version": "1.0",
-        "joint_source": os.path.abspath(a.joint),
-        "grid": {"n_targets": len(targets), "n_guides": len(guides),
-                 "n_donors": len(donors), "n_conditions": len(conds),
-                 "n_cells_present": len(cells),
-                 "n_cells_possible": len(targets)*len(guides)*len(donors)*len(conds),
-                 "completeness": round(len(cells)/max(1, len(targets)*len(guides)*len(donors)*len(conds)), 4)},
-        "ntc": {"n_ntc_targets": len(ntc_targets)},
-        "replication": {"max_rows_per_spec": max_rep,
-                        "floor_status": "empirically_passed" if max_rep >= 2 else "not_identifiable"},
-        "identifiability": {k: ("empirically_passed" if v else "not_identifiable") for k, v in comp_status.items()},
+        "joint_source": os.path.basename(a.joint),
+        "n_obs": N,
+        "grid": {"n_targets": len(targets), "n_guides": len(guides), "n_donors": len(donors),
+                 "n_conditions": len(conds), "n_runs": len(runs),
+                 "completeness_guide_donor_cond_run": round(N / max(1, poss), 4)},
+        "identifiability": ident,
+        "replication_floor": {"max_rows_per_spec": int(max_rep), "status": floor,
+                              "note": "run does not create identical-spec replicates" if floor == "not_identifiable" else "lane replicate present"},
+        "separability_run_donor": {"status": run_donor_status,
+                                   "donors_single_run": donors_single_run,
+                                   "note": "run partially confounded with donor" if run_donor_status == "partially_confounded" else ""},
+        "ntc": {"n_ntc_cells": int(ntc.sum()), "fraction": round(float(ntc.mean()), 4)},
+        "measurement_error": {"n_cells_min": float(nc.min()), "n_cells_median": float(np.median(nc)),
+                              "n_cells_max": float(nc.max()), "n_singleton_cells": int((nc == 1).sum())},
+        "qc": {"keep_for_DE_true": int(keep.sum()), "fraction": round(float(keep.mean()), 4)},
     }
     canon = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     checksum = hashlib.sha256(canon.encode()).hexdigest()
     out = os.path.abspath(a.out); os.makedirs(os.path.dirname(out), exist_ok=True)
     json.dump({"payload": payload, "sha256": checksum}, open(out, "w"), indent=2)
     open(out + ".sha256", "w").write(checksum + "\n")
-    print(f"[build_manifest] wrote {out}\n  sha256={checksum}\n  grid={payload['grid']}  floor={payload['replication']['floor_status']}")
-
-def all_or_any_guide_varies(cells, idx_a, idx_b):
-    """Does factor idx_b take >=2 values within some level of anchor idx_a (identifiability)?"""
-    by_anchor = {}
-    for key in cells:
-        by_anchor.setdefault(key[idx_a], set()).add(key[idx_b])
-    return any(len(v) >= 2 for v in by_anchor.values())
+    print(f"[build_manifest] wrote {out}")
+    print(f"  sha256 = {checksum}")
+    print(f"  grid: {payload['grid']}")
+    print(f"  identifiability: {ident}")
+    print(f"  floor: {floor} (max_rep={max_rep}) | run×donor: {run_donor_status}")
+    print(f"  NTC: {payload['ntc']} | singletons(n_cells=1): {payload['measurement_error']['n_singleton_cells']}")
 
 if __name__ == "__main__":
     main()
