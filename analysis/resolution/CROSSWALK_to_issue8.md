@@ -11,9 +11,9 @@ manifest (B-001). Synthetic-stage outcomes already produced this turn are filled
 
 | #8 artifact | Action | Driven by | Status |
 |---|---|---|---|
-| `proposal.md` (h5mu-marginal, `1−CCC`, Fay–Herriot) | **replace** headline with the winning candidate + honest floor | synthetic recovery winner + identifiability | **method selected: PWM** (full synthetic recovery, only candidate PASSing both scenarios; KDP/RHF FAIL). Real-data application **pending-joint** |
+| `proposal.md` (h5mu-marginal, `1−CCC`, Fay–Herriot) | **replace** headline with the winning candidate + honest floor | synthetic recovery winner + identifiability | **method selected: PWM** (full synthetic recovery; only candidate PASSing both scenarios; KDP/RHF FAIL). **Real-data application DELIVERED** (issue #11): all 18,129 genes fitted on the real NTC-relative effect, `realdata/pwm_components.csv` |
 | `design.md` §9 scalar heuristic | **keep** as sanity-check stepping-stone | unchanged reframe | keep |
-| `design.md` §10.4 distribution-light core | **replace** the estimator with the selected candidate | `results/synthetic_recovery/` | **pending-joint** full verdict |
+| `design.md` §10.4 distribution-light core | **replace** the estimator with the selected candidate | `realdata/pwm_{components.csv,summary.json}` | **DELIVERED on real joint** (issue #11): genome-wide PWM decomposition — median share_T=0.019, signal highly concentrated (40 genes share_T>0.10; top ENSG00000165953 share_T=0.908). residual still carries measurement error (me-removal = documented refinement) |
 | `design.md` replication floor | **replace** with `not_identifiable` unless a lane replicate exists | `results/evidence.manifest.json` | **resolved on real joint**: floor = `not_identifiable` (every target×guide×donor×cond spec has exactly one row; run is not a replicate) |
 | `spec.md` variance-component requirements | **add** the fail-closed identifiability clauses | `lib/identifiability.R` gates | **resolved (synthetic)** |
 | `tasks.md` 2.x/3.x/4.1/5.x statistical core | **replace** with the gated pipeline in `analysis/resolution/` | all gates | **pending-joint** (paused until gates pass) |

@@ -1,0 +1,42 @@
+{
+  "n_genes": 18129,
+  "n_fitted": 18129,
+  "fit_failures": 0,
+  "elapsed_s": 9072.2,
+  "cores": 16,
+  "share_T_quantiles": {
+    "5%": 0,
+    "25%": 0,
+    "50%": 0.0186,
+    "75%": 0.0455,
+    "95%": 0.0646
+  },
+  "share_TG_quantiles": {
+    "5%": 0,
+    "25%": 0.0028,
+    "50%": 0.0444,
+    "75%": 0.0712,
+    "95%": 0.0867
+  },
+  "share_TD_quantiles": {
+    "5%": 0,
+    "25%": 0.0053,
+    "50%": 0.0477,
+    "75%": 0.0641,
+    "95%": 0.0837
+  },
+  "share_res_quantiles": {
+    "5%": 0.7754,
+    "25%": 0.8185,
+    "50%": 0.883,
+    "75%": 0.9922,
+    "95%": 1
+  },
+  "median_shares": {
+    "T": 0.0186,
+    "TG": 0.0444,
+    "TD": 0.0477,
+    "res": 0.883
+  },
+  "note": "share_res includes measurement error (n_cells); me-removal is a documented refinement. Floor = not_identifiable (manifest)."
+}
