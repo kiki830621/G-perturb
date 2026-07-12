@@ -1,0 +1,195 @@
+<style>
+  :root {
+    --ground: #f5f7f8; --surface: #ffffff; --surface-2: #eef1f3;
+    --ink: #15181d; --muted: #5a626e; --faint: #8b93a0; --line: #e0e4e8;
+    --accent: #0d9488; --activation: #d9620a; --blocked: #b91c1c; --resolved: #2a8a3e;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ground: #0e1116; --surface: #171b21; --surface-2: #1e242c; --ink: #e9edf2;
+      --muted: #99a2b0; --faint: #6b7482; --line: #272e38; --accent: #2dd4bf; --activation: #f2914e;
+      --blocked: #f05a5a; --resolved: #56c96a; }
+  }
+  :root[data-theme="light"] { --ground: #f5f7f8; --surface: #ffffff; --surface-2: #eef1f3; --ink: #15181d;
+    --muted: #5a626e; --faint: #8b93a0; --line: #e0e4e8; --accent: #0d9488; --activation: #d9620a;
+    --blocked: #b91c1c; --resolved: #2a8a3e; }
+  :root[data-theme="dark"] { --ground: #0e1116; --surface: #171b21; --surface-2: #1e242c; --ink: #e9edf2;
+    --muted: #99a2b0; --faint: #6b7482; --line: #272e38; --accent: #2dd4bf; --activation: #f2914e;
+    --blocked: #f05a5a; --resolved: #56c96a; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--ground); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  .deck { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { .deck { scroll-behavior: auto; } }
+  .slide { min-height: 100vh; scroll-snap-align: start; display: grid; place-items: center;
+    padding: clamp(2rem, 6vh, 5rem) clamp(1.5rem, 6vw, 6rem); position: relative; }
+  .inner { width: 100%; max-width: 1000px; }
+  .wide { max-width: 1080px; }
+
+  .eyebrow { font-family: var(--mono); font-size: clamp(0.72rem, 1.1vw, 0.85rem); letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600; margin: 0 0 1rem; }
+  .eyebrow.act { color: var(--activation); }
+  h1 { font-family: var(--serif); font-weight: 600; letter-spacing: -0.01em; margin: 0; text-wrap: balance;
+    font-size: clamp(3rem, 9vw, 6rem); line-height: 0.98; }
+  h2 { font-family: var(--serif); font-weight: 600; letter-spacing: -0.01em; margin: 0 0 0.6em; text-wrap: balance;
+    font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.06; }
+  p { margin: 0; font-size: clamp(1.05rem, 1.7vw, 1.4rem); line-height: 1.5; color: var(--muted); max-width: 40ch; }
+  p.wide-p { max-width: 62ch; }
+  .ink { color: var(--ink); }
+  .hl { color: var(--accent); font-style: italic; }
+  .hl.act { color: var(--activation); }
+
+  .thesis { font-family: var(--serif); font-size: clamp(1.5rem, 3vw, 2.3rem); line-height: 1.3; color: var(--ink);
+    max-width: 24ch; margin: 1.5rem 0 2rem; text-wrap: pretty; }
+  .metaline { font-family: var(--mono); font-size: clamp(0.78rem, 1.2vw, 0.92rem); color: var(--faint);
+    letter-spacing: 0.03em; display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; }
+
+  .huge { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; letter-spacing: -0.03em;
+    white-space: nowrap; font-size: clamp(3rem, 9.5vw, 7.5rem); line-height: 0.92; color: var(--accent); margin: 0.18em 0 0.12em; }
+  .sub { font-family: var(--mono); font-size: clamp(0.85rem, 1.4vw, 1.05rem); color: var(--muted); letter-spacing: 0.02em; }
+
+  figure { margin: 1.4rem 0 0; }
+  .fig-frame { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 18px 44px -22px rgba(0,0,0,0.3); }
+  .fig-frame img { display: block; width: 100%; height: auto; border-radius: 6px; max-height: 62vh; object-fit: contain; }
+
+  .formula { font-family: var(--mono); font-size: clamp(0.82rem, 1.5vw, 1.05rem); background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.3rem; margin: 1.5rem 0 0; overflow-x: auto;
+    line-height: 1.9; color: var(--ink); display: inline-block; }
+  .formula .c { color: var(--muted); } .formula .a { color: var(--accent); }
+  .facets { display: flex; flex-wrap: wrap; gap: 0.55rem; margin: 1.6rem 0 0; }
+  .chip { font-family: var(--mono); font-size: clamp(0.8rem, 1.3vw, 0.95rem); padding: 0.4rem 0.85rem; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
+  .chip.rand { border-color: var(--accent); color: var(--accent); }
+  .chip.fix { border-color: var(--activation); color: var(--activation); }
+
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.7rem; margin: 1.8rem 0 0; }
+  .flow .node { flex: 1 1 220px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem 1.15rem; }
+  .flow .node .t { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+  .flow .node .h { font-family: var(--serif); font-size: clamp(1.2rem, 2vw, 1.5rem); margin: 0.3rem 0 0.4rem; }
+  .flow .node p { font-size: 0.95rem; }
+  .flow .node.blocked .h { color: var(--blocked); } .flow .node.resolved .h { color: var(--resolved); }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1.35fr; gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; }
+  @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } .fig-frame img { max-height: 46vh; } }
+
+  /* progress + nav hint */
+  .rail { position: fixed; top: 0; left: 0; height: 3px; width: 100%; background: var(--accent); z-index: 40;
+    transform: scaleX(0); transform-origin: left; transition: transform .25s ease; }
+  .counter { position: fixed; bottom: 1.1rem; right: 1.3rem; font-family: var(--mono); font-size: 0.8rem;
+    color: var(--faint); z-index: 40; font-variant-numeric: tabular-nums; }
+  .hint { position: fixed; bottom: 1.1rem; left: 1.3rem; font-family: var(--mono); font-size: 0.72rem; color: var(--faint); z-index: 40; }
+  .brandmark { position: fixed; top: 1rem; left: 1.4rem; font-family: var(--serif); font-size: 1rem; color: var(--muted); z-index: 40; }
+</style>
+
+<div class="rail" id="rail"></div>
+<div class="brandmark">G-perturb</div>
+<div class="counter" id="counter">01 / 09</div>
+<div class="hint">↓ / → to advance</div>
+
+<div class="deck" id="deck">
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">Generalizability theory × Perturb-seq</p>
+    <h1>G-perturb</h1>
+    <p class="thesis">Rank CD4<sup>+</sup> T-cell drug targets by whether the readout is
+      <span class="hl">dependable</span> — not by how large it is.</p>
+    <div class="metaline"><span>Built with Claude: Life Sciences</span><span>Marson-lab CD4<sup>+</sup> screen</span><span>Apache-2.0</span></div>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">The problem</p>
+    <h2>Dependability, not effect size</h2>
+    <p class="wide-p ink">A large effect measured in <em>one</em> guide, <em>one</em> donor, or a pseudobulk of
+      a handful of cells can be an artifact. For target prioritization — where every false lead costs a
+      validation experiment — dependability matters as much as magnitude.</p>
+  </div></section>
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">The method</p>
+    <h2>A measurement, decomposed</h2>
+    <p class="wide-p">Each perturbation effect is a measurement in a crossed design. Two facets are
+      <em>random</em> (generalize across them); one is <em>fixed</em> (consistency, not sampling).</p>
+    <div class="facets"><span class="chip">Target</span><span class="chip rand">Guide · random</span>
+      <span class="chip rand">Donor · random</span><span class="chip fix">Condition · fixed</span></div>
+    <div class="formula"><span class="a">R_dep,t</span> = 1 / ( 1 + (1&minus;R<span class="c">^guide</span>)/R<span class="c">^guide</span> + (1&minus;R<span class="c">^donor</span>)/R<span class="c">^donor</span> )   <span class="c">// = correlation of two independent redos</span></div>
+  </div></section>
+
+  <section class="slide"><div class="inner wide">
+    <p class="eyebrow">The process — why you can trust it</p>
+    <h2>An auditable, cross-model-hardened method</h2>
+    <p class="wide-p">Every scientific decision filed as a GitHub issue — a ledger you <em>can</em> red-team.</p>
+    <div class="flow">
+      <div class="node"><div class="t">Claude · IDD ledger</div><div class="h">Decide &amp; document</div><p>Each decision a timestamped issue.</p></div>
+      <div class="node blocked"><div class="t">GPT-5.6 Sol</div><div class="h">BLOCKED</div><p>11 methodological holes, 3 critical.</p></div>
+      <div class="node resolved"><div class="t">Claude</div><div class="h">Worked through</div><p>Each hole resolved; gates frozen first.</p></div>
+    </div>
+  </div></section>
+
+  <section class="slide"><div class="inner wide"><div class="grid2">
+    <div><p class="eyebrow">Finding · measurement error</p><h2>Signal hidden under noise</h2>
+      <div class="huge">40 → 7,674</div><div class="sub">genes with dependable target signal · 42% of the genome</div>
+      <p style="margin-top:1.2rem">Estimate the noise floor from the non-targeting controls, subtract it — the dependable hits were there all along.</p></div>
+    <figure><div class="fig-frame"><img src="__FIG1__" alt="me-removal reveal"></div></figure>
+  </div></div></section>
+
+  <section class="slide"><div class="inner wide"><div class="grid2">
+    <div><p class="eyebrow">Finding · the bottleneck</p><h2>Reliability is guide-limited</h2>
+      <p class="ink" style="font-size:clamp(1.1rem,1.9vw,1.5rem);max-width:22ch">2 guides cap near 0.53. No number of donors reaches 0.70.</p>
+      <p style="margin-top:1.1rem"><strong class="ink">Add guides, not people</strong> — and this holds in every activation state.</p></div>
+    <figure><div class="fig-frame"><img src="__FIG2__" alt="D-study surface"></div></figure>
+  </div></div></section>
+
+  <section class="slide"><div class="inner wide"><div class="grid2">
+    <div><p class="eyebrow">Finding · the ranking</p><h2>The list reshuffles</h2>
+      <div class="huge">49 / 100</div><div class="sub">top effect-only hits drop out · RPS3 climbs #79 → #4</div>
+      <p style="margin-top:1.2rem">Rank by effect × dependability, errors adding. The reshuffle <em>is</em> the deliverable.</p></div>
+    <figure><div class="fig-frame"><img src="__FIG3__" alt="ranking reshuffle"></div></figure>
+  </div></div></section>
+
+  <section class="slide"><div class="inner wide"><div class="grid2">
+    <div><p class="eyebrow act">Finding · context — the sharpest test</p><h2>Reliable only when activated</h2>
+      <p class="ink wide-p">With no gene labels, the method reconstructs the TCR signaling module: the CD3
+        complex, ZAP70 and LAT are reliably measurable <span class="hl act">only</span> in activated
+        T cells — resting dependability sits at the noise floor.</p></div>
+    <figure><div class="fig-frame"><img src="__FIG4__" alt="TCR context-specificity"></div></figure>
+  </div></div></section>
+
+  <section class="slide"><div class="inner">
+    <p class="eyebrow">Reproduce</p>
+    <h2>Every number regenerates<br>from one re-run</h2>
+    <p class="wide-p">Data fetch → frozen checksummed manifest → identifiability gates → synthetic method
+      selection → per-gene decomposition → measurement-error removal → D-study → per-context ranking.</p>
+    <p class="metaline" style="margin-top:2rem"><span class="ink" style="font-family:var(--serif);font-size:1.15rem">Built with Claude.</span><span>Apache-2.0</span><span>a frozen, cross-model-audited analysis</span></p>
+  </div></section>
+
+</div>
+
+<script>
+  (function () {
+    var deck = document.getElementById('deck');
+    var slides = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
+    var counter = document.getElementById('counter'), rail = document.getElementById('rail');
+    var n = slides.length, pad = function (i) { return (i < 10 ? '0' : '') + i; };
+    function current() {
+      var top = deck.scrollTop, best = 0, bd = Infinity;
+      slides.forEach(function (s, i) { var d = Math.abs(s.offsetTop - top); if (d < bd) { bd = d; best = i; } });
+      return best;
+    }
+    function update() {
+      var i = current(); counter.textContent = pad(i + 1) + ' / ' + pad(n);
+      rail.style.transform = 'scaleX(' + (n > 1 ? i / (n - 1) : 1) + ')';
+    }
+    function go(i) { i = Math.max(0, Math.min(n - 1, i)); slides[i].scrollIntoView({ behavior: 'smooth' }); }
+    deck.addEventListener('scroll', function () { window.requestAnimationFrame(update); }, { passive: true });
+    document.addEventListener('keydown', function (e) {
+      if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1) { e.preventDefault(); go(current() + 1); }
+      else if (['ArrowUp', 'ArrowLeft', 'PageUp'].indexOf(e.key) > -1) { e.preventDefault(); go(current() - 1); }
+      else if (e.key === 'Home') { e.preventDefault(); go(0); } else if (e.key === 'End') { e.preventDefault(); go(n - 1); }
+    });
+    update();
+  })();
+</script>
