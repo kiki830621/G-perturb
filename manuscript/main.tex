@@ -71,17 +71,28 @@ hit that does not reproduce spends a validation experiment on an artifact. What 
 screen is worth therefore depends not only on the effects it detects but on
 whether the ranking it induces over targets can be trusted.
 
-Target prioritization in Perturb-seq conventionally ranks candidates by
-differential-expression strength: effect size, $z$-score, false-discovery rate,
-or the number of downstream differentially expressed genes. These summaries
-answer whether a perturbation moved the transcriptome \emph{in the observed
-dataset}. They do not answer whether the effect would hold up under another
-guide, another donor, or another cell-state context. The two questions come
-apart. A target can carry a large apparent effect that is fragile, when two
-guides disagree, one donor drives the signal, knockdown is weak, or an off-target
-flag is present; a target of moderate effect that is consistent across guides and
-donors can be the better validation bet. We therefore treat \emph{dependability}
-as a first-class quantity alongside magnitude.
+Target prioritization conventionally ranks candidates by the strength of a
+perturbation's differential-expression signature. The strength is read from the
+coefficients of a regularized model of expression on guide assignment
+\parencite{dixit2016}, from a $z$-score or false-discovery rate for each
+perturbation-gene association, or from the number of downstream differentially
+expressed genes together with a global test that the transcriptome moved at all
+\parencite{replogle2022}. Effect metrics have since grown more sophisticated,
+replacing the gene count with the distance between the perturbed and control
+single-cell distributions \parencite{peidli2024} or with a per-target rate of
+cells classified as perturbed \parencite{papalexi2021}. All of them quantify how
+large an effect is.
+
+None answers a prior question: whether the effect is dependable, in the sense that
+it would recur under another guide, another donor, or another cell-state context.
+The number of differentially expressed genes, for instance, tracks the number of
+cells assayed \parencite{dixit2016} and need not track the strength of the
+perturbation itself \parencite{norman2019}, so a target can rank high on this
+measure yet low on reproducibility. A large apparent effect can be fragile, when
+two guides disagree, one donor drives the signal, knockdown is weak, or an
+off-target flag is present, while a target of moderate but consistent effect is
+the better validation bet. We therefore treat \emph{dependability} as a
+first-class quantity alongside magnitude.
 
 Two properties are at stake that effect size does not by itself deliver:
 \emph{accuracy}, that a reported effect is dependable rather than measurement
@@ -98,17 +109,21 @@ the same variance decomposition to alternative designs. Answering any of them
 first requires separating the dependable part of an effect from measurement
 noise.
 
-This concern is not new in high-throughput biology, though it has rarely been
-framed as measurement reliability. \textcite{li2011idr} call discoveries by their
-reproducibility across replicates rather than by effect size, defining an
-irreproducible discovery rate as an analogue of the false-discovery rate;
-\textcite{billmann2023} show that standard CRISPR-screen quality metrics do not
-by themselves capture the reproducibility of context-specific hits; and
-data-driven target-prioritization frameworks integrate several weighted evidence
-types rather than fitness effect alone \parencite{behan2019}. Generalizability
-theory supplies the missing piece: a single interpretable coefficient for the
-dependability of a per-target effect, together with an explicit account of which
-experimental facet limits it.
+Reliability, as opposed to size, has been approached from two directions. One
+measures reproducibility across replicates directly: the irreproducible discovery
+rate calls discoveries by whether they recur rather than by effect size
+\parencite{li2011idr}, and reproducibility metrics tuned to context-specific
+CRISPR screens show that standard quality-control does not capture whether such a
+hit will replicate \parencite{billmann2023}. The other decomposes expression
+variance into named sources, as a per-gene linear mixed model partitions variance
+into donor, batch, and residual components \parencite{hoffman2016}; data-driven
+prioritization frameworks likewise integrate several weighted evidence types
+rather than fitness effect alone \parencite{behan2019}. Neither direction yields a
+per-target coefficient one can rank on. Generalizability theory joins them: it
+turns a per-gene variance decomposition into a single dependability coefficient
+for each target, on the scale of a correlation between independent repeats, and
+separates the facets a target must generalize across from the context it is
+measured within.
 
 The rest of the paper develops the per-target coefficient and the two levels it
 rests on (Section~2), describes the data and the pre-registered choice of
