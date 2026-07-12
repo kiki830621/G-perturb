@@ -8,6 +8,8 @@ Genome-wide Perturb-seq screens prioritize candidate targets by the strength of 
 
 Target prioritization in Perturb-seq conventionally ranks candidates by differential-expression strength: effect size, *z*-score, false-discovery rate, or the number of downstream differentially expressed genes. These summaries answer whether a perturbation moved the transcriptome *in the observed dataset*. They do not answer whether the effect would hold up under another guide, another donor, or another cell-state context. The two questions come apart. A target can carry a large apparent effect that is fragile, when two guides disagree, one donor drives the signal, knockdown is weak, or an off-target flag is present; a target of moderate effect that is consistent across guides and donors can be the better validation bet. We therefore treat *dependability* as a first-class quantity alongside magnitude.
 
+This concern is not new in high-throughput biology, though it has rarely been framed as measurement reliability. Li et al. (2011) call discoveries by their reproducibility across replicates rather than by effect size, defining an irreproducible discovery rate as an analogue of the false-discovery rate; Billmann et al. (2023) show that standard CRISPR-screen quality metrics do not by themselves capture the reproducibility of context-specific hits; and data-driven target-prioritization frameworks integrate several weighted evidence types rather than fitness effect alone (Behan et al., 2019). Generalizability theory supplies the missing piece: a single interpretable coefficient for the dependability of a per-target effect, together with an explicit account of which experimental facet limits it.
+
 ## 2. A generalizability-theory decomposition
 
 ### 2.1 The crossed design and its facets
@@ -74,6 +76,12 @@ Four donors leave the donor variance component with three degrees of freedom, so
 
 ## References
 
+Behan, F. M., et al. (2019). Prioritization of cancer therapeutic targets using CRISPR–Cas9 screens. *Nature, 568,* 511–516. https://doi.org/10.1038/s41586-019-1103-9
+
+Billmann, M., Ward, H. N., Aregger, M., Costanzo, M., Andrews, B. J., Boone, C., Moffat, J., & Myers, C. L. (2023). Reproducibility metrics for context-specific CRISPR screens. *Cell Systems, 14*(5), 418–422.e2. https://doi.org/10.1016/j.cels.2023.04.003
+
 Cronbach, L. J., Gleser, G. C., Nanda, H., & Rajaratnam, N. (1972). *The dependability of behavioral measurements: Theory of generalizability for scores and profiles.* Wiley.
+
+Li, Q., Brown, J. B., Huang, H., & Bickel, P. J. (2011). Measuring reproducibility of high-throughput experiments. *Annals of Applied Statistics, 5*(3), 1752–1779. https://doi.org/10.1214/11-AOAS466
 
 Zhu, R., Dann, E., Yan, J., Reyes Retana, J., Goto, R., Guitche, R. C., Petersen, L. K., Ota, M., Pritchard, J. K., & Marson, A. (2025). Genome-scale perturb-seq in primary human CD4+ T cells maps context-specific regulators of T cell programs and human immune traits. *bioRxiv*. https://doi.org/10.64898/2025.12.23.696273
