@@ -91,7 +91,7 @@ Priority_t = E_t × R_dep,t × Q_t          (× optional Biology_t)
 
 ## Data
 
-Zhu et al. (2025), *Genome-scale perturb-seq in primary human CD4+ T cells* (Marson & Pritchard labs), bioRxiv `2025.12.23.696273`. Genome-scale CRISPRi, ~22M primary human CD4+ T cells, **4 donors × 3 conditions** (`Rest`, `Stim8hr`, `Stim48hr`). Public S3, no credentials:
+Zhu et al. (2025), *Genome-scale perturb-seq in primary human CD4+ T cells maps context-specific regulators of T cell programs and human immune traits* (Marson & Pritchard labs), bioRxiv [doi:10.64898/2025.12.23.696273](https://doi.org/10.64898/2025.12.23.696273). Genome-scale CRISPRi, ~22M primary human CD4+ T cells, **4 donors × 3 conditions** (`Rest`, `Stim8hr`, `Stim48hr`). Public S3, no credentials:
 
 ```
 s3://genome-scale-tcell-perturb-seq/marson2025_data/

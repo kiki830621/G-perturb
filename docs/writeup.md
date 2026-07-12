@@ -76,4 +76,4 @@ Four donors leave the donor variance component with three degrees of freedom, so
 
 Cronbach, L. J., Gleser, G. C., Nanda, H., & Rajaratnam, N. (1972). *The dependability of behavioral measurements: Theory of generalizability for scores and profiles.* Wiley.
 
-Zhu, J., et al. (2025). Genome-scale Perturb-seq in primary human CD4+ T cells. *bioRxiv* 2025.12.23.696273.
+Zhu, R., Dann, E., Yan, J., Reyes Retana, J., Goto, R., Guitche, R. C., Petersen, L. K., Ota, M., Pritchard, J. K., & Marson, A. (2025). Genome-scale perturb-seq in primary human CD4+ T cells maps context-specific regulators of T cell programs and human immune traits. *bioRxiv*. https://doi.org/10.64898/2025.12.23.696273
