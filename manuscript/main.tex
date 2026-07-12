@@ -48,11 +48,11 @@ generalizability coefficient over the two random facets, and we re-rank targets
 by effect magnitude weighted by that coefficient. On the released screen
 \parencite{zhu2025}, removing the measurement-error floor estimated from the
 non-targeting controls raises the number of genes with a dependable target-signal
-share above $.10$ from $40$ to $7{,}674$. A design study indicates that
-reliability is limited by the number of guides rather than the number of donors.
-Analyzed within activation states, dependability recovers the T-cell-receptor
-signaling module as reliably measurable only in activated cells, without recourse
-to gene annotation. Every methodological decision was recorded and adversarially
+share above $.10$ from $40$ to $7{,}674$. Analyzed within activation states,
+dependability recovers the T-cell-receptor signaling module as reliably measurable
+only in activated cells, without recourse to gene annotation. A design study
+indicates that reliability is limited by the number of guides rather than the
+number of donors, so a future screen should add guides. Every methodological decision was recorded and adversarially
 reviewed, and all results regenerate from the released summary statistics.
 \end{abstract}
 
@@ -269,48 +269,6 @@ controls give a clean non-targeting-versus-non-targeting negative test
   \label{fig:me}
 \end{figure}
 
-\subsection{A guide-limited design}
-
-A design study projects the generalizability coefficient onto alternative numbers
-of guides and donors (Figure~\ref{fig:dstudy}). On the representative signal genes
-the current design (two guides, four donors) reaches $E\rho^2 \approx .44$. The
-guide error term exceeds the donor error term by a factor of about $2.4$; adding
-one guide raises the coefficient about three times as much as adding one donor.
-With two guides the coefficient is capped near $.53$, and no number of donors
-reaches $.70$, whereas $.70$ is attainable with about 15 guides.
-Guide-to-guide variability, rather than donor heterogeneity, is the binding
-constraint, which is actionable guidance for the design of subsequent screens.
-Repeating the design study within each activation state returns the same verdict
-in all three states (Table~\ref{tab:percond}), so the recommendation is not an
-artifact of pooling; within a state the guide term dominates the donor term more
-sharply still, because most donor disagreement is a cross-state phenomenon.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.82\linewidth]{fig2_dstudy_surface.pdf}
-  \caption{The generalizability coefficient $E\rho^2$ across the design grid. The
-  current screen (two guides, four donors) is marked; reaching $.70$ requires
-  about 15 guides and is unreachable by adding donors.}
-  \label{fig:dstudy}
-\end{figure}
-
-\begin{table}[t]
-  \centering
-  \caption{Per-condition design study on the representative signal genes. The
-  guide-limited verdict holds within every activation state.}
-  \label{tab:percond}
-  \begin{tabular}{lccc}
-    \toprule
-    Activation state & $E\rho^2$ & Guide error & Donor error \\
-    \midrule
-    Rest      & $.502$ & $0.026$ & $0.005$ \\
-    Stim8hr   & $.507$ & $0.023$ & $0.004$ \\
-    Stim48hr  & $.491$ & $0.019$ & $0.004$ \\
-    Pooled    & $.438$ & $0.040$ & $0.017$ \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
 \subsection{A reliability-weighted ranking}
 
 Ranking targets by $S_t$ reorders the candidate list relative to effect size
@@ -373,6 +331,50 @@ perturbation rather than an artifact of the summary.
   only upon activation.}
   \label{fig:tcr}
 \end{figure}
+
+\subsection{A guide-limited design}
+
+The ranking and its context-specific structure describe the screen as it stands.
+How could a future screen be made more dependable? A design study projects the
+generalizability coefficient onto alternative numbers of guides and donors
+(Figure~\ref{fig:dstudy}). On the representative signal genes the current design
+(two guides, four donors) reaches $E\rho^2 \approx .44$. The guide error term
+exceeds the donor error term by a factor of about $2.4$; adding one guide raises
+the coefficient about three times as much as adding one donor. With two guides the
+coefficient is capped near $.53$, and no number of donors reaches $.70$, whereas
+$.70$ is attainable with about 15 guides. Guide-to-guide variability, rather than
+donor heterogeneity, is the binding constraint, which is actionable guidance for
+the design of subsequent screens. Repeating the design study within each
+activation state returns the same verdict in all three states
+(Table~\ref{tab:percond}), so the recommendation is not an artifact of pooling;
+within a state the guide term dominates the donor term more sharply still, because
+most donor disagreement is a cross-state phenomenon.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.82\linewidth]{fig2_dstudy_surface.pdf}
+  \caption{The generalizability coefficient $E\rho^2$ across the design grid. The
+  current screen (two guides, four donors) is marked; reaching $.70$ requires
+  about 15 guides and is unreachable by adding donors.}
+  \label{fig:dstudy}
+\end{figure}
+
+\begin{table}[t]
+  \centering
+  \caption{Per-condition design study on the representative signal genes. The
+  guide-limited verdict holds within every activation state.}
+  \label{tab:percond}
+  \begin{tabular}{lccc}
+    \toprule
+    Activation state & $E\rho^2$ & Guide error & Donor error \\
+    \midrule
+    Rest      & $.502$ & $0.026$ & $0.005$ \\
+    Stim8hr   & $.507$ & $0.023$ & $0.004$ \\
+    Stim48hr  & $.491$ & $0.019$ & $0.004$ \\
+    Pooled    & $.438$ & $0.040$ & $0.017$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \section{Reproducibility}
 
