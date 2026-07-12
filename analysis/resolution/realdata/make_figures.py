@@ -61,7 +61,8 @@ def fig1():
     axR.annotate("", xy=(1, n_corr), xytext=(0, n_raw),
                  arrowprops=dict(arrowstyle="->", color=RED, lw=1.8, connectionstyle="arc3,rad=-0.25"))
     axR.text(0.5, np.sqrt(n_raw * n_corr) * 1.4, "192×", ha="center", color=RED, fontsize=14, fontweight="bold")
-    fig.suptitle("Removing measurement error via the non-targeting controls", fontsize=14, fontweight="bold", y=1.02)
+    fig.subplots_adjust(top=0.80)   # reserve headroom so the suptitle clears the two subplot titles
+    fig.suptitle("Removing measurement error via the non-targeting controls", fontsize=14, fontweight="bold", y=1.13)
     save(fig, "fig1_me_removal")
 
 # ---------- Fig 2: D-study Erho2 surface ----------

@@ -83,13 +83,14 @@ experimental facet limits it.
 
 \subsection{The crossed design and its facets}
 
-The experimental structure maps onto a psychometric measurement design. The
-target gene is the object of measurement; the true perturbation signature is the
-universe score; the two guides per gene act as parallel forms; the four donors
-and the three culture conditions are crossed facets; cell sampling and sequencing
-contribute residual error. Classical test theory writes an observed score as
-$X = T + E$; generalizability theory decomposes the error term into named
-sources,
+The experimental structure maps onto a psychometric measurement design
+\parencite{lordnovick1968}. The target gene is the object of measurement; the true
+perturbation signature is the universe score; the two guides per gene act as
+parallel forms; the four donors and the three culture conditions are crossed
+facets; cell sampling and sequencing contribute residual error. Classical test
+theory writes an observed score as $X = T + E$, its true score the expected
+observation over independent replications \parencite{novick1966}; generalizability
+theory \parencite{cronbach1972} decomposes the error term into named sources,
 \[
 E = E_{\mathrm{guide}} + E_{\mathrm{donor}} + E_{\mathrm{condition}}
       + E_{\mathrm{interactions}} + E_{\mathrm{residual}},
@@ -116,7 +117,13 @@ mean profiles that differ only in that facet:
 \begin{itemize}
   \item $\Rg$: the target's guides are split into two halves, each half's mean
   profile is formed, and the two are correlated. A high value indicates that the
-  transcriptional signature reproduces across independent guide sets.
+  transcriptional signature reproduces across independent guide
+  sets.\footnote{These are raw single-observation split-half correlations. The
+  reliability of the deployed two-guide average is the Spearman--Brown step-up
+  $2r/(1+r)$, a separate and larger quantity; we report the single-observation form
+  because the joint coefficient is defined at the single-guide-by-single-donor
+  level. Both are distribution-light empirical correlations rather than Gaussian
+  variance-component ratios.}
   \item $\Rd$: the same construction with a two-versus-two donor split, followed
   by a moment-based empirical-Bayes shrinkage toward the pooled mean, which is
   warranted because four donors leave the donor coefficient with three degrees of
@@ -154,55 +161,24 @@ reproducibility. The equality is exact under the additive model; a
 guide-by-donor interaction would add a further disagreement term, so the
 error-adding form is an upper bound when interactions are present.
 
-\subsection{Split-half versus Spearman--Brown}
+\section{Data and estimation}
 
-A split-half correlation estimates the reliability of a \emph{single} level of a
-facet. The reliability of the deployed design, which averages over the two guides
-actually used, follows from the Spearman--Brown step-up
-$R_{\mathrm{full}} = 2r/(1+r)$. We report the raw single-observation split-half
-$r$, because the joint coefficient is defined at the single-guide-by-single-donor
-observation level; the stepped-up value is a separate, larger quantity,
-appropriate when the question is the dependability of the measurement one
-actually takes rather than the generalization of a single observation. Both are
-distribution-light empirical correlations; the Gaussian crossed mixed model is
-retained only as a baseline comparator, not as the reported estimator.
-
-\section{Estimation and reproducible adversarial review}
+The data are the released summary statistics of a genome-scale Perturb-seq screen
+in primary human CD4+ T cells \parencite{zhu2025}: CRISPR perturbations of
+$18{,}129$ genes in a crossed design of two guides per gene, four donors, and
+three culture conditions (Rest, Stim8hr, Stim48hr), with non-targeting guides as
+controls. We work from the released joint pseudobulk and define each
+perturbation's per-gene effect as its non-targeting-control-relative log-CPM within
+the matched donor-condition-run stratum, so that the effect is measured against the
+controls that share its technical context. No single-cell data are processed.
 
 The gene-level variance components are estimated with a precision-weighted
-crossed mixed model fit per gene on the joint pseudobulk. The estimator was not
-assumed. Three candidates were compared by pre-registered synthetic recovery, and
-the precision-weighted model was the only one to recover the planted components in
-both Gaussian and heavy-tailed regimes; a distance-based candidate failed, because
-a distance share is not a variance component.
-
-The methodology was developed under an auditable process
-(Figure~\ref{fig:hardening}). Each decision --- the choice of estimator, the
-thresholds, the classification of each facet as random or fixed, the criterion
-for identifiability --- was recorded as a versioned issue using issue-driven
-development \parencite{idd} and spec-driven development, both open-source tooling
-the author maintains. Because the reasoning was documented rather than implicit,
-the frozen record could be subjected to adversarial review by an independent
-frontier model, which returned a blocked verdict with eleven findings, three of
-them critical, spanning identifiability, measurement error, selection, validation
-leakage, and compute. Each finding was resolved within the same recorded loop:
-the falsification gates and controls were frozen before any real result was
-inspected, the estimator was selected as above, and a mis-specified reliability
-aggregation (a product of coefficients) was replaced by the joint coefficient of
-Section~2.2. The resolutions were then cross-verified across models with a second
-adversarial pass and with \texttt{parallel-ai-agents} \parencite{parallelaiagents},
-a package the author maintains that dispatches a task to independent agents and
-cross-compares their outputs. The recorded decisions, the blocked verdict, and
-every resolution are versioned in the repository.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{fig5_sol_hardening.pdf}
-  \caption{The recorded, cross-model-hardened process: a decision ledger enables
-  adversarial review by an independent model, whose blocked verdict is resolved
-  in the same loop. The verdict was blocked and worked through, not certified.}
-  \label{fig:hardening}
-\end{figure}
+crossed mixed model fit per gene, following the generalizability-theory design of
+Section~2 \parencite{brennan2001}. The estimator was not assumed. Three candidates
+were compared by pre-registered synthetic recovery, and the precision-weighted
+model was the only one to recover the planted components in both Gaussian and
+heavy-tailed regimes; a distance-based candidate failed, because a distance share
+is not a variance component.
 
 \section{Results}
 
@@ -353,6 +329,38 @@ are scheduled on a compute cluster; the results shown are the local synthetic an
 real-data tier. Finally, this is a re-analysis of released data, so the
 design-study guidance is prospective, addressed to subsequent screens rather than
 to the present one.
+
+\appendix
+
+\section{A recorded, cross-model-hardened process}
+
+The methodology was developed under an auditable process
+(Figure~\ref{fig:hardening}). Each decision --- the choice of estimator, the
+thresholds, the classification of each facet as random or fixed, the criterion
+for identifiability --- was recorded as a versioned issue using issue-driven
+development \parencite{idd} and spec-driven development, both open-source tooling
+the author maintains. Because the reasoning was documented rather than implicit,
+the frozen record could be subjected to adversarial review by an independent
+frontier model, which returned a blocked verdict with eleven findings, three of
+them critical, spanning identifiability, measurement error, selection, validation
+leakage, and compute. Each finding was resolved within the same recorded loop:
+the falsification gates and controls were frozen before any real result was
+inspected, the estimator was selected as in Section~3, and a mis-specified
+reliability aggregation (a product of coefficients) was replaced by the joint
+coefficient of Section~2.2. The resolutions were then cross-verified across models
+with a second adversarial pass and with \texttt{parallel-ai-agents}
+\parencite{parallelaiagents}, a package the author maintains that dispatches a task
+to independent agents and cross-compares their outputs. The recorded decisions, the
+blocked verdict, and every resolution are versioned in the repository.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{fig5_sol_hardening.pdf}
+  \caption{The recorded, cross-model-hardened process: a decision ledger enables
+  adversarial review by an independent model, whose blocked verdict is resolved
+  in the same loop. The verdict was blocked and worked through, not certified.}
+  \label{fig:hardening}
+\end{figure}
 
 \printbibliography
 
