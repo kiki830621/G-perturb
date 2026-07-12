@@ -56,7 +56,7 @@ to gene annotation. Every methodological decision was recorded and adversarially
 reviewed, and all results regenerate from the released summary statistics.
 \end{abstract}
 
-\section{Dependability, Not Effect Size}
+\section{Dependability, not effect size}
 
 Genome-scale Perturb-seq couples pooled CRISPR perturbation with a single-cell
 transcriptomic readout, so that the transcriptional consequence of perturbing each
@@ -110,9 +110,14 @@ theory supplies the missing piece: a single interpretable coefficient for the
 dependability of a per-target effect, together with an explicit account of which
 experimental facet limits it.
 
-\section{A Generalizability-Theory Decomposition}
+The rest of the paper develops the per-target coefficient and the two levels it
+rests on (Section~2), describes the data and the pre-registered choice of
+estimator (Section~3), and takes up RQ1 through RQ3 across four analyses
+(Section~4).
 
-\subsection{The Crossed Design and Its Facets}
+\section{A generalizability-theory decomposition}
+
+\subsection{The crossed design and its facets}
 
 The experimental structure maps onto a psychometric measurement design
 \parencite{lordnovick1968}. The target gene is the object of measurement; the true
@@ -136,7 +141,7 @@ rather than a generalization across states. A perturbation that acts only in the
 activated state is context-specific, not unreliable, and folding condition into a
 generalization coefficient would misclassify that signal as noise.
 
-\subsection{Per-Target Dependability}
+\subsection{Per-target dependability}
 
 For target $t$ we summarize dependability as a \emph{profile} of three facet
 coefficients, reported separately and never multiplied. Each observation is a
@@ -192,7 +197,7 @@ reproducibility. The equality is exact under the additive model; a
 guide-by-donor interaction would add a further disagreement term, so the
 error-adding form is an upper bound when interactions are present.
 
-\section{Data and Estimation}
+\section{Data and estimation}
 
 The data are the released summary statistics of a genome-scale Perturb-seq screen
 in primary human CD4+ T cells \parencite{zhu2025}: CRISPR perturbations of
@@ -213,7 +218,7 @@ is not a variance component.
 
 \section{Results}
 
-\subsection{Measurement Error Masks Dependable Signal}
+\subsection{Measurement error masks dependable signal}
 
 The residual of a pseudobulk decomposition combines biological idiosyncrasy with
 measurement error, and the latter is inflated when a pseudobulk aggregates few
@@ -235,7 +240,7 @@ controls give a clean non-targeting-versus-non-targeting negative test
   \label{fig:me}
 \end{figure}
 
-\subsection{A Guide-Limited Design}
+\subsection{A guide-limited design}
 
 A design study projects the generalizability coefficient onto alternative numbers
 of guides and donors (Figure~\ref{fig:dstudy}). On the representative signal genes
@@ -269,15 +274,15 @@ sharply still, because most donor disagreement is a cross-state phenomenon.
     \toprule
     Activation state & $E\rho^2$ & Guide error & Donor error \\
     \midrule
-    Rest      & $.502$ & $.026$ & $.005$ \\
-    Stim8hr   & $.507$ & $.023$ & $.004$ \\
-    Stim48hr  & $.491$ & $.019$ & $.004$ \\
-    Pooled    & $.438$ & $.040$ & $.017$ \\
+    Rest      & $.502$ & $0.026$ & $0.005$ \\
+    Stim8hr   & $.507$ & $0.023$ & $0.004$ \\
+    Stim48hr  & $.491$ & $0.019$ & $0.004$ \\
+    Pooled    & $.438$ & $0.040$ & $0.017$ \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\subsection{A Reliability-Weighted Ranking}
+\subsection{A reliability-weighted ranking}
 
 Ranking targets by $S_t$ reorders the candidate list relative to effect size
 alone (Figure~\ref{fig:rank}). Of the $100$ highest-effect targets, $49$ fall out
@@ -313,7 +318,7 @@ screen would nominate for validation but a strength-ranked screen would overlook
   \end{tabular}
 \end{table}
 
-\subsection{Context-Specific Dependability Recovers the TCR Module}
+\subsection{Context-specific dependability recovers the TCR module}
 
 Analyzed within activation states, dependability separates targets that are
 reliable across all states from targets that are reliable in one state and not
@@ -363,7 +368,7 @@ to the present one.
 
 \appendix
 
-\section{A Recorded, Cross-Model-Hardened Process}
+\section{A recorded, cross-model-hardened process}
 
 The methodology was developed under an auditable process
 (Figure~\ref{fig:hardening}). Each decision (the choice of estimator, the
