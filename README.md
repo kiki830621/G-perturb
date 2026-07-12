@@ -4,7 +4,7 @@
 
 > Built for **Built with Claude: Life Sciences** (Researcher track, 2026), in partnership with Gladstone Institutes. All work in this repository is done from scratch during the hackathon, per the event rules.
 
-> 📄 Full design rationale and method: [`docs/design.md`](./docs/design.md) (canonical design). The **method** is a distribution-light generalizability decomposition — facet variance shares plus an irreducible replication floor. The **deliverables** are a reliability-weighted target ranking and the dependability findings below, all resting on that decomposition.
+> 📄 Full design rationale: [`docs/design.md`](./docs/design.md) (canonical design). 📝 Research write-up (methods + results, paper voice): [`docs/writeup.md`](./docs/writeup.md). The **method** is a distribution-light generalizability decomposition — facet variance shares plus an irreducible replication floor. The **deliverables** are a reliability-weighted target ranking and the dependability findings below, all resting on that decomposition.
 
 ---
 
