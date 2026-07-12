@@ -1,12 +1,29 @@
 # G-perturb
 
-**A distribution-light generalizability decomposition of CD4+ T cell Perturb-seq — how much of each perturbation's effect is dependable (across guides, donors, conditions) versus irreducible idiosyncrasy, with a reliability-weighted target ranking as a by-product.**
+**Rank CD4+ T-cell Perturb-seq drug targets by whether the readout is *dependable*, not by how large it is.** G-perturb decomposes each perturbation's effect across guides, donors, and activation states with generalizability theory, then re-ranks targets by how reproducibly their signal generalizes.
 
 > Built for **Built with Claude: Life Sciences** (Researcher track, 2026), in partnership with Gladstone Institutes. All work in this repository is done from scratch during the hackathon, per the event rules.
 
-> 📄 Full design rationale and method write-up: [`docs/design.md`](./docs/design.md) — the single canonical design. **Headline deliverable (2026-07 reframe, issue #8): the design-level generalizability decomposition** — facet variance shares plus an irreducible replication floor, estimated distribution-light — with the scalar ranking demoted to a sanity-check stepping-stone and criterion validation as corroboration.
+> 📄 Full design rationale and method: [`docs/design.md`](./docs/design.md) (canonical design). The **method** is a distribution-light generalizability decomposition — facet variance shares plus an irreducible replication floor. The **deliverables** are a reliability-weighted target ranking and the dependability findings below, all resting on that decomposition.
 
 ---
+
+## What we found
+
+On the real 44.6 GB joint pseudobulk (18,129 genes × 4 donors × 3 conditions), decomposed genome-wide:
+
+- **Signal was hidden under measurement noise.** Raw pseudobulk shows dependable target-signal in only **40** genes; removing the measurement-error floor (estimated from the non-targeting controls) lifts that to **7,674 genes (42%)** — the dependable hits were masked by noise, not absent.
+- **The ranking reshuffles.** Weighting effect size by a per-target dependability coefficient, **49 of the top-100 effect-only targets drop out** of the dependability-weighted top-100. Targets you would *miss by effect size alone* climb sharply — **RPS3 #79→#4, RPP21 #124→#8, NMD3 #158→#17, IMP4 #96→#13, QARS1 #53→#5** are dependable but effect-underranked: the "validate these next" candidates.
+- **Reliability is guide-limited.** A D-study shows two guides per gene cap generalizability near 0.53; reaching 0.70 needs ~15 guides, and no number of donors suffices — **add guides, not donors** (and this holds within every activation state, not just pooled).
+- **Context-specificity recovers real biology, unprompted.** Slicing dependability by activation state surfaces the **T-cell-receptor signaling module — CD3D, CD3G, CD247, ZAP70, LAT — as reliably measurable only in *activated* T cells** (resting dependability at the noise floor). With no gene labels, the method reconstructs the TCR module: the sharpest evidence it measures something real.
+
+Figures (submission-grade): [`analysis/resolution/realdata/figures/`](./analysis/resolution/realdata/figures/). Ranked tables: [`analysis/resolution/realdata/target_ranking.csv`](./analysis/resolution/realdata/target_ranking.csv) + `target_context_specificity.csv`. The whole pipeline regenerates every number from one re-run.
+
+## How it was built — an auditable, cross-model-hardened process
+
+Every scientific decision (estimator, thresholds, why a facet is random vs fixed, what counts as identifiable) was filed as a GitHub issue through **issue-driven development (IDD)** and spec-driven development (Spectra) — open-source Claude Code plugins I built ([`PsychQuant/issue-driven-development`](https://github.com/PsychQuant/issue-driven-development)). That auditable decision ledger let a *competing* frontier model, **GPT-5.6 Sol**, red-team the design: it returned **BLOCKED** with 11 methodological holes (3 critical), and each was worked through in the same loop with Claude — gates frozen before results, the method chosen by pre-registered synthetic recovery. The resolutions were then **cross-verified across models**: a second adversarial pass via **codex-pro** (Codex) and multi-agent cross-checking through [`PsychQuant/parallel-ai-agents`](https://github.com/PsychQuant/parallel-ai-agents) — another package I wrote that dispatches a task to independent Claude and Codex agents and cross-compares their outputs. The blocked verdict and every resolution are versioned in the repo (`docs/reviews/`, `openspec/changes/`, the issue history) — the audit trail *is* the evidence.
+
+*(IDD and Spectra are my pre-existing open-source tooling; the G-perturb analysis they govern here is the new hackathon work.)*
 
 ## The reframing
 
@@ -18,7 +35,7 @@ It does **not** answer the question target discovery actually depends on:
 
 > Will the effect **hold up** with another guide, another donor, another cell-state context?
 
-These are different questions. A target can have a large apparent effect but be fragile (two guides disagree, one donor drives it, weak knockdown, off-target flag). A moderate-effect target that is consistent across guides and donors may be the better validation bet. **G-perturb treats each perturbation effect as a measured score and decomposes its variance across guide, donor, and condition facets — reporting how much of the effect is dependable versus irreducible idiosyncrasy, distribution-light.** The reliability-weighted target ranking (effect magnitude × dependability × quality) falls out as a by-product / sanity-check, not the headline.
+These are different questions. A target can have a large apparent effect but be fragile (two guides disagree, one donor drives it, weak knockdown, off-target flag). A moderate-effect target that is consistent across guides and donors may be the better validation bet. **G-perturb treats each perturbation effect as a measured score and decomposes its variance across guide, donor, and condition facets — reporting how much of the effect is dependable versus irreducible idiosyncrasy, distribution-light.** The reliability-weighted target ranking (effect magnitude × dependability) is the primary deliverable; the variance decomposition is the engine underneath it.
 
 ## Why it's a measurement problem
 
