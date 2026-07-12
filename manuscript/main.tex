@@ -6,7 +6,10 @@
 \usepackage{booktabs}
 \usepackage{authblk}
 \usepackage{microtype}
-\usepackage[style=authoryear,backend=biber,natbib=true,maxcitenames=2,uniquename=false]{biblatex}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage[style=apa,backend=biber]{biblatex}
+\DeclareLanguageMapping{american}{american-apa}
 \usepackage[colorlinks=true,allcolors=blue]{hyperref}
 
 \graphicspath{{figures/}}
@@ -53,7 +56,7 @@ to gene annotation. Every methodological decision was recorded and adversarially
 reviewed, and all results regenerate from the released summary statistics.
 \end{abstract}
 
-\section{Dependability, not effect size}
+\section{Dependability, Not Effect Size}
 
 Target prioritization in Perturb-seq conventionally ranks candidates by
 differential-expression strength: effect size, $z$-score, false-discovery rate,
@@ -94,9 +97,9 @@ theory supplies the missing piece: a single interpretable coefficient for the
 dependability of a per-target effect, together with an explicit account of which
 experimental facet limits it.
 
-\section{A generalizability-theory decomposition}
+\section{A Generalizability-Theory Decomposition}
 
-\subsection{The crossed design and its facets}
+\subsection{The Crossed Design and Its Facets}
 
 The experimental structure maps onto a psychometric measurement design
 \parencite{lordnovick1968}. The target gene is the object of measurement; the true
@@ -120,7 +123,7 @@ rather than a generalization across states. A perturbation that acts only in the
 activated state is context-specific, not unreliable, and folding condition into a
 generalization coefficient would misclassify that signal as noise.
 
-\subsection{Per-target dependability}
+\subsection{Per-Target Dependability}
 
 For target $t$ we summarize dependability as a \emph{profile} of three facet
 coefficients, reported separately and never multiplied. Each observation is a
@@ -176,7 +179,7 @@ reproducibility. The equality is exact under the additive model; a
 guide-by-donor interaction would add a further disagreement term, so the
 error-adding form is an upper bound when interactions are present.
 
-\section{Data and estimation}
+\section{Data and Estimation}
 
 The data are the released summary statistics of a genome-scale Perturb-seq screen
 in primary human CD4+ T cells \parencite{zhu2025}: CRISPR perturbations of
@@ -197,7 +200,7 @@ is not a variance component.
 
 \section{Results}
 
-\subsection{Measurement error masks dependable signal}
+\subsection{Measurement Error Masks Dependable Signal}
 
 The residual of a pseudobulk decomposition combines biological idiosyncrasy with
 measurement error, and the latter is inflated when a pseudobulk aggregates few
@@ -219,7 +222,7 @@ controls give a clean non-targeting-versus-non-targeting negative test
   \label{fig:me}
 \end{figure}
 
-\subsection{A guide-limited design}
+\subsection{A Guide-Limited Design}
 
 A design study projects the generalizability coefficient onto alternative numbers
 of guides and donors (Figure~\ref{fig:dstudy}). On the representative signal genes
@@ -227,7 +230,7 @@ the current design (two guides, four donors) reaches $E\rho^2 \approx .44$. The
 guide error term exceeds the donor error term by a factor of about $2.4$; adding
 one guide raises the coefficient about three times as much as adding one donor.
 With two guides the coefficient is capped near $.53$, and no number of donors
-reaches $.70$, whereas $.70$ is attainable with about fifteen guides.
+reaches $.70$, whereas $.70$ is attainable with about 15 guides.
 Guide-to-guide variability, rather than donor heterogeneity, is the binding
 constraint, which is actionable guidance for the design of subsequent screens.
 Repeating the design study within each activation state returns the same verdict
@@ -240,7 +243,7 @@ sharply still, because most donor disagreement is a cross-state phenomenon.
   \includegraphics[width=0.82\linewidth]{fig2_dstudy_surface.pdf}
   \caption{The generalizability coefficient $E\rho^2$ across the design grid. The
   current screen (two guides, four donors) is marked; reaching $.70$ requires
-  about fifteen guides and is unreachable by adding donors.}
+  about 15 guides and is unreachable by adding donors.}
   \label{fig:dstudy}
 \end{figure}
 
@@ -261,7 +264,7 @@ sharply still, because most donor disagreement is a cross-state phenomenon.
   \end{tabular}
 \end{table}
 
-\subsection{A reliability-weighted ranking}
+\subsection{A Reliability-Weighted Ranking}
 
 Ranking targets by $S_t$ reorders the candidate list relative to effect size
 alone (Figure~\ref{fig:rank}). Of the $100$ highest-effect targets, $49$ fall out
@@ -297,19 +300,19 @@ screen would nominate for validation but a strength-ranked screen would overlook
   \end{tabular}
 \end{table}
 
-\subsection{Context-specific dependability recovers the TCR module}
+\subsection{Context-Specific Dependability Recovers the TCR Module}
 
 Analyzed within activation states, dependability separates targets that are
 reliable across all states from targets that are reliable in one state and not
 another (Figure~\ref{fig:tcr}). Because a within-state coefficient rests on
 roughly a third of the cells and runs lower than the pooled value, states are
 compared to one another rather than to the pooled number. One hundred targets are
-context-specific in this sense. Among them, the T-cell-receptor signaling module,
+context-specific in this sense. Among them, the T-cell-receptor (TCR) signaling module,
 the CD3 complex (CD3D, CD3G, CD247) with the proximal kinase ZAP70 and the
 scaffold LAT, is reliably measurable only in activated cells, with resting
 dependability at the noise floor (resting $R_{\mathrm{dep}} \approx .02$--$.05$;
 stimulated $\approx .20$--$.28$). The knockdown effect for CD3D grows with
-activation (effect magnitude $.26$, $.57$, and $1.12$ across Rest, Stim8hr, and
+activation (effect magnitude $0.26$, $0.57$, and $1.12$ across Rest, Stim8hr, and
 Stim48hr) and becomes dependable only upon activation. The framework reconstructs
 a coherent signaling module from dependability alone, without gene annotation,
 which is the strongest available evidence that it measures a real property of the
@@ -347,16 +350,16 @@ to the present one.
 
 \appendix
 
-\section{A recorded, cross-model-hardened process}
+\section{A Recorded, Cross-Model-Hardened Process}
 
 The methodology was developed under an auditable process
-(Figure~\ref{fig:hardening}). Each decision --- the choice of estimator, the
-thresholds, the classification of each facet as random or fixed, the criterion
-for identifiability --- was recorded as a versioned issue using issue-driven
+(Figure~\ref{fig:hardening}). Each decision (the choice of estimator, the
+thresholds, the classification of each facet as random or fixed, and the criterion
+for identifiability) was recorded as a versioned issue using issue-driven
 development \parencite{idd} and spec-driven development, both open-source tooling
 the author maintains. Because the reasoning was documented rather than implicit,
 the frozen record could be subjected to adversarial review by an independent
-frontier model, which returned a blocked verdict with eleven findings, three of
+frontier model, which returned a blocked verdict with 11 findings, three of
 them critical, spanning identifiability, measurement error, selection, validation
 leakage, and compute. Each finding was resolved within the same recorded loop:
 the falsification gates and controls were frozen before any real result was
