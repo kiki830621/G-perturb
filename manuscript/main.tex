@@ -58,6 +58,19 @@ reviewed, and all results regenerate from the released summary statistics.
 
 \section{Dependability, Not Effect Size}
 
+Genome-scale Perturb-seq couples pooled CRISPR perturbation with a single-cell
+transcriptomic readout, so that the transcriptional consequence of perturbing each
+of thousands of genes is measured in one experiment
+\parencite{dixit2016,replogle2022}. Applied to primary human CD4+ T cells, the
+cells that coordinate adaptive immunity and are a substrate for engineered cell
+therapies, such a screen identifies the genes whose perturbation most reshapes a
+T-cell program and, on that basis, nominates candidate targets
+\parencite{zhu2025}. The nomination carries a cost. Each target that advances is
+committed to an arrayed knockdown, a functional assay, or an animal model, so a
+hit that does not reproduce spends a validation experiment on an artifact. What a
+screen is worth therefore depends not only on the effects it detects but on
+whether the ranking it induces over targets can be trusted.
+
 Target prioritization in Perturb-seq conventionally ranks candidates by
 differential-expression strength: effect size, $z$-score, false-discovery rate,
 or the number of downstream differentially expressed genes. These summaries
