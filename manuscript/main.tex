@@ -119,20 +119,28 @@ estimator (Section~3), and takes up RQ1 through RQ3 across four analyses
 
 \subsection{The crossed design and its facets}
 
-The experimental structure maps onto a psychometric measurement design
-\parencite{lordnovick1968}. The target gene is the object of measurement; the true
-perturbation signature is the universe score; the two guides per gene act as
-parallel forms; the four donors and the three culture conditions are crossed
-facets; cell sampling and sequencing contribute residual error. Classical test
-theory writes an observed score as $X = T + E$, its true score the expected
-observation over independent replications \parencite{novick1966}; generalizability
-theory \parencite{cronbach1972} decomposes the error term into named sources,
+We treat one perturbation's effect as a measurement and ask how much of it would
+recur if the experiment were repeated. The quantity of interest is the target
+gene's true effect on the transcriptome. What we observe is that effect seen
+through one guide, in one donor, under one culture condition, and read from a
+finite sample of cells, and each of these can make the observation differ from the
+truth. This is the setting generalizability theory was built for, and the
+correspondence is direct \parencite{lordnovick1968}: the target gene is the
+\emph{object of measurement}, its true effect is the \emph{universe score} (the
+value one would obtain by averaging over infinitely many independent repeats), the
+two guides are interchangeable versions of the same perturbation (\emph{parallel
+forms}), and donors and conditions are further experimental factors, or
+\emph{facets}, crossed with the target. Cell sampling and sequencing contribute the
+residual noise. Classical test theory writes an observation as a true score plus
+error, $X = T + E$ \parencite{novick1966}, and generalizability theory
+\parencite{cronbach1972} splits that error into one term per facet,
 \[
 E = E_{\mathrm{guide}} + E_{\mathrm{donor}} + E_{\mathrm{condition}}
       + E_{\mathrm{interactions}} + E_{\mathrm{residual}},
 \]
-and reports how much of the effect is attributable to each. We distinguish random
-from fixed facets. Guides and donors are \emph{random} facets: one wants the
+and estimates how large each term is.
+
+We distinguish random from fixed facets. Guides and donors are \emph{random} facets: one wants the
 effect to generalize across the guides and donors that were not sampled.
 Condition is a \emph{fixed} facet: Rest, Stim8hr, and Stim48hr are three
 deliberately chosen activation states, not a sample from a population of
@@ -143,13 +151,15 @@ generalization coefficient would misclassify that signal as noise.
 
 \subsection{Per-target dependability}
 
-For target $t$ we summarize dependability as a \emph{profile} of three facet
-coefficients, reported separately and never multiplied. Each observation is a
-(target, guide, donor, condition) pseudobulk carrying an effect profile over the
-$18{,}129$ genes, defined relative to a matched non-targeting-control reference.
-For a set of observations, the group-mean profile is the elementwise mean, and
-each facet coefficient is the Pearson correlation, across genes, between two such
-mean profiles that differ only in that facet:
+For target $t$ we report dependability as a \emph{profile} of three coefficients,
+one per facet, kept separate and never multiplied together. Each coefficient
+answers a reproducibility question: with everything held fixed except one facet,
+how well does the target's transcriptional signature repeat? An observation is a
+(target, guide, donor, condition) pseudobulk whose effect profile spans the
+$18{,}129$ genes, measured relative to a matched non-targeting control. We average
+a group of observations into a mean profile, and each facet coefficient is the
+Pearson correlation, across genes, between two mean profiles that differ only in
+that facet:
 \begin{itemize}
   \item $\Rg$: the target's guides are split into two halves, each half's mean
   profile is formed, and the two are correlated. A high value indicates that the
@@ -160,42 +170,44 @@ mean profiles that differ only in that facet:
   because the joint coefficient is defined at the single-guide-by-single-donor
   level. Both are distribution-light empirical correlations rather than Gaussian
   variance-component ratios.}
-  \item $\Rd$: the same construction with a two-versus-two donor split, followed
-  by a moment-based empirical-Bayes shrinkage toward the pooled mean, which is
-  warranted because four donors leave the donor coefficient with three degrees of
-  freedom and correspondingly noisy.
+  \item $\Rd$: the same construction with a two-versus-two donor split, then
+  shrunk toward the pooled mean by a moment-based empirical-Bayes step, which
+  stabilizes a coefficient that four donors otherwise leave with only three
+  degrees of freedom.
   \item $\Rc$: the mean of the pairwise correlations among the three within-state
   profiles, reported as cross-context \emph{consistency} rather than as a
   generalization coefficient.
 \end{itemize}
 
-The ranking scalar is the per-target dependability $\Rdep$, the joint
-generalizability over the two random facets. Writing each facet coefficient as
-$R = \tau/(\tau + e)$ for a shared true-score variance $\tau$ and a
-facet-specific error variance $e$, the error-to-signal ratios
-$(1-R)/R = e/\tau$ add, so
+To rank targets we need one number rather than a profile. The per-target
+dependability $\Rdep$ is that number, and it has a concrete meaning: the
+correlation one would expect between two fully independent repeats of the
+experiment, a second run carried out with fresh guides and fresh donors. Writing
+an observed profile as a true signal plus independent guide and donor errors,
+$\tau_t + \varepsilon_{\mathrm{guide}} + \varepsilon_{\mathrm{donor}}$, that
+correlation is the signal's share of the total variation,
+$\sigma^2_\tau / (\sigma^2_\tau + \sigma^2_{\mathrm{guide}}
++ \sigma^2_{\mathrm{donor}})$. The same quantity is assembled from the two
+split-half coefficients. Writing each as $R = \tau/(\tau + e)$ for a shared signal
+variance $\tau$ and a facet error variance $e$, each facet contributes an
+error-to-signal ratio $(1-R)/R = e/\tau$, and because the guide and donor errors
+are independent these ratios add:
 \begin{equation}
 \Rdep = \frac{1}{1 + \dfrac{1 - \Rg}{\Rg} + \dfrac{1 - \Rd}{\Rd}},
 \qquad S_t = E_t \, \Rdep,
 \label{eq:rdep}
 \end{equation}
 where $E_t$ is the effect magnitude and $S_t$ the dependability-weighted score
-used for ranking. We keep the naming discipline that separates the two levels of
-the theory: $\Rdep$ is a per-target quantity, whereas the design-level
-coefficients $E\rho^2$ and $\Phi$ describe the measurement design as a whole and
-carry no per-target subscript.
+used for ranking. A single-facet coefficient refreshes one source of variation;
+the joint coefficient refreshes both, and is therefore the most demanding form of
+reproducibility we report. The equality is exact when the two errors are
+independent, and becomes an upper bound if a guide-by-donor interaction adds a
+further disagreement term.
 
-The joint coefficient has a direct interpretation. Writing an observed profile as
-$\tau_t + \varepsilon_{\mathrm{guide}} + \varepsilon_{\mathrm{donor}}$, the
-correlation between two \emph{independent replications} of the whole measurement,
-a second experiment with fresh guides and fresh donors, is
-$\sigma^2_\tau / (\sigma^2_\tau + \sigma^2_{\mathrm{guide}}
-+ \sigma^2_{\mathrm{donor}})$, which is Equation~\eqref{eq:rdep}. The single-facet
-coefficients are the same correlation with only one facet refreshed; the joint
-coefficient refreshes both and is therefore the most stringent form of
-reproducibility. The equality is exact under the additive model; a
-guide-by-donor interaction would add a further disagreement term, so the
-error-adding form is an upper bound when interactions are present.
+We keep a naming discipline that separates the two levels of the theory: $\Rdep$
+is a per-target quantity, whereas the design-level coefficients $E\rho^2$ and
+$\Phi$ describe the measurement design as a whole and carry no per-target
+subscript.
 
 \section{Data and estimation}
 
@@ -208,13 +220,14 @@ perturbation's per-gene effect as its non-targeting-control-relative log-CPM wit
 the matched donor-condition-run stratum, so that the effect is measured against the
 controls that share its technical context. No single-cell data are processed.
 
-The gene-level variance components are estimated with a precision-weighted
-crossed mixed model fit per gene, following the generalizability-theory design of
-Section~2 \parencite{brennan2001}. The estimator was not assumed. Three candidates
-were compared by pre-registered synthetic recovery, and the precision-weighted
-model was the only one to recover the planted components in both Gaussian and
-heavy-tailed regimes; a distance-based candidate failed, because a distance share
-is not a variance component.
+The variance contributed by each facet is estimated per gene by a crossed mixed
+model that weights each pseudobulk by its precision, following the
+generalizability-theory design of Section~2 \parencite{brennan2001}. We did not
+assume this estimator. Three candidates were compared on simulated data with known
+variance components, a pre-registered synthetic-recovery test, and only the
+precision-weighted model recovered the planted values under both Gaussian and
+heavy-tailed noise. A distance-based candidate failed, because a share of a
+distance is not a variance and cannot be read as one.
 
 \section{Results}
 
