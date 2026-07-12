@@ -188,16 +188,17 @@ $\tau_t + \varepsilon_{\mathrm{guide}} + \varepsilon_{\mathrm{donor}}$, that
 correlation is the signal's share of the total variation,
 $\sigma^2_\tau / (\sigma^2_\tau + \sigma^2_{\mathrm{guide}}
 + \sigma^2_{\mathrm{donor}})$. The same quantity is assembled from the two
-split-half coefficients. Writing each as $R = \tau/(\tau + e)$ for a shared signal
-variance $\tau$ and a facet error variance $e$, each facet contributes an
-error-to-signal ratio $(1-R)/R = e/\tau$, and because the guide and donor errors
-are independent these ratios add:
+split-half coefficients. Each is itself a signal share of the same kind,
+$R = \sigma^2_\tau/(\sigma^2_\tau + \sigma^2_e)$, where $\sigma^2_e$ is the error
+variance of the facet it refreshes. Its error-to-signal ratio is therefore
+$(1-R)/R = \sigma^2_e/\sigma^2_\tau$, and because the guide and donor errors are
+independent these two ratios add:
 \begin{equation}
 \Rdep = \frac{1}{1 + \dfrac{1 - \Rg}{\Rg} + \dfrac{1 - \Rd}{\Rd}},
-\qquad S_t = E_t \, \Rdep,
+\qquad S_t = M_t \, \Rdep,
 \label{eq:rdep}
 \end{equation}
-where $E_t$ is the effect magnitude and $S_t$ the dependability-weighted score
+where $M_t$ is the effect magnitude and $S_t$ the dependability-weighted score
 used for ranking. A single-facet coefficient refreshes one source of variation;
 the joint coefficient refreshes both, and is therefore the most demanding form of
 reproducibility we report. The equality is exact when the two errors are
@@ -335,7 +336,7 @@ screen would nominate for validation but a strength-ranked screen would overlook
 
 Analyzed within activation states, dependability separates targets that are
 reliable across all states from targets that are reliable in one state and not
-another (Figure~\ref{fig:tcr}). Because a within-state coefficient rests on
+another (Figure~\ref{fig:tcr}). Because a within-state per-target dependability rests on
 roughly a third of the cells and runs lower than the pooled value, states are
 compared to one another rather than to the pooled number. One hundred targets are
 context-specific in this sense. Among them, the T-cell-receptor (TCR) signaling module,
