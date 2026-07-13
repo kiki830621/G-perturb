@@ -106,26 +106,29 @@ guides and donors. Measuring that \emph{reproducibility} therefore captures both
 once. We ask four
 questions, moving from the present screen to future ones:
 \begin{itemize}
-  \item \emph{RQ1 (per target):} which targets carry an individually dependable
-  effect, one that would recur under a fresh guide and a fresh donor, and does
-  ranking by that dependability reorder the list that effect size alone
-  produces?
-  \item \emph{RQ2 (in context):} does the same dependability, evaluated within each
-  activation state, separate context-specific signal from noise and recover
-  coherent biology?
-  \item \emph{RQ3 (the design):} how dependable is the present screen as a whole, at
-  its two guides and four donors?
-  \item \emph{RQ4 (improving the design):} which facet limits that dependability,
-  and how much would a future screen recover by adding to it?
+  \item \emph{RQ1 (per target):} which targets carry a dependable effect, one that
+  would recur under a fresh guide and a fresh donor, and does ranking targets by that
+  dependability reorder the shortlist that effect size alone produces?
+  \item \emph{RQ2 (in context):} within each activation state (Rest, Stim8hr,
+  Stim48hr), does per-target dependability separate a context-specific signal from
+  noise and reconstruct a coherent biological module?
+  \item \emph{RQ3 (the design):} how dependable is the screen as a whole, given its
+  two guides and four donors per target?
+  \item \emph{RQ4 (improving the design):} which facet, guides or donors, limits the
+  screen's dependability, and how much would a future screen recover by adding to the
+  limiting one?
 \end{itemize}
 RQ1 and RQ2 concern individual targets, RQ3 and RQ4 the measurement design, and each
 answer carries a consequence. A reordering under RQ1 would mean that effect size on
 its own has been nominating fragile targets and passing over reproducible ones, so
-the shortlist a screen carries to the bench is the wrong one. A yes to RQ2 would show
-that the coefficient tracks a real property of the perturbation rather than an
-artifact of the summary, since a coherent signaling module cannot assemble itself
-from noise, and it would mark out context-specific-but-reliable targets that pooled
-ranking and effect size both miss. RQ3 fixes how far the present screen's rankings
+the targets a screen sends for validation are the wrong ones: strong but fragile hits
+crowd out the reproducible ones that would actually confirm. A yes to RQ2 would show
+that the coefficient measures real biology, not a quirk of how the data were
+summarized: a known signaling module cannot assemble itself out of noise, so
+recovering one from dependability alone, with no gene labels supplied, means the
+signal being scored is genuine. It would also single out targets dependable in one
+activation state but not another, a class that pooled ranking and effect size both
+miss. RQ3 fixes how far the present screen's rankings
 can be trusted, and RQ4 turns that into guidance for the next screen, naming the
 facet whose reinforcement recovers the most reliability.
 
@@ -635,8 +638,8 @@ thresholds, the classification of each facet as random or fixed, and the criteri
 for identifiability) was recorded as a versioned issue using issue-driven
 development \parencite{idd} and spec-driven development, both open-source tooling
 the author maintains. Because the reasoning was documented rather than implicit,
-the frozen record could be subjected to adversarial review by an independent
-frontier model, which returned a blocked verdict with 11 findings, three of
+the frozen record could be subjected to adversarial review by a competing frontier
+model, GPT-5.6 Sol, which returned a blocked verdict with 11 findings, three of
 them critical, spanning identifiability, measurement error, selection, validation
 leakage, and compute. Each finding was resolved within the same recorded loop:
 the falsification gates and controls were frozen before any real result was
@@ -659,8 +662,8 @@ like the analysis, is auditable rather than opaque.
   \centering
   \includegraphics[width=\linewidth]{fig5_sol_hardening.pdf}
   \caption{The recorded, cross-model-hardened process: a decision ledger enables
-  adversarial review by an independent model, whose blocked verdict is resolved
-  in the same loop. The verdict was blocked and worked through, not certified.}
+  adversarial review by a competing model, GPT-5.6 Sol, whose blocked verdict is
+  resolved in the same loop. The verdict was blocked and worked through, not certified.}
   \label{fig:hardening}
 \end{figure}
 
