@@ -171,22 +171,23 @@ value one would obtain by averaging over infinitely many independent repeats), t
 two guides are interchangeable versions of the same perturbation (\emph{parallel
 forms}), and donors and conditions are further experimental factors, or
 \emph{facets}, crossed with the target. Cell sampling and sequencing contribute the
-residual noise. Classical test theory writes an observation as a true score plus
-error, $X = T + \varepsilon$ \parencite{novick1966}, and generalizability theory
-\parencite{cronbach1972} splits that error into one independent term per facet,
+residual noise. Classical test theory writes an observation as a true effect plus
+error, $X = \tau + \varepsilon$ \parencite{novick1966}, and generalizability theory
+\parencite{cronbach1972} splits that error into one term per facet,
 \[
 \varepsilon = \varepsilon_{\mathrm{guide}} + \varepsilon_{\mathrm{donor}}
-      + \varepsilon_{\mathrm{condition}} + \varepsilon_{\mathrm{interaction}}
-      + \varepsilon_{\mathrm{residual}}.
+      + \varepsilon_{\mathrm{condition}} + \varepsilon_{\mathrm{res}},
 \]
-Because these terms are independent, the observed variance is a sum of variance
-components,
+so that the observed variance is a sum of components,
 \[
-\sigma^2_X = \sigma^2_T + \sigma^2_{\mathrm{guide}} + \sigma^2_{\mathrm{donor}}
-      + \sigma^2_{\mathrm{condition}} + \sigma^2_{\mathrm{interaction}}
-      + \sigma^2_{\mathrm{residual}},
+\sigma^2_X = \sigma^2_\tau + \sigma^2_{\mathrm{guide}} + \sigma^2_{\mathrm{donor}}
+      + \sigma^2_{\mathrm{condition}} + \sigma^2_{\mathrm{res}}.
 \]
-and the analysis estimates how large each component is.
+Here $\sigma^2_\tau$ is the variance of the target's true effect across genes, and
+$\sigma^2_{\mathrm{guide}}$, $\sigma^2_{\mathrm{donor}}$, $\sigma^2_{\mathrm{condition}}$
+measure how much that effect moves across guides, donors, and states, with
+$\sigma^2_{\mathrm{res}}$ the residual. The analysis estimates each component; these
+are the variances the coefficients below are built from.
 
 We distinguish random from fixed facets. Guides and donors are \emph{random} facets: one wants the
 effect to generalize across the guides and donors that were not sampled.
@@ -232,9 +233,12 @@ correlations, not Gaussian variance-component ratios.}
   degrees of freedom and is noisy, so it is shrunk toward the pooled mean; the
   released code applies a global shrinkage factor in place of the target-specific one,
   as detailed in Appendix~\ref{app:estimator}.}
-  \item $\Rc$: cross-context \emph{consistency}, the mean of the pairwise
-  correlations among the three within-state profiles. Because condition is a fixed
-  facet, it is reported as consistency rather than as a signal share of this form.
+  \item $\Rc = \sigma^2_\tau/(\sigma^2_\tau + \sigma^2_{\mathrm{condition}})$: the same
+  signal-share form with the condition variance in the denominator, estimated by the
+  mean of the pairwise correlations among the three within-state profiles. Because
+  condition is a fixed facet, $\Rc$ is read as cross-context \emph{consistency} and is
+  kept out of $\Rdep$: a low value marks a context-specific perturbation, not an
+  unreliable one.
 \end{itemize}
 
 A ranking requires a single number rather than a profile. The per-target
@@ -286,30 +290,21 @@ the substance of RQ2.
 The coefficients so far are per-target. The remaining two questions concern the
 screen's measurement design as a whole: how dependable the panel is overall (RQ3),
 and which facet limits that dependability (RQ4). These are answered at the design
-level, where generalizability theory forms coefficients from the design's variance
-components. For a panel of $n_g$ guides and $n_d$ donors, the \emph{generalizability
-coefficient}, for \emph{relative} decisions such as ranking, is the universe-score
-share
+level, where the same variance components enter with the design sizes. For a panel of
+$n_g$ guides and $n_d$ donors, the \emph{generalizability coefficient}, for
+\emph{relative} decisions such as ranking, is the true-effect share
 \[
 E\rho^2 = \frac{\sigma^2_\tau}{\sigma^2_\tau + \sigma^2_\delta}, \qquad
-\sigma^2_\delta = \frac{\sigma^2_{\tau g}}{n_g} + \frac{\sigma^2_{\tau d}}{n_d}
-      + \frac{\sigma^2_{\mathrm{res}}}{n_g n_d},
+\sigma^2_\delta = \frac{\sigma^2_{\mathrm{guide}}}{n_g}
+      + \frac{\sigma^2_{\mathrm{donor}}}{n_d} + \frac{\sigma^2_{\mathrm{res}}}{n_g n_d},
 \]
-where the relative error $\sigma^2_\delta$ is the target-by-facet interaction and
-residual variance averaged over the design. The \emph{index of dependability},
-$\Phi = \sigma^2_\tau/(\sigma^2_\tau + \sigma^2_\Delta)$, for \emph{absolute}
-decisions against a threshold, replaces $\sigma^2_\delta$ with the absolute error
-$\sigma^2_\Delta = \sigma^2_\delta + \sigma^2_g/n_g + \sigma^2_d/n_d$, which
-additionally counts the guide and donor main effects; since
-$\sigma^2_\Delta \ge \sigma^2_\delta$, $\Phi \le E\rho^2$. Because our task is to rank targets, $E\rho^2$ is the
-design-level coefficient we report, and the design study varies the guide and donor
-counts to ask how much either would raise it. The per-target $\Rdep$ is the
-single-target counterpart of $E\rho^2$: the generalizability of one target's effect
-over the two random facets, carrying no design-level subscript. Throughout,
-\emph{dependability} is the plain-language name for the trustworthiness these
-coefficients estimate, after \textcite{cronbach1972}, whose theory of
-generalizability is a treatment of the dependability of measurements; the
-coefficients themselves keep their standard names.
+the same guide, donor, and residual variances as above, each now averaged over the
+design. The \emph{index of dependability} $\Phi$, for \emph{absolute} decisions
+against a threshold, uses an absolute error that additionally counts the guide and
+donor main effects, so $\Phi \le E\rho^2$. Because our task is ranking, we report
+$E\rho^2$, and the design study varies $n_g$ and $n_d$ to ask how much either would
+raise it. The per-target $\Rdep$ is its single-target counterpart, the same
+generalizability read for one target rather than for the panel.
 
 \section{Data and estimation}
 
