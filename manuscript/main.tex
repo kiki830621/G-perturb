@@ -25,7 +25,7 @@ Perturb-seq: a generalizability-theory decomposition}}
 
 \author[1]{Che Cheng}
 \affil[1]{Institute of Statistical Science, Academia Sinica, Taipei, Taiwan.
-\texttt{che830621@stat.sinica.edu.tw}. ORCID 0000-0003-3376-7833.}
+\texttt{che830621@as.edu.tw}. ORCID 0000-0003-3376-7833.}
 
 \date{\today}
 
@@ -71,8 +71,8 @@ hit that does not reproduce spends a validation experiment on an artifact. What 
 screen is worth therefore depends not only on the effects it detects but on
 whether the ranking it induces over targets can be trusted.
 
-Target prioritization conventionally ranks candidates by the strength of a
-perturbation's differential-expression signature. The strength is read from the
+Target prioritization conventionally ranks candidates by \emph{effect size}, the
+strength of a perturbation's differential-expression signature. The strength is read from the
 coefficients of a regularized model of expression on guide assignment
 \parencite{dixit2016}, from a $z$-score or false-discovery rate for each
 perturbation-gene association, or from the number of downstream differentially
@@ -80,8 +80,8 @@ expressed genes together with a global test that the transcriptome moved at all
 \parencite{replogle2022}. Effect metrics have since grown more sophisticated,
 replacing the gene count with the distance between the perturbed and control
 single-cell distributions \parencite{peidli2024} or with a per-target rate of
-cells classified as perturbed \parencite{papalexi2021}. All of them quantify how
-large an effect is.
+cells classified as perturbed \parencite{papalexi2021}. All of them are measures of
+effect size, of how large an effect is.
 
 None answers a prior question: whether the effect is dependable, in the sense that
 it would recur under another guide, another donor, or another cell-state context.
