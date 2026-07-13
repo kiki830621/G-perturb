@@ -1,0 +1,136 @@
+{
+  "scale": "smoke_only_not_a_gate_pass",
+  "issue": 19,
+  "reps": 30,
+  "n_target": 100,
+  "theta": 3,
+  "note": "count-native NB-GLMM vs shipped plug-in-logCPM PWM; local smoke, NOT a gate pass; full scale (reps>=2000) is a cluster job",
+  "results": [
+    {
+      "regime": "covered",
+      "candidate": "PWM_logCPM",
+      "reps_effective": 30,
+      "fit_failures": 0,
+      "bias": {
+        "T": -0.0212,
+        "TG": -0.0116,
+        "TD": -0.0023,
+        "res": 0.0351
+      },
+      "rmse": {
+        "T": 0.0521,
+        "TG": 0.0282,
+        "TD": 0.0242,
+        "res": 0.0396
+      },
+      "max_abs_bias": 0.0351,
+      "max_rmse": 0.0521,
+      "elapsed_s": 64.7
+    },
+    {
+      "regime": "covered",
+      "candidate": "NB_GLMM",
+      "reps_effective": 30,
+      "fit_failures": 0,
+      "bias": {
+        "T": -0.0931,
+        "TG": -0.0272,
+        "TD": -0.0256,
+        "res": 0.1459
+      },
+      "rmse": {
+        "T": 0.1033,
+        "TG": 0.0345,
+        "TD": 0.0332,
+        "res": 0.1477
+      },
+      "max_abs_bias": 0.1459,
+      "max_rmse": 0.1477,
+      "elapsed_s": 64.7
+    },
+    {
+      "regime": "covered",
+      "candidate": "POIS_GLMM",
+      "reps_effective": 30,
+      "fit_failures": 0,
+      "bias": {
+        "T": -0.0931,
+        "TG": -0.0272,
+        "TD": -0.0256,
+        "res": 0.1459
+      },
+      "rmse": {
+        "T": 0.1033,
+        "TG": 0.0345,
+        "TD": 0.0332,
+        "res": 0.1477
+      },
+      "max_abs_bias": 0.1459,
+      "max_rmse": 0.1477,
+      "elapsed_s": 64.7
+    },
+    {
+      "regime": "singleton",
+      "candidate": "PWM_logCPM",
+      "reps_effective": 30,
+      "fit_failures": 0,
+      "bias": {
+        "T": -0.2526,
+        "TG": -0.0566,
+        "TD": -0.0843,
+        "res": 0.3935
+      },
+      "rmse": {
+        "T": 0.2562,
+        "TG": 0.0605,
+        "TD": 0.0864,
+        "res": 0.3956
+      },
+      "max_abs_bias": 0.3935,
+      "max_rmse": 0.3956,
+      "elapsed_s": 61.3
+    },
+    {
+      "regime": "singleton",
+      "candidate": "NB_GLMM",
+      "reps_effective": 30,
+      "fit_failures": 0,
+      "bias": {
+        "T": -0.1031,
+        "TG": -0.0132,
+        "TD": -0.0214,
+        "res": 0.1377
+      },
+      "rmse": {
+        "T": 0.1112,
+        "TG": 0.0259,
+        "TD": 0.0276,
+        "res": 0.14
+      },
+      "max_abs_bias": 0.1377,
+      "max_rmse": 0.14,
+      "elapsed_s": 61.3
+    },
+    {
+      "regime": "singleton",
+      "candidate": "POIS_GLMM",
+      "reps_effective": 30,
+      "fit_failures": 0,
+      "bias": {
+        "T": -0.1034,
+        "TG": -0.0133,
+        "TD": -0.0216,
+        "res": 0.1383
+      },
+      "rmse": {
+        "T": 0.1115,
+        "TG": 0.0259,
+        "TD": 0.0277,
+        "res": 0.1405
+      },
+      "max_abs_bias": 0.1383,
+      "max_rmse": 0.1405,
+      "elapsed_s": 61.3
+    }
+  ]
+}
