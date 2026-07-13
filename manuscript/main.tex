@@ -269,10 +269,10 @@ cell's whole transcriptome. We do not process single cells. We start from the
 screen's released \emph{pseudobulk}, the table obtained by averaging all cells that
 share an experimental combination into one expression profile. Each of its
 $278{,}684$ rows is one such combination, a silenced target gene, the guide RNA used
-to silence it, the donor the cells came from, and the culture condition, and it gives
-the average expression of $18{,}129$ genes. The screen silences $12{,}731$ target
+to silence it, the donor the cells came from, and the T cells' activation state, whether resting or
+stimulated. It gives the average expression of $18{,}129$ genes. The screen silences $12{,}731$ target
 genes with about two guides each, crossed with four donors and three activation
-conditions (Rest, Stim8hr, Stim48hr) over two sequencing runs. Only about $45\%$ of
+states (Rest, Stim8hr, Stim48hr) over two sequencing runs. Only about $45\%$ of
 that full grid was run, and guides that target no gene serve as the controls. A row
 averages a median of $49$ cells, and as few as one, so rows differ in how precisely
 they are measured, which is what sets each row's measurement-error variance. For every
