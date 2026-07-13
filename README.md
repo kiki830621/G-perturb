@@ -4,6 +4,8 @@
 
 > Built for **Built with Claude: Life Sciences** (Researcher track, 2026), in partnership with Gladstone Institutes. All work in this repository is done from scratch during the hackathon, per the event rules.
 
+> 🧬 **Preprint status:** the manuscript was **submitted to [bioRxiv](https://www.biorxiv.org/) on 2026-07-14** (submission ID `BIORXIV/2026/738312`) and is currently **undergoing screening**. The bioRxiv DOI will be added here once the preprint posts (typically 24–72 h after screening clears). Manuscript licensed CC-BY 4.0; code Apache-2.0.
+
 > 📄 Full design rationale: [`docs/design.md`](./docs/design.md) (canonical design). 📝 Research write-up (methods + results, paper voice): [`docs/writeup.md`](./docs/writeup.md) — the bioRxiv-format LaTeX preprint is in [`manuscript/`](./manuscript/) ([`main.pdf`](./manuscript/main.pdf)). The **method** is a distribution-light generalizability decomposition — facet variance shares plus an irreducible replication floor. The **deliverables** are a reliability-weighted target ranking and the dependability findings below, all resting on that decomposition.
 
 ---
@@ -13,7 +15,7 @@
 On the real 44.6 GB joint pseudobulk (18,129 genes × 4 donors × 3 conditions), decomposed genome-wide:
 
 - **Signal was hidden under measurement noise.** Raw pseudobulk shows dependable target-signal in only **40** genes; removing the measurement-error floor (estimated from the non-targeting controls) lifts that to **7,674 genes (42%)** — the dependable hits were masked by noise, not absent.
-- **The ranking reshuffles.** Weighting effect size by a per-target dependability coefficient, **49 of the top-100 effect-only targets drop out** of the dependability-weighted top-100. Targets you would *miss by effect size alone* climb sharply — **RPS3 #79→#4, RPP21 #124→#8, NMD3 #158→#17, IMP4 #96→#13, QARS1 #53→#5** are dependable but effect-underranked: the "validate these next" candidates.
+- **The ranking reshuffles.** Weighting effect size by a per-target dependability coefficient reorders the shortlist: the effect-only and dependability-weighted rankings correlate at Spearman ρ = 0.74 overall, yet **50 of the top-100 effect-only targets drop out** of the dependability-weighted top-100. Targets you would *miss by effect size alone* climb sharply — **RPS3 #79→#4, QARS1 #53→#5, RPP21 #124→#6, IMP4 #96→#12, NMD3 #158→#14** are dependable but effect-underranked: the "validate these next" candidates.
 - **Reliability is guide-limited.** A D-study shows two guides per gene cap generalizability near 0.53; reaching 0.70 needs ~15 guides, and no number of donors suffices — **add guides, not donors** (and this holds within every activation state, not just pooled).
 - **Context-specificity recovers real biology, unprompted.** Slicing dependability by activation state surfaces the **T-cell-receptor signaling module — CD3D, CD3G, CD247, ZAP70, LAT — as reliably measurable only in *activated* T cells** (resting dependability at the noise floor). With no gene labels, the method reconstructs the TCR module: the sharpest evidence it measures something real.
 

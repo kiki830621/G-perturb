@@ -149,8 +149,9 @@
       <span class="hl">dependable</span> — not by how large it is.</p>
     <div class="meta">
       <span><b>Track</b> · Built with Claude: Life Sciences (Researcher)</span>
-      <span><b>Data</b> · Marson-lab CD4<sup>+</sup> T-cell screen (Zhu et al. 2026)</span>
-      <span><b>License</b> · Apache-2.0</span>
+      <span><b>Data</b> · Marson-lab CD4<sup>+</sup> T-cell screen (Zhu et al. 2025)</span>
+      <span><b>Preprint</b> · submitted to bioRxiv (under screening)</span>
+      <span><b>License</b> · Apache-2.0 (code) · CC-BY 4.0 (paper)</span>
     </div>
   </div>
 </header>
@@ -263,14 +264,15 @@
         right way — errors adding, never a product of coefficients. Strong-but-unreliable hits fall;
         reproducible ones rise. The reshuffle <em>is</em> the deliverable.</p>
       <div class="stats">
-        <div class="stat"><div class="v">49 / 100</div><div class="l">top effect-only hits drop out of the dependability top-100</div></div>
-        <div class="stat"><div class="v">#79 → #4</div><div class="l">RPS3 — reproducible, promoted</div></div>
-        <div class="stat"><div class="v">7,169</div><div class="l">targets scored on the real joint pseudobulk</div></div>
+        <div class="stat"><div class="v">50 / 100</div><div class="l">top effect-only hits drop out of the dependability top-100</div></div>
+        <div class="stat"><div class="v">ρ = 0.74</div><div class="l">Spearman, effect vs dependability rank — broad order holds, the top reshuffles</div></div>
+        <div class="stat"><div class="v">#79 → #4</div><div class="l">RPS3 — reproducible, promoted (of 7,258 scored)</div></div>
       </div>
       <figure>
         <div class="fig-frame"><img src="__FIG3__" alt="effect-only versus dependability-weighted ranking"></div>
         <figcaption><b>Fig 3.</b> Rank by effect alone (x) vs by dependability-weighted score (y).
-          Red = demoted (strong, unreliable); green = promoted (reproducible).</figcaption>
+          Teal (upper-left) = strong AND dependable, where the two rankings agree; red = demoted
+          (strong but unreliable); green = promoted (reproducible). RPS3 circled.</figcaption>
       </figure>
     </div>
   </section>
@@ -289,7 +291,7 @@
       <figure>
         <div class="fig-frame"><img src="__FIG4__" alt="TCR module dependability per activation state"></div>
         <figcaption><b>Fig 4.</b> Per-state <span class="mono">R_dep</span> for the TCR module. Pooled ranking
-          and effect size both blur this context-specificity; <b>100 targets</b> are flagged context-specific-but-reliable.</figcaption>
+          and effect size both blur this context-specificity; <b>92 targets</b> are flagged context-specific-but-reliable.</figcaption>
       </figure>
     </div>
   </section>
