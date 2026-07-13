@@ -186,9 +186,10 @@ that facet:
   level. Both are distribution-light empirical correlations rather than Gaussian
   variance-component ratios.}
   \item $\Rd$: the same construction with a two-versus-two donor split, then
-  shrunk toward the pooled mean by a moment-based empirical-Bayes step, which
-  stabilizes a coefficient that four donors otherwise leave with only three
-  degrees of freedom.
+  shrunk toward the pooled mean by a moment-based empirical-Bayes step (a global
+  shrinkage factor in the released code, in place of a target-specific one; see
+  Appendix~\ref{app:estimator}), which stabilizes a coefficient that four donors
+  otherwise leave with only three degrees of freedom.
   \item $\Rc$: the mean of the pairwise correlations among the three within-state
   profiles, reported as cross-context \emph{consistency} rather than as a
   generalization coefficient.
@@ -243,7 +244,10 @@ assume this estimator. Three candidates were compared on simulated data with kno
 variance components, a pre-registered synthetic-recovery test, and only the
 precision-weighted model recovered the planted values under both Gaussian and
 heavy-tailed noise. A distance-based candidate failed, because a share of a
-distance is not a variance and cannot be read as one.
+distance is not a variance and cannot be read as one. The full estimator decision
+path (the candidate ANOVA models and their identifiability, the two levels, the
+per-target formulas, and a crosswalk to what the released code computes) is given
+in Appendix~\ref{app:estimator}.
 
 \section{Results}
 
@@ -398,6 +402,197 @@ design-study guidance is prospective, addressed to subsequent screens rather tha
 to the present one.
 
 \appendix
+
+\section{Estimator decision path}
+\label{app:estimator}
+
+This appendix records the full path from the candidate analysis-of-variance
+decomposition to the per-target dependability used for ranking, so the estimator
+can be audited rather than taken on faith. The main text gives the readable
+version; here we give the design, the identifiability arithmetic, the methods we
+set aside, the exact formulas, and an honest crosswalk to what the released code
+actually computes.
+
+\subsection{Estimand, observation unit, and facets}
+
+The object of measurement is the target gene $t$. Its response is the effect
+profile $\mathbf{y}_{tgdc}\in\mathbb{R}^{p}$ over $p=18{,}129$ genes, the
+non-targeting-control-relative log-CPM within the matched donor-condition-run
+stratum. The facets are the two guides per target (nested within target; a random
+facet we want to generalize across), the four donors (a crossed random facet, with
+inference confined to the present panel), and the three culture conditions (a fixed
+facet of deliberately chosen states, analyzed within level). Sequencing run is
+partially confounded with donor; the pseudobulk cell count sets the
+measurement-error variance of each observation, so profiles built from fewer cells
+are noisier.
+
+\subsection{The crossed model, and why it is not per-target identifiable}
+
+Written per outcome gene $j$, the crossed generalizability model is
+\[
+y_{tgdc,j} = \mu_j + T_{t,j} + (TG)_{tg,j} + (TD)_{td,j} + (TC)_{tc,j}
+             + (TGD)_{tgd,j} + \varepsilon_{tgdc,j},
+\]
+with $T,TG,TD,TGD$ random and the condition term $TC$ treated as fixed
+(within-state). The variance components $\sigma^2_T,\sigma^2_{TG},\sigma^2_{TD},
+\sigma^2_{\mathrm{res}}$ are \emph{design-level}: estimable only by pooling across
+targets. For a single target in a single condition the design is $2\times4=8$
+observations, $7$ degrees of freedom: guide contributes $1$, donor $3$, the
+guide-by-donor interaction $3$, leaving $0$ residual. The full $2\times4\times3=24$
+factorial is likewise saturated at its highest interaction. Without an
+identical-specification replicate (a second pseudobulk at the same guide, donor,
+condition, and run), the top-order interaction and the sampling residual cannot be
+separated; dropping the interaction to recover a residual is an \emph{additive
+restriction} the data do not prove, not a demonstration that the interaction is
+zero. The $\approx 18{,}000$ outcome genes are correlated and do not act as
+independent replicates. A per-target factorial ANOVA is therefore not identifiable,
+which forces the two-level treatment below.
+
+\subsection{Two levels, kept distinct}
+
+\emph{Design level.} Across targets, a precision-weighted crossed mixed model fit
+per gene by REML,
+\[
+y \sim \mathrm{condition} + (1\mid \mathrm{target})
+      + (1\mid \mathrm{target{:}guide}) + (1\mid \mathrm{target{:}donor}),
+\]
+yields $\sigma^2_T,\sigma^2_{TG},\sigma^2_{TD}$ and a residual (the reduced model
+absorbs the three-way interaction into the residual, per the restriction above).
+This is an ANOVA / mixed-model variance decomposition. The design study projects it
+onto alternative designs,
+\[
+E\rho^2(n_g,n_d) = \frac{\sigma^2_T}{\sigma^2_T + \sigma^2_{TG}/n_g
+                  + \sigma^2_{TD}/n_d + \sigma^2_{\mathrm{res}}/(n_gn_d)},
+\]
+the design-level coefficient of Section~4. Its residual carries measurement error;
+subtracting the floor estimated from the non-targeting controls is the
+measurement-error removal of Section~4.1.
+
+\emph{Per-target level.} A single target has only two guides and four donors, so its
+own variance components are unstable to non-identifiable. We therefore estimate a
+per-target dependability from split-half profile reproducibility with partial
+pooling, not from per-target variance components. The two coefficients are not the
+same quantity and do not share a name: design-level is $E\rho^2$ (and $\Phi$),
+per-target is $R_{\mathrm{dep},t}$.
+
+\subsection{Candidate estimators, and why the others were set aside}
+
+The per-target method was chosen by pre-registered synthetic recovery, never by how
+the real ranking looked. Five candidates were weighed:
+\begin{enumerate}
+  \item method-of-moments / factorial ANOVA per target: not identifiable at
+  $2\times4$ (above);
+  \item precision-weighted crossed REML/GLS: identifiable and used at the
+  \emph{design} level; at the per-target level the same non-identifiability applies;
+  \item kernel / distance-based decomposition: a distance share is not a variance
+  component without a positive-semidefinite-plus-additivity proof, so it is kept as
+  a diagnostic, not a reported component;
+  \item robust hierarchical functional model: heavier assumptions and compute,
+  kept as a comparator;
+  \item per-target split-half correlation with empirical-Bayes shrinkage:
+  distribution-light, identifiable at $2\times4$, and the only candidate to recover
+  the planted components under both Gaussian and heavy-tailed synthetic regimes;
+  selected.
+\end{enumerate}
+
+\subsection{The per-target formulas}
+
+Within condition $c$, let $\bar{\mathbf y}_{t\cdot\cdot c}$ be the target's mean
+effect profile. The effect magnitude is the root-mean-square across genes,
+\[
+M_{t,c} = \sqrt{\tfrac{1}{p}\textstyle\sum_{j} \bar y_{t\cdot\cdot c,j}^{\,2}}.
+\]
+The guide coefficient splits the target's guides into halves, averages each half's
+profile, and correlates them across genes,
+\[
+R^{\mathrm{guide}}_{t,c}
+ = \operatorname{cor}\!\big(\bar{\mathbf y}_{t,g_1,\cdot,c},\ \bar{\mathbf y}_{t,g_2,\cdot,c}\big).
+\]
+The correlation is Pearson, so it measures \emph{consistency} of the transcriptional
+pattern, not exact agreement of magnitude; a concordance correlation would also
+penalize scale and location shifts, and we do not currently apply one. The donor
+coefficient is the same construction on a two-versus-two donor split,
+$R^{\mathrm{donor,raw}}_{t,c}$, then shrunk toward the pooled mean $\mu_c$,
+\[
+\widetilde R^{\mathrm{donor}}_{t,c}
+ = \mu_c + w_{t,c}\big(R^{\mathrm{donor,raw}}_{t,c}-\mu_c\big).
+\]
+The paper-grade weight is the Fay--Herriot form $w_{t,c}=\tau_c^2/(\tau_c^2+s_{t,c}^2)$
+with a target-specific sampling variance $s_{t,c}^2$. The released code uses a
+simplified global weight: it sets the within-target variance to half the total
+variance of the raw donor coefficients, which collapses $w_{t,c}$ to a single
+constant $w=0.5$ applied to every target in the view. The target-varying
+Fay--Herriot weight is a planned upgrade; the constant is a documented heuristic,
+not the ideal estimator, and we label it as such.
+
+Writing each coefficient as a signal share $R=\sigma^2_\tau/(\sigma^2_\tau+\sigma^2_e)$,
+its error-to-signal ratio is $(1-R)/R=\sigma^2_e/\sigma^2_\tau$; because the guide and
+donor errors are taken to be independent, the ratios add, and
+\[
+R_{\mathrm{dep},t,c} = \frac{1}{1
+  + \dfrac{1-R^{\mathrm{guide}}_{t,c}}{R^{\mathrm{guide}}_{t,c}}
+  + \dfrac{1-\widetilde R^{\mathrm{donor}}_{t,c}}{\widetilde R^{\mathrm{donor}}_{t,c}}},
+\qquad
+S_{t,c} = M_{t,c}\,R_{\mathrm{dep},t,c}.
+\]
+A guide-by-donor interaction would add a further disagreement term, so this form is
+an upper bound when the interaction is nonzero. If either coefficient is
+non-positive or undefined the target is reported \texttt{not\_identifiable} (a
+fail-closed NA), never zero-filled. The score $S_{t,c}$ is a ranking criterion, not
+the probability that a target is real. The deployed screen averages two guides,
+whose reliability is the Spearman--Brown step-up $R_{2g}=2r/(1+r)$; because the joint
+coefficient is defined at the single-guide-by-single-donor level, this step-up is
+reported separately and is not substituted into $R_{\mathrm{dep}}$.
+
+\subsection{Pipeline and formula-to-code crosswalk}
+
+The analysis runs: joint pseudobulk $\rightarrow$ matched-NTC effects and covariance
+$\rightarrow$ design/rank gate $\rightarrow$ estimator comparison and synthetic
+recovery $\rightarrow$ guide/donor split-half profiles $\rightarrow$ donor shrinkage
+$\rightarrow$ $R_{\mathrm{dep}}$ $\rightarrow$ effect-weighted ranking $\rightarrow$
+within-condition repetition $\rightarrow$ D-study projection. The design-level path
+(variance components, D-study, measurement-error removal) and the per-target path
+(split-half, shrinkage, $R_{\mathrm{dep}}$) diverge after the effects are formed;
+measurement-error removal acts on the design-level residual, not on the split-half
+coefficients, which absorb measurement error by construction.
+
+\begin{table}[t]
+  \centering
+  \caption{What each quantity is in the released code, against its paper-grade
+  target.}
+  \label{tab:crosswalk}
+  \begin{tabular}{llll}
+    \toprule
+    Symbol & Released implementation & Paper-grade target & Status \\
+    \midrule
+    $M_{t,c}$ & RMS of the target mean profile & same & exact \\
+    $R^{\mathrm{guide}}$ & Pearson split-half across genes & (add agreement variant) & consistency only \\
+    $R^{\mathrm{donor,raw}}$ & two-vs-two Pearson split-half & same & exact \\
+    $w_{t,c}$ & global $0.5$ (half-variance split) & Fay--Herriot $\tau^2/(\tau^2+s_t^2)$ & heuristic; planned \\
+    $R_{\mathrm{dep}}$ & error-adding joint, fail-closed NA & $+$ interaction term & exact under additivity \\
+    $S_{t,c}$ & $M_{t,c}\times R_{\mathrm{dep}}$ & same & exact \\
+    $\sigma^2_{T,TG,TD,\mathrm{res}}$ & REML \texttt{lmer} per gene & same & exact (design level) \\
+    $E\rho^2$ & D-study projection & same & exact \\
+    me-removal & NTC floor from residual & same & exact (design path) \\
+    $R_{2g}$ & reported separately & same & exact \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Assumptions, costs, and falsifiers}
+
+The reported quantities rest on stated assumptions, each of which can fail: guide
+and donor errors are independent, so a guide-by-donor interaction would make
+$R_{\mathrm{dep}}$ an upper bound rather than an equality; the four donors are a
+panel, not a population, so donor generalization is to these donors; the
+$\approx 18{,}000$ genes are correlated, so the effective dimension is far below
+$18{,}000$ and the split-half coefficients are noisier than an
+independent-gene count would suggest; Pearson measures consistency, not magnitude
+agreement; the non-targeting-control covariance is shared and heteroskedastic across
+strata; sequencing run is partially confounded with donor; and without an
+identical-specification replicate the top-order interaction and the residual are not
+separable per target. Restoring full per-target variance-component estimation would
+require more guides, more donors, and lane or library replicates.
 
 \section{A recorded, cross-model-hardened process}
 
