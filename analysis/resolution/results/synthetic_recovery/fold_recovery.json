@@ -1,0 +1,130 @@
+{
+  "issue": 19,
+  "true_logFC": 1.0,
+  "true_fold": 2.718,
+  "theta": 3.0,
+  "reps": 4000,
+  "criterion": "fold-change (multiplicative effect) recovery vs known truth; count-GLM fold = log(pooled rate ratio) = exact Poisson/NB-GLM MLE; plug-in = mean log1p(CPM) difference",
+  "rows": [
+    {
+      "n_cells": 1,
+      "count_glm": {
+        "n": 3998,
+        "bias": -0.0893,
+        "rmse": 0.4601,
+        "undefined_frac": 0.0005
+      },
+      "plug_in": {
+        "n": 4000,
+        "bias": -0.6686,
+        "rmse": 1.2713,
+        "undefined_frac": null
+      }
+    },
+    {
+      "n_cells": 2,
+      "count_glm": {
+        "n": 4000,
+        "bias": -0.0602,
+        "rmse": 0.3923,
+        "undefined_frac": 0.0
+      },
+      "plug_in": {
+        "n": 4000,
+        "bias": -0.2232,
+        "rmse": 0.712,
+        "undefined_frac": null
+      }
+    },
+    {
+      "n_cells": 3,
+      "count_glm": {
+        "n": 4000,
+        "bias": -0.0573,
+        "rmse": 0.3638,
+        "undefined_frac": 0.0
+      },
+      "plug_in": {
+        "n": 4000,
+        "bias": -0.1331,
+        "rmse": 0.5602,
+        "undefined_frac": null
+      }
+    },
+    {
+      "n_cells": 5,
+      "count_glm": {
+        "n": 4000,
+        "bias": -0.055,
+        "rmse": 0.3502,
+        "undefined_frac": 0.0
+      },
+      "plug_in": {
+        "n": 4000,
+        "bias": -0.0677,
+        "rmse": 0.4397,
+        "undefined_frac": null
+      }
+    },
+    {
+      "n_cells": 10,
+      "count_glm": {
+        "n": 4000,
+        "bias": -0.0404,
+        "rmse": 0.3242,
+        "undefined_frac": 0.0
+      },
+      "plug_in": {
+        "n": 4000,
+        "bias": -0.0174,
+        "rmse": 0.3589,
+        "undefined_frac": null
+      }
+    },
+    {
+      "n_cells": 20,
+      "count_glm": {
+        "n": 4000,
+        "bias": -0.036,
+        "rmse": 0.3154,
+        "undefined_frac": 0.0
+      },
+      "plug_in": {
+        "n": 4000,
+        "bias": 0.0014,
+        "rmse": 0.3378,
+        "undefined_frac": null
+      }
+    },
+    {
+      "n_cells": 50,
+      "count_glm": {
+        "n": 4000,
+        "bias": -0.0397,
+        "rmse": 0.3208,
+        "undefined_frac": 0.0
+      },
+      "plug_in": {
+        "n": 4000,
+        "bias": -0.0047,
+        "rmse": 0.3405,
+        "undefined_frac": null
+      }
+    },
+    {
+      "n_cells": 100,
+      "count_glm": {
+        "n": 4000,
+        "bias": -0.0422,
+        "rmse": 0.3145,
+        "undefined_frac": 0.0
+      },
+      "plug_in": {
+        "n": 4000,
+        "bias": -0.0012,
+        "rmse": 0.3322,
+        "undefined_frac": null
+      }
+    }
+  ]
+}
