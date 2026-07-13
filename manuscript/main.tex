@@ -227,10 +227,19 @@ reproducibility we report. The equality is exact when the two errors are
 independent, and becomes an upper bound if a guide-by-donor interaction adds a
 further disagreement term.
 
-We keep a naming discipline that separates the two levels of the theory: $\Rdep$
-is a per-target quantity, whereas the design-level coefficients $E\rho^2$ and
-$\Phi$ describe the measurement design as a whole and carry no per-target
-subscript.
+We keep a naming discipline that separates the two levels of the theory, and the
+two decisions it serves. At the design level, generalizability theory distinguishes
+the \emph{generalizability coefficient} $E\rho^2$, for \emph{relative} decisions
+such as ranking, from the \emph{index of dependability} $\Phi$, for \emph{absolute}
+decisions against a threshold; $\Phi$ counts the facet main effects in its error as
+well, so $\Phi \le E\rho^2$. Because our task is to rank targets, $E\rho^2$ is the
+design-level coefficient we report. The per-target quantity $\Rdep$ is the
+single-target counterpart of $E\rho^2$: the generalizability of one target's effect
+over the two random facets, carrying no design-level subscript. Throughout,
+\emph{dependability} is the plain-language name for the trustworthiness these
+coefficients estimate, after \textcite{cronbach1972}, whose theory of
+generalizability is a treatment of the dependability of measurements; the
+coefficients themselves keep their standard names.
 
 \section{Data and estimation}
 
