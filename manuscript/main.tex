@@ -443,7 +443,15 @@ uncertainty, which we report as bands rather than point values. Sequencing run i
 partially confounded with donor, a fact of the released design that we record
 rather than correct. A small number of full-scale Monte Carlo gate confirmations
 are scheduled on a compute cluster; the results shown are the local synthetic and
-real-data tier. Finally, this is a re-analysis of released data, so the
+real-data tier. The perturbation effect is a plug-in log-CPM contrast; because the
+pseudobulk is raw counts, we also checked a count-native alternative that scores each
+effect as a multiplicative fold, a negative-binomial or Poisson log-fold-change with a
+library-size offset. It recovers a known effect more accurately at low counts on
+synthetic data, but once low-count genes are handled it leaves the target ranking
+essentially unchanged, because the plug-in maps a near-zero count to a near-zero
+effect and so already suppresses the low-count noise that would otherwise inflate
+sparse targets; the ranking is robust to this choice of effect estimator. Finally,
+this is a re-analysis of released data, so the
 design-study guidance is prospective, addressed to subsequent screens rather than
 to the present one.
 
