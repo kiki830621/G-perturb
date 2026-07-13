@@ -110,7 +110,8 @@ questions, moving from the present screen to future ones:
 \begin{itemize}
   \item \emph{RQ1 (per target):} which targets carry a dependable effect, one that
   would recur under a fresh guide and a fresh donor, and does ranking targets by that
-  dependability reorder the shortlist that effect size alone produces?
+  dependability reorder the shortlist of targets taken forward for validation
+  that effect size alone produces?
   \item \emph{RQ2 (in context):} within each activation state (Rest, Stim8hr,
   Stim48hr), does per-target dependability separate a context-specific signal from
   noise and reconstruct a coherent biological module?
@@ -369,11 +370,14 @@ the measurement design (RQ3, RQ4).
 \subsection{Reliability-weighted ranking reorders the shortlist}
 
 RQ1 asks whether ranking targets by dependability reorders the shortlist that effect
-size alone produces. It does: ranking by $S_t$ reorders the candidate list relative to
-effect size alone (Figure~\ref{fig:rank}). Of the $100$ highest-effect targets, $50$ fall out
-of the $100$ most dependable, and reproducible targets that effect size underranks
-rise (Table~\ref{tab:rankshift}). These are the targets a dependability-weighted
-screen would nominate for validation but a strength-ranked screen would overlook.
+size alone produces. It does. Ranking by $S_t$ correlates with the effect-size ranking
+at a Spearman $\rho = .74$ over the $7{,}258$ scored targets: the broad order is
+preserved, but the shortlist itself turns over, with $50$ of the $100$ highest-effect
+targets falling out of the $100$ most dependable (Figure~\ref{fig:rank}). Reproducible
+targets that effect size underranks rise in their place (Table~\ref{tab:rankshift});
+RPS3 is the clearest case, $79$th by effect size but $4$th once weighted by its
+dependability of $.34$. These are the targets a dependability-weighted screen would
+nominate for validation but a strength-ranked screen would overlook.
 The contribution is a shortlist that effect size alone cannot produce: it demotes
 strong but fragile hits, which spend validation capacity without confirming, and
 promotes reproducible effects that a strength ranking buries.
@@ -382,9 +386,11 @@ promotes reproducible effects that a strength ranking buries.
   \centering
   \includegraphics[width=0.78\linewidth]{fig3_ranking_reshuffle.pdf}
   \caption{Rank by effect size alone (horizontal) against rank by the
-  dependability-weighted score (vertical). Points below the diagonal in the
-  lower-left quadrant are demoted (strong but unreliable); points in the upper
-  right are promoted (reproducible).}
+  dependability-weighted score (vertical); the dotted lines mark the top $100$ on
+  each axis. The upper-left quadrant holds targets that are both strong and
+  dependable, where the two rankings agree; lower-left targets are strong but
+  unreliable and are demoted; upper-right targets are reproducible and are promoted.
+  RPS3 is circled.}
   \label{fig:rank}
 \end{figure}
 
@@ -460,9 +466,13 @@ test ($r \approx 0$), so the correction introduces no signal where none exists.
 
 With measurement error removed, the panel generalizability coefficient for the
 current design, two guides and four donors, on the representative signal genes is
-$E\rho^2 \approx .44$. This is a moderate value: adequate for ranking, where only the
-order of targets matters, but short of the $.70$ that an absolute per-target threshold
-would demand. This calibrates how far the screen can be trusted. Its rankings can be
+$E\rho^2 \approx .44$. Read as a reliability, this is the correlation expected between
+the target scores this screen produces and those an independent replication with fresh
+guides and donors would produce, and equivalently the fraction of the between-target
+variance in the measured effects that reflects real target-to-target difference rather
+than guide-and-donor sampling error. This is a moderate value: adequate for ranking,
+where only the order of targets matters, but short of the $.70$ that an absolute
+per-target threshold would demand. This calibrates how far the screen can be trusted. Its rankings can be
 relied on, yet no single target's dependability clears an absolute bar, so
 dependability is a prioritization signal for the panel rather than a certificate for
 any one target read in isolation.
@@ -537,7 +547,8 @@ processing the full single-cell data: data retrieval, a checksummed evidence
 manifest, identifiability gates, synthetic method selection, per-gene
 decomposition, measurement-error removal, the reliability-weighted ranking, the
 per-context analysis, and the design study. All results are committed as tables and figures, and every reported
-number regenerates from a single re-run. The code is released under Apache-2.0.
+number regenerates from a single re-run. The code is released under Apache-2.0 at
+\url{https://github.com/kiki830621/G-perturb}.
 
 \section{Limitations}
 

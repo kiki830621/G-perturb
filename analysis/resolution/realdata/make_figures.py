@@ -4,7 +4,7 @@
 Reads the committed result artifacts and renders 5 figures (PNG @200dpi + PDF) into figures/:
   fig1_me_removal        me-removal reveal (40 -> 7,674 dependable genes)
   fig2_dstudy_surface    D-study Erho2 surface (guides x donors) — add guides, not donors
-  fig3_ranking_reshuffle effect-only vs reliability-weighted ranking (49/100 churn, RPS3 #79->#4)
+  fig3_ranking_reshuffle effect-only vs reliability-weighted ranking (50/100 churn, RPS3 #79->#4)
   fig4_context_tcr       context-specific reliability — the TCR module, reliable only when activated
   fig5_sol_hardening     IDD ledger -> Sol BLOCKED (11 findings) -> resolution (schematic)
 All numbers come from the files; nothing hard-coded that the data can supply.
@@ -101,9 +101,11 @@ def fig3():
     fig, ax = plt.subplots(figsize=(6.8, 6.4))
     N = 300  # plot targets in either top-N by effect or by reliability
     pts = [t for t in rE if rE[t] <= N or rS[t] <= N]
+    ax.add_patch(plt.Rectangle((0, 0), 100, 100, facecolor=TEAL, alpha=0.07, zorder=0))  # agreement region
     for t in pts:
         e, s = rE[t], rS[t]
-        if e <= 100 and s > 100:   col, z, a = RED, 4, 0.9      # dropped out (strong but unreliable)
+        if e <= 100 and s <= 100:  col, z, a = TEAL, 5, 0.9     # strong AND dependable (rankings agree)
+        elif e <= 100 and s > 100: col, z, a = RED, 4, 0.9      # dropped out (strong but unreliable)
         elif s <= 100 and e > 100: col, z, a = GREEN, 4, 0.9    # promoted (reproducible)
         else:                      col, z, a = GRAY, 1, 0.35
         ax.scatter(e, s, s=14, color=col, alpha=a, zorder=z, edgecolors="none")
@@ -114,10 +116,14 @@ def fig3():
         ax.scatter([rE["RPS3"]], [rS["RPS3"]], s=90, facecolors="none", edgecolors=INK, linewidths=2, zorder=6)
         ax.annotate("RPS3\n#79 → #4", xy=(rE["RPS3"], rS["RPS3"]), xytext=(rE["RPS3"] + 32, rS["RPS3"] + 26),
                     fontsize=10, fontweight="bold", arrowprops=dict(arrowstyle="->", color=INK, lw=1.4))
+    ax.text(50, 93, "strong AND dependable\n(rankings agree)", ha="center", va="bottom",
+            fontsize=9.5, fontweight="bold", color=TEAL, zorder=7,
+            bbox=dict(boxstyle="round,pad=0.3", fc="white", ec=TEAL, alpha=0.85))
     ax.set_xlim(0, N); ax.set_ylim(N, 0)  # invert y so rank 1 top
     ax.set_xlabel("rank by effect size alone"); ax.set_ylabel("rank by dependability-weighted score  $S_t = E_t \\times R_{dep,t}$")
     ax.set_title(f"The ranking reshuffles: {churn} of the top-100 effect hits\ndrop out once weighted by dependability",
                  fontsize=12, fontweight="bold")
+    ax.scatter([], [], color=TEAL, label="strong & dependable → confident hit")
     ax.scatter([], [], color=RED, label="strong effect, unreliable → demoted")
     ax.scatter([], [], color=GREEN, label="reproducible → promoted into top-100")
     ax.legend(loc="lower right", fontsize=9.5, framealpha=0.95)
