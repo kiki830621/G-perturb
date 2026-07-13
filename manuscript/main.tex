@@ -304,12 +304,18 @@ the target, target-by-guide, and target-by-donor components, written $\sigma^2_T
 $\sigma^2_{TG}$, and $\sigma^2_{TD}$.} The \emph{index of dependability},
 $\Phi = \sigma^2_\tau/(\sigma^2_\tau + \sigma^2_\Delta)$, is the coefficient for
 \emph{absolute} decisions, those that compare a target to a fixed threshold rather than
-to other targets; its absolute error $\sigma^2_\Delta$ adds the guide and donor main
-effects to $\sigma^2_\delta$, so $\Phi \le E\rho^2$. We report $E\rho^2$ rather than
-$\Phi$ because ranking is a relative decision: the guide and donor main effects are
-common shifts that move every target together and leave the ordering unchanged, so
-counting them as error would understate a dependability that is fully adequate for
-ranking. The design study varies $n_g$ and $n_d$ to ask how much either would raise
+to other targets; its absolute error adds the guide and donor main-effect variances,
+\[
+\sigma^2_\Delta = \sigma^2_\delta + \frac{\sigma^2_{\mathrm{g}}}{n_g}
+      + \frac{\sigma^2_{\mathrm{d}}}{n_d},
+\]
+so $\Phi \le E\rho^2$. We report $E\rho^2$ rather than $\Phi$ because ranking is a
+relative decision: those main-effect variances $\sigma^2_{\mathrm{g}}$ and
+$\sigma^2_{\mathrm{d}}$, the overall bias of a guide or a donor across targets (as
+opposed to the within-target variances $\sigma^2_{\mathrm{guide}}$ and
+$\sigma^2_{\mathrm{donor}}$), are common shifts that move every target together and
+leave the ordering unchanged, so counting them as error would understate a
+dependability that is fully adequate for ranking. The design study varies $n_g$ and $n_d$ to ask how much either would raise
 $E\rho^2$. The per-target $\Rdep$ is its single-target counterpart, the same
 generalizability read for one target rather than for the panel.
 
