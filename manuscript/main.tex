@@ -172,13 +172,21 @@ two guides are interchangeable versions of the same perturbation (\emph{parallel
 forms}), and donors and conditions are further experimental factors, or
 \emph{facets}, crossed with the target. Cell sampling and sequencing contribute the
 residual noise. Classical test theory writes an observation as a true score plus
-error, $X = T + E$ \parencite{novick1966}, and generalizability theory
-\parencite{cronbach1972} splits that error into one term per facet,
+error, $X = T + \varepsilon$ \parencite{novick1966}, and generalizability theory
+\parencite{cronbach1972} splits that error into one independent term per facet,
 \[
-E = E_{\mathrm{guide}} + E_{\mathrm{donor}} + E_{\mathrm{condition}}
-      + E_{\mathrm{interactions}} + E_{\mathrm{residual}},
+\varepsilon = \varepsilon_{\mathrm{guide}} + \varepsilon_{\mathrm{donor}}
+      + \varepsilon_{\mathrm{condition}} + \varepsilon_{\mathrm{interaction}}
+      + \varepsilon_{\mathrm{residual}}.
 \]
-and estimates how large each term is.
+Because these terms are independent, the observed variance is a sum of variance
+components,
+\[
+\sigma^2_X = \sigma^2_T + \sigma^2_{\mathrm{guide}} + \sigma^2_{\mathrm{donor}}
+      + \sigma^2_{\mathrm{condition}} + \sigma^2_{\mathrm{interaction}}
+      + \sigma^2_{\mathrm{residual}},
+\]
+and the analysis estimates how large each component is.
 
 We distinguish random from fixed facets. Guides and donors are \emph{random} facets: one wants the
 effect to generalize across the guides and donors that were not sampled.
@@ -191,68 +199,115 @@ generalization coefficient would misclassify that signal as noise.
 
 \subsection{Per-target dependability}
 
-For target $t$ we report dependability as a \emph{profile} of three coefficients,
-one per facet, kept separate rather than multiplied into a single index. Each coefficient
-answers a reproducibility question: with everything held fixed except one facet,
-how well does the target's transcriptional signature repeat? An observation is a
+For target $t$, dependability is a \emph{profile} of three coefficients, one per
+facet, kept separate rather than multiplied into a single index. Each answers a
+reproducibility question: with everything else held fixed, how well does the
+target's transcriptional signature repeat across a single facet? An observation is a
 (target, guide, donor, condition) pseudobulk whose effect profile spans the
-$18{,}129$ genes, measured relative to a matched non-targeting control. We average
-a group of observations into a mean profile, and each facet coefficient is the
-Pearson correlation, across genes, between two mean profiles that differ only in
-that facet:
+$18{,}129$ genes, measured against a matched non-targeting control. Write
+$\bar{P}_A$ for the mean effect profile over a set of observations $A$, a vector over
+the genes, and $\rho(\cdot,\cdot)$ for the Pearson correlation across genes; each
+coefficient is such a correlation between mean profiles that differ only in the facet
+of interest. The three share one underlying form, a \emph{signal share},
+$R = \sigma^2_\tau/(\sigma^2_\tau + \sigma^2_e)$, the true-signal variance over the
+total, where $\sigma^2_e$ is the error variance of the facet being refreshed;
+equivalently, its error-to-signal ratio is $(1-R)/R = \sigma^2_e/\sigma^2_\tau$. We
+estimate each one empirically, as a split-half or pairwise profile correlation,
+rather than as a Gaussian variance-component ratio.\footnote{These are raw
+single-observation correlations. For a facet a screen deploys as an average (the two
+guides, the four donors), the reliability of that average is the larger
+Spearman--Brown step-up, $kR/(1+(k-1)R)$ for $k$ units; we report the
+single-observation form because the joint coefficient below is defined at the
+single-guide-by-single-donor level. All three are distribution-light empirical
+correlations, not Gaussian variance-component ratios.}
 \begin{itemize}
-  \item $\Rg$: the target's guides are split into two halves, each half's mean
-  profile is formed, and the two are correlated. A high value indicates that the
-  transcriptional signature reproduces across independent guide
-  sets.\footnote{These are raw single-observation split-half correlations. The
-  reliability of the deployed two-guide average is the Spearman--Brown step-up
-  $2r/(1+r)$, a separate and larger quantity; we report the single-observation form
-  because the joint coefficient is defined at the single-guide-by-single-donor
-  level. Both are distribution-light empirical correlations rather than Gaussian
-  variance-component ratios.}
-  \item $\Rd$: the same construction with a two-versus-two donor split, then
-  shrunk toward the pooled mean by a moment-based empirical-Bayes step (a global
-  shrinkage factor in the released code, in place of a target-specific one; see
-  Appendix~\ref{app:estimator}), which stabilizes a coefficient that four donors
-  otherwise leave with only three degrees of freedom.
-  \item $\Rc$: the mean of the pairwise correlations among the three within-state
-  profiles, reported as cross-context \emph{consistency} rather than as a
-  generalization coefficient.
+  \item $\Rg = \sigma^2_\tau/(\sigma^2_\tau + \sigma^2_{\mathrm{guide}})$: the signal
+  share whose error is the guide variance, estimated by the split-half correlation
+  $\rho(\bar{P}_{G_1}, \bar{P}_{G_2})$ between the mean profiles of two guide halves; a
+  high value indicates that the signature reproduces across independent guide sets.
+  \item $\Rd = \sigma^2_\tau/(\sigma^2_\tau + \sigma^2_{\mathrm{donor}})$: the signal
+  share whose error is the donor variance, estimated by the split-half correlation
+  averaged over the three two-versus-two donor partitions,
+  $\tfrac{1}{3}\sum_{\{A,B\}} \rho(\bar{P}_A, \bar{P}_B)$, so that it does not depend
+  on donor ordering, then shrunk toward the pooled mean by a moment-based
+  empirical-Bayes step.\footnote{With only four donors this coefficient carries three
+  degrees of freedom and is noisy, so it is shrunk toward the pooled mean; the
+  released code applies a global shrinkage factor in place of the target-specific one,
+  as detailed in Appendix~\ref{app:estimator}.}
+  \item $\Rc$: cross-context \emph{consistency}, the mean of the pairwise
+  correlations among the three within-state profiles,
+  $\tfrac{1}{3}\sum_{c<c'} \rho(\bar{P}^{(c)}, \bar{P}^{(c')})$. Because condition is a
+  fixed facet, it is reported as consistency rather than as a signal share of this
+  form.
 \end{itemize}
 
-To rank targets we need one number rather than a profile. The per-target
-dependability $\Rdep$ is that number, and it has a concrete meaning: the
-correlation one would expect between two fully independent repeats of the
-experiment, a second run carried out with fresh guides and fresh donors. Writing
-an observed profile as a true signal plus independent guide and donor errors,
-$\tau_t + \varepsilon_{\mathrm{guide}} + \varepsilon_{\mathrm{donor}}$, that
-correlation is the signal's share of the total variation,
+A ranking requires a single number rather than a profile. The per-target
+dependability $\Rdep$ provides it, with a concrete interpretation: the correlation
+expected between two fully independent repeats of the experiment, a second run
+carried out with fresh guides and fresh donors. Writing an observed profile as a
+true signal plus independent guide and donor errors,
+$\tau_t + \varepsilon_{\mathrm{guide}} + \varepsilon_{\mathrm{donor}}$, this
+correlation is again a signal share, now taken over both error sources,
 $\sigma^2_\tau / (\sigma^2_\tau + \sigma^2_{\mathrm{guide}}
-+ \sigma^2_{\mathrm{donor}})$. The same quantity is assembled from the two
-split-half coefficients. Each is itself a signal share of the same kind,
-$R = \sigma^2_\tau/(\sigma^2_\tau + \sigma^2_e)$, where $\sigma^2_e$ is the error
-variance of the facet it refreshes. Its error-to-signal ratio is therefore
-$(1-R)/R = \sigma^2_e/\sigma^2_\tau$, and because the guide and donor errors are
-independent these two ratios add:
++ \sigma^2_{\mathrm{donor}})$. Because the two errors are independent, their
+error-to-signal ratios add, and $\Rdep$ follows from the two split-half
+coefficients:
 \begin{equation}
-\Rdep = \frac{1}{1 + \dfrac{1 - \Rg}{\Rg} + \dfrac{1 - \Rd}{\Rd}},
-\qquad S_t = M_t \, \Rdep,
+\Rdep = \frac{1}{1 + \dfrac{1 - \Rg}{\Rg} + \dfrac{1 - \Rd}{\Rd}}.
 \label{eq:rdep}
 \end{equation}
-where $M_t$ is the effect magnitude and $S_t$ the dependability-weighted score
-used for ranking. A single-facet coefficient refreshes one source of variation;
-the joint coefficient refreshes both, and is therefore the most demanding form of
-reproducibility we report. The equality is exact when the two errors are
-independent, and becomes an upper bound if a guide-by-donor interaction adds a
-further disagreement term.
+The guide coefficient refreshes one source of variation and the donor coefficient
+the other; the joint coefficient refreshes both at once, so it poses the most
+demanding of the three reproducibility questions. The addition of ratios is exact
+when the guide and donor errors are independent; a guide-by-donor interaction would
+contribute a further disagreement term, making the assembled $\Rdep$ an upper bound
+on the true value.
 
-We keep a naming discipline that separates the two levels of the theory, and the
-two decisions it serves. At the design level, generalizability theory distinguishes
-the \emph{generalizability coefficient} $E\rho^2$, for \emph{relative} decisions
-such as ranking, from the \emph{index of dependability} $\Phi$, for \emph{absolute}
-decisions against a threshold; $\Phi$ counts the facet main effects in its error as
-well, so $\Phi \le E\rho^2$. Because our task is to rank targets, $E\rho^2$ is the
-design-level coefficient we report. The per-target quantity $\Rdep$ is the
+Dependability measures reproducibility, not importance, so it is not the ranking on
+its own. We rank by the effect magnitude weighted by dependability,
+\begin{equation}
+S_t = M_t \, \Rdep,
+\label{eq:score}
+\end{equation}
+where $M_t$ is the effect magnitude, the root-mean-square of the target's mean effect
+profile across genes. A target scores high only when a sizeable effect is also
+reproducible; a large but fragile effect and a small but reproducible one are both
+demoted, each for a different reason. Comparing the $S_t$ ranking against the ranking
+by $M_t$ alone is the substance of RQ1.
+
+The same construction applies within a single activation state. Restricting the
+observations to a state $c \in \{\mathrm{Rest}, \mathrm{Stim8hr}, \mathrm{Stim48hr}\}$,
+we re-form the guide and donor mean profiles from that state's observations alone,
+obtain the two within-state split-half coefficients, and combine them through
+Equation~\eqref{eq:rdep} into a within-state dependability $\Rdep^{(c)}$.
+Because each state carries roughly a third of the cells, $\Rdep^{(c)}$ is noisier and
+runs lower than the pooled $\Rdep$; a target's context specificity is therefore read
+by comparing its $\Rdep^{(c)}$ across states, not against the pooled value, which is
+the substance of RQ2.
+
+\subsection{Design-level dependability}
+
+The coefficients so far are per-target. The remaining two questions concern the
+screen's measurement design as a whole: how dependable the panel is overall (RQ3),
+and which facet limits that dependability (RQ4). These are answered at the design
+level, where generalizability theory forms coefficients from the design's variance
+components. For a panel of $n_g$ guides and $n_d$ donors, the \emph{generalizability
+coefficient}, for \emph{relative} decisions such as ranking, is the universe-score
+share
+\[
+E\rho^2 = \frac{\sigma^2_\tau}{\sigma^2_\tau + \sigma^2_\delta}, \qquad
+\sigma^2_\delta = \frac{\sigma^2_{\tau g}}{n_g} + \frac{\sigma^2_{\tau d}}{n_d}
+      + \frac{\sigma^2_{\mathrm{res}}}{n_g n_d},
+\]
+where the relative error $\sigma^2_\delta$ is the target-by-facet interaction and
+residual variance averaged over the design. The \emph{index of dependability},
+$\Phi = \sigma^2_\tau/(\sigma^2_\tau + \sigma^2_\Delta)$, for \emph{absolute}
+decisions against a threshold, replaces $\sigma^2_\delta$ with the absolute error
+$\sigma^2_\Delta = \sigma^2_\delta + \sigma^2_g/n_g + \sigma^2_d/n_d$, which
+additionally counts the guide and donor main effects; since
+$\sigma^2_\Delta \ge \sigma^2_\delta$, $\Phi \le E\rho^2$. Because our task is to rank targets, $E\rho^2$ is the
+design-level coefficient we report, and the design study varies the guide and donor
+counts to ask how much either would raise it. The per-target $\Rdep$ is the
 single-target counterpart of $E\rho^2$: the generalizability of one target's effect
 over the two random facets, carrying no design-level subscript. Throughout,
 \emph{dependability} is the plain-language name for the trustworthiness these
@@ -322,7 +377,7 @@ controls give a clean non-targeting-versus-non-targeting negative test
 \subsection{A reliability-weighted ranking}
 
 Ranking targets by $S_t$ reorders the candidate list relative to effect size
-alone (Figure~\ref{fig:rank}). Of the $100$ highest-effect targets, $49$ fall out
+alone (Figure~\ref{fig:rank}). Of the $100$ highest-effect targets, $50$ fall out
 of the $100$ most dependable, and reproducible targets that effect size underranks
 rise (Table~\ref{tab:rankshift}). These are the targets a dependability-weighted
 screen would nominate for validation but a strength-ranked screen would overlook.
@@ -340,17 +395,17 @@ screen would nominate for validation but a strength-ranked screen would overlook
 \begin{table}[t]
   \centering
   \caption{Targets that effect size underranks but dependability promotes. Rank
-  is out of the $7{,}169$ scored targets.}
+  is out of the $7{,}258$ scored targets.}
   \label{tab:rankshift}
   \begin{tabular}{lccc}
     \toprule
     Target & Rank by effect & Rank by dependability & $\Rdep$ \\
     \midrule
     RPS3  & $79$  & $4$  & $.34$ \\
-    QARS1 & $53$  & $5$  & $.32$ \\
-    RPP21 & $124$ & $8$  & $.34$ \\
-    IMP4  & $96$  & $13$ & $.31$ \\
-    NMD3  & $158$ & $17$ & $.33$ \\
+    QARS1 & $53$  & $5$  & $.31$ \\
+    RPP21 & $124$ & $6$  & $.34$ \\
+    IMP4  & $96$  & $12$ & $.30$ \\
+    NMD3  & $158$ & $14$ & $.33$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -359,13 +414,13 @@ screen would nominate for validation but a strength-ranked screen would overlook
 
 Analyzed within activation states, dependability separates targets that are
 reliable across all states from targets that are reliable in one state and not
-another (Figure~\ref{fig:tcr}). Because a within-state per-target dependability rests on
+another (Figure~\ref{fig:tcr}). Because a within-state coefficient $\Rdep^{(c)}$ rests on
 roughly a third of the cells and runs lower than the pooled value, states are
-compared to one another rather than to the pooled number. One hundred targets are
+compared to one another rather than to the pooled number. Ninety-two targets are
 context-specific in this sense. Among them, the T-cell-receptor (TCR) signaling module,
 the CD3 complex (CD3D, CD3G, CD247) with the proximal kinase ZAP70 and the
 scaffold LAT, is reliably measurable only in activated cells, with resting
-dependability at the noise floor (resting $R_{\mathrm{dep}} \approx .02$--$.05$;
+dependability at the noise floor (resting $\Rdep^{(c)} \approx .03$--$.05$;
 stimulated $\approx .20$--$.28$). The knockdown effect for CD3D grows with
 activation (effect magnitude $0.26$, $0.57$, and $1.12$ across Rest, Stim8hr, and
 Stim48hr) and becomes dependable only upon activation. The framework reconstructs

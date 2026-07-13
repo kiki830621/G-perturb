@@ -1,232 +1,232 @@
 {
   "n_targets": 12730,
-  "n_scored_overall": 7169,
+  "n_scored_overall": 7258,
   "per_view": {
     "overall": {
-      "n_scored": 7169,
-      "median_R_dep": 0.075,
+      "n_scored": 7258,
+      "median_R_dep": 0.0792,
       "donor_shrink_w": 0.5
     },
     "Rest": {
-      "n_scored": 6884,
-      "median_R_dep": 0.0413,
+      "n_scored": 7021,
+      "median_R_dep": 0.0432,
       "donor_shrink_w": 0.5
     },
     "Stim8hr": {
-      "n_scored": 7181,
-      "median_R_dep": 0.0367,
+      "n_scored": 7306,
+      "median_R_dep": 0.0384,
       "donor_shrink_w": 0.5
     },
     "Stim48hr": {
-      "n_scored": 7062,
-      "median_R_dep": 0.0343,
+      "n_scored": 7204,
+      "median_R_dep": 0.038,
       "donor_shrink_w": 0.5
     }
   },
   "overall_top10": [
     {
       "target": "GFPT1",
-      "S": 0.7003,
-      "R_dep": 0.3122,
+      "S": 0.6595,
+      "R_dep": 0.294,
       "rank_E": 1
     },
     {
       "target": "POP1",
-      "S": 0.5453,
-      "R_dep": 0.3169,
+      "S": 0.5465,
+      "R_dep": 0.3175,
       "rank_E": 14
     },
     {
       "target": "MED22",
-      "S": 0.4824,
-      "R_dep": 0.2461,
+      "S": 0.4697,
+      "R_dep": 0.2397,
       "rank_E": 4
     },
     {
       "target": "RPS3",
-      "S": 0.4729,
-      "R_dep": 0.3376,
+      "S": 0.4696,
+      "R_dep": 0.3353,
       "rank_E": 79
     },
     {
       "target": "QARS1",
-      "S": 0.4715,
-      "R_dep": 0.3175,
+      "S": 0.4553,
+      "R_dep": 0.3065,
       "rank_E": 53
     },
     {
-      "target": "RPL3",
-      "S": 0.467,
-      "R_dep": 0.2921,
-      "rank_E": 29
-    },
-    {
-      "target": "DUT",
-      "S": 0.4446,
-      "R_dep": 0.2695,
-      "rank_E": 22
-    },
-    {
       "target": "RPP21",
-      "S": 0.4359,
-      "R_dep": 0.338,
+      "S": 0.4344,
+      "R_dep": 0.3369,
       "rank_E": 124
     },
     {
-      "target": "CINP",
-      "S": 0.4322,
-      "R_dep": 0.2857,
-      "rank_E": 40
+      "target": "NOL11",
+      "S": 0.4302,
+      "R_dep": 0.2572,
+      "rank_E": 17
     },
     {
-      "target": "NOL11",
-      "S": 0.432,
-      "R_dep": 0.2583,
-      "rank_E": 17
+      "target": "RPL3",
+      "S": 0.4299,
+      "R_dep": 0.2689,
+      "rank_E": 29
+    },
+    {
+      "target": "CUL1",
+      "S": 0.4282,
+      "R_dep": 0.2061,
+      "rank_E": 2
+    },
+    {
+      "target": "DUT",
+      "S": 0.4279,
+      "R_dep": 0.2593,
+      "rank_E": 22
     }
   ],
   "context_specific": {
-    "n_flagged": 100,
+    "n_flagged": 92,
     "best_state_counts": {
-      "Stim48hr": 19,
-      "Stim8hr": 43,
-      "Rest": 38
+      "Stim48hr": 21,
+      "Stim8hr": 38,
+      "Rest": 33
     },
     "top15": [
       {
         "target": "RPP21",
         "best_state": "Stim48hr",
-        "best_Rdep": 0.2544,
-        "cs_spread": 0.2383,
-        "Rdep_Rest": 0.0161,
-        "Rdep_Stim8hr": 0.1846,
-        "Rdep_Stim48hr": 0.2544
+        "best_Rdep": 0.2476,
+        "cs_spread": 0.2316,
+        "Rdep_Rest": 0.016,
+        "Rdep_Stim8hr": 0.1693,
+        "Rdep_Stim48hr": 0.2476
       },
       {
         "target": "CD3D",
         "best_state": "Stim8hr",
-        "best_Rdep": 0.2812,
-        "cs_spread": 0.2273,
-        "Rdep_Rest": 0.0539,
-        "Rdep_Stim8hr": 0.2812,
-        "Rdep_Stim48hr": 0.2038
+        "best_Rdep": 0.2773,
+        "cs_spread": 0.2293,
+        "Rdep_Rest": 0.048,
+        "Rdep_Stim8hr": 0.2773,
+        "Rdep_Stim48hr": 0.2159
       },
       {
         "target": "CD3G",
         "best_state": "Stim8hr",
-        "best_Rdep": 0.247,
-        "cs_spread": 0.2221,
-        "Rdep_Rest": 0.0248,
-        "Rdep_Stim8hr": 0.247,
+        "best_Rdep": 0.2397,
+        "cs_spread": 0.197,
+        "Rdep_Rest": 0.0427,
+        "Rdep_Stim8hr": 0.2397,
         "Rdep_Stim48hr": 0.1185
+      },
+      {
+        "target": "CD247",
+        "best_state": "Stim8hr",
+        "best_Rdep": 0.2335,
+        "cs_spread": 0.1877,
+        "Rdep_Rest": 0.0458,
+        "Rdep_Stim8hr": 0.2335,
+        "Rdep_Stim48hr": 0.0869
       },
       {
         "target": "AAMP",
         "best_state": "Stim8hr",
         "best_Rdep": 0.2045,
-        "cs_spread": 0.1869,
-        "Rdep_Rest": 0.1419,
+        "cs_spread": 0.1865,
+        "Rdep_Rest": 0.1412,
         "Rdep_Stim8hr": 0.2045,
-        "Rdep_Stim48hr": 0.0176
-      },
-      {
-        "target": "QARS1",
-        "best_state": "Stim8hr",
-        "best_Rdep": 0.2629,
-        "cs_spread": 0.184,
-        "Rdep_Rest": 0.0789,
-        "Rdep_Stim8hr": 0.2629,
-        "Rdep_Stim48hr": "NA"
-      },
-      {
-        "target": "CD247",
-        "best_state": "Stim8hr",
-        "best_Rdep": 0.2312,
-        "cs_spread": 0.1827,
-        "Rdep_Rest": 0.0485,
-        "Rdep_Stim8hr": 0.2312,
-        "Rdep_Stim48hr": 0.091
+        "Rdep_Stim48hr": 0.018
       },
       {
         "target": "TMX1",
         "best_state": "Stim8hr",
-        "best_Rdep": 0.1922,
-        "cs_spread": 0.1806,
-        "Rdep_Rest": 0.0116,
-        "Rdep_Stim8hr": 0.1922,
-        "Rdep_Stim48hr": 0.135
-      },
-      {
-        "target": "TRMT5",
-        "best_state": "Stim48hr",
-        "best_Rdep": 0.2636,
-        "cs_spread": 0.1743,
-        "Rdep_Rest": 0.1461,
-        "Rdep_Stim8hr": 0.0893,
-        "Rdep_Stim48hr": 0.2636
+        "best_Rdep": 0.1931,
+        "cs_spread": 0.18,
+        "Rdep_Rest": 0.013,
+        "Rdep_Stim8hr": 0.1931,
+        "Rdep_Stim48hr": 0.1322
       },
       {
         "target": "TRIP12",
         "best_state": "Stim8hr",
-        "best_Rdep": 0.195,
-        "cs_spread": 0.1697,
-        "Rdep_Rest": 0.0253,
-        "Rdep_Stim8hr": 0.195,
-        "Rdep_Stim48hr": 0.1401
+        "best_Rdep": 0.2002,
+        "cs_spread": 0.1783,
+        "Rdep_Rest": 0.0219,
+        "Rdep_Stim8hr": 0.2002,
+        "Rdep_Stim48hr": 0.1536
+      },
+      {
+        "target": "QARS1",
+        "best_state": "Stim8hr",
+        "best_Rdep": 0.2553,
+        "cs_spread": 0.1758,
+        "Rdep_Rest": 0.0795,
+        "Rdep_Stim8hr": 0.2553,
+        "Rdep_Stim48hr": "NA"
+      },
+      {
+        "target": "LCP2",
+        "best_state": "Stim8hr",
+        "best_Rdep": 0.2267,
+        "cs_spread": 0.1682,
+        "Rdep_Rest": 0.0585,
+        "Rdep_Stim8hr": 0.2267,
+        "Rdep_Stim48hr": 0.1483
       },
       {
         "target": "ZAP70",
         "best_state": "Stim8hr",
-        "best_Rdep": 0.2049,
-        "cs_spread": 0.1692,
-        "Rdep_Rest": 0.0357,
-        "Rdep_Stim8hr": 0.2049,
-        "Rdep_Stim48hr": 0.1486
+        "best_Rdep": 0.1981,
+        "cs_spread": 0.1662,
+        "Rdep_Rest": 0.0319,
+        "Rdep_Stim8hr": 0.1981,
+        "Rdep_Stim48hr": 0.1383
       },
       {
-        "target": "WAPL",
-        "best_state": "Rest",
-        "best_Rdep": 0.2213,
-        "cs_spread": 0.1638,
-        "Rdep_Rest": 0.2213,
-        "Rdep_Stim8hr": 0.1101,
-        "Rdep_Stim48hr": 0.0575
-      },
-      {
-        "target": "ABCF1",
-        "best_state": "Rest",
-        "best_Rdep": 0.1963,
-        "cs_spread": 0.1625,
-        "Rdep_Rest": 0.1963,
-        "Rdep_Stim8hr": 0.0987,
-        "Rdep_Stim48hr": 0.0338
+        "target": "TRMT5",
+        "best_state": "Stim48hr",
+        "best_Rdep": 0.2583,
+        "cs_spread": 0.1645,
+        "Rdep_Rest": 0.144,
+        "Rdep_Stim8hr": 0.0938,
+        "Rdep_Stim48hr": 0.2583
       },
       {
         "target": "HECTD4",
         "best_state": "Stim48hr",
-        "best_Rdep": 0.1681,
-        "cs_spread": 0.1601,
-        "Rdep_Rest": 0.008,
-        "Rdep_Stim8hr": 0.0635,
-        "Rdep_Stim48hr": 0.1681
+        "best_Rdep": 0.1727,
+        "cs_spread": 0.1618,
+        "Rdep_Rest": 0.0109,
+        "Rdep_Stim8hr": 0.0557,
+        "Rdep_Stim48hr": 0.1727
       },
       {
-        "target": "APAF1",
+        "target": "ABCF1",
         "best_state": "Rest",
-        "best_Rdep": 0.1614,
-        "cs_spread": 0.1572,
-        "Rdep_Rest": 0.1614,
-        "Rdep_Stim8hr": 0.0042,
-        "Rdep_Stim48hr": "NA"
+        "best_Rdep": 0.2002,
+        "cs_spread": 0.1557,
+        "Rdep_Rest": 0.2002,
+        "Rdep_Stim8hr": 0.1447,
+        "Rdep_Stim48hr": 0.0446
       },
       {
-        "target": "VMA21",
-        "best_state": "Stim8hr",
-        "best_Rdep": 0.21,
-        "cs_spread": 0.1529,
-        "Rdep_Rest": 0.0571,
-        "Rdep_Stim8hr": 0.21,
-        "Rdep_Stim48hr": "NA"
+        "target": "PRDM1",
+        "best_state": "Stim48hr",
+        "best_Rdep": 0.1759,
+        "cs_spread": 0.1541,
+        "Rdep_Rest": 0.1581,
+        "Rdep_Stim8hr": 0.0218,
+        "Rdep_Stim48hr": 0.1759
+      },
+      {
+        "target": "WAPL",
+        "best_state": "Rest",
+        "best_Rdep": 0.2081,
+        "cs_spread": 0.1526,
+        "Rdep_Rest": 0.2081,
+        "Rdep_Stim8hr": 0.1045,
+        "Rdep_Stim48hr": 0.0554
       }
     ]
   },

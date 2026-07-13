@@ -35,6 +35,7 @@ Writes: target_ranking.csv (overall headline, backward-compatible) + target_rank
 """
 import numpy as np, h5py, os, csv, json
 from collections import defaultdict
+from itertools import combinations
 from scipy.sparse import csr_matrix
 here = os.path.dirname(os.path.abspath(__file__))
 meta = np.load(os.path.join(here, "meta.npy"), allow_pickle=True).item()
@@ -73,6 +74,23 @@ def split_half_corr(P, idxs):
     if len(idxs) < 2: return np.nan
     h = len(idxs) // 2
     return pearson(P[idxs[:h]].mean(axis=0), P[idxs[h:]].mean(axis=0))
+def avg_split_half_corr(P, idxs):
+    # order-independent split-half: average the mean-profile correlation over ALL balanced
+    # half-splits of idxs (for 4 donors, the 3 distinct 2v2 splits; for 2 units, the single
+    # split). Removes the arbitrariness of one fixed split without changing the estimand.
+    n = len(idxs)
+    if n < 2: return np.nan
+    h = n // 2
+    rs, seen = [], set()
+    for combo in combinations(range(n), h):
+        comp = tuple(sorted(set(range(n)) - set(combo)))
+        key = tuple(sorted((tuple(combo), comp)))   # dedup mirror splits (A|B == B|A)
+        if key in seen: continue
+        seen.add(key)
+        a = [idxs[i] for i in combo]; b = [idxs[i] for i in comp]
+        r = pearson(P[a].mean(axis=0), P[b].mean(axis=0))
+        if np.isfinite(r): rs.append(r)
+    return float(np.mean(rs)) if rs else np.nan
 def pairwise_corr(P, idxs):
     if len(idxs) < 2: return np.nan
     rs = [pearson(P[idxs[a]], P[idxs[b]]) for a in range(len(idxs)) for b in range(a + 1, len(idxs))]
@@ -104,7 +122,7 @@ def compute_view(view_tobs, label, with_condition):
         recs[t] = dict(target=t, view=label, n_guides=len(tg_guides[t]), n_donors=len(tg_donors[t]),
                        E_t=float(np.sqrt(np.mean(prof_all ** 2))),
                        Rg=split_half_corr(Pg, tg_guides[t]),
-                       Rd=split_half_corr(Pd, tg_donors[t]),
+                       Rd=avg_split_half_corr(Pd, tg_donors[t]),
                        Rc=(pairwise_corr(Pc, tg_conds[t]) if with_condition else np.nan))
     # per-VIEW moment-based EB shrinkage on R^donor (per-slice noise differs → re-estimate μ, w)
     rd_raw = np.array([r["Rd"] for r in recs.values()], float)
