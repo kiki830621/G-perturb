@@ -348,17 +348,24 @@ facet and how much by the donor facet, the two facets a target must generalize
 across. A crossed mixed model, fit per gene, estimates these variance contributions
 and weights each pseudobulk by its precision, so rows built from few cells count for
 less; this is the generalizability-theory design of Section~2 \parencite{brennan2001}.
-We did not take this estimator for granted. On simulated data whose true variance
-components are known, we compared three candidates in a pre-registered test of which
-could recover the planted values, and only the precision-weighted model recovered
-them, under both Gaussian and heavy-tailed noise. A distance-based candidate failed:
-a share of a pairwise distance is not a variance, and the coefficients are defined
-from variances. The full estimator decision path (the candidate models and what each
+We did not take either estimator for granted. Across the design level and the
+per-target level we weighed five candidate estimators and chose between them on
+simulated data whose true variance components are known, in a pre-registered test of
+which could recover the planted values. At the design level the precision-weighted
+crossed model was selected. At the per-target level a split-half coefficient with
+empirical-Bayes shrinkage was the only candidate to recover the planted components
+under both Gaussian and heavy-tailed noise, and was selected. Of the three set aside,
+a distance-based decomposition is the clearest case: a share of a pairwise distance
+is not a variance, and the coefficients are defined from variances. The full estimator decision path (the candidate models and what each
 can and cannot identify, the two levels of the design, the per-target formulas, and a
 crosswalk to what the released code computes) is given in
 Appendix~\ref{app:estimator}.
 
-\section{Results}
+\section{Results and Discussion}
+
+We take up the four questions in turn, moving from individual targets (RQ1, RQ2) to
+the measurement design (RQ3, RQ4). All four rest on one preliminary correction, which
+we describe first.
 
 \subsection{Measurement error masks dependable signal}
 
@@ -371,7 +378,9 @@ target-signal share from $.019$ to $.081$ and raises the number of genes with a
 target-signal share above $.10$ from $40$ to $7{,}674$, or $42\%$ of the genome
 (Figure~\ref{fig:me}). The dependable signal was present but masked; the same
 controls give a clean non-targeting-versus-non-targeting negative test
-($r \approx 0$), so the correction introduces no signal where none exists.
+($r \approx 0$), so the correction introduces no signal where none exists. This
+correction is what makes the design-level coefficients measurable, and every
+overall-dependability number below is read after it.
 
 \begin{figure}[t]
   \centering
@@ -382,13 +391,16 @@ controls give a clean non-targeting-versus-non-targeting negative test
   \label{fig:me}
 \end{figure}
 
-\subsection{A reliability-weighted ranking}
+\subsection{RQ1: reliability-weighted ranking reorders the shortlist}
 
 Ranking targets by $S_t$ reorders the candidate list relative to effect size
 alone (Figure~\ref{fig:rank}). Of the $100$ highest-effect targets, $50$ fall out
 of the $100$ most dependable, and reproducible targets that effect size underranks
 rise (Table~\ref{tab:rankshift}). These are the targets a dependability-weighted
 screen would nominate for validation but a strength-ranked screen would overlook.
+The contribution is a shortlist that effect size alone cannot produce: it demotes
+strong but fragile hits, which spend validation capacity without confirming, and
+promotes reproducible effects that a strength ranking buries.
 
 \begin{figure}[t]
   \centering
@@ -418,7 +430,7 @@ screen would nominate for validation but a strength-ranked screen would overlook
   \end{tabular}
 \end{table}
 
-\subsection{Context-specific dependability recovers the TCR module}
+\subsection{RQ2: context-specific dependability recovers the TCR module}
 
 Analyzed within activation states, dependability separates targets that are
 reliable across all states from targets that are reliable in one state and not
@@ -431,10 +443,10 @@ scaffold LAT, is reliably measurable only in activated cells, with resting
 dependability at the noise floor (resting $\Rdep^{(c)} \approx .03$--$.05$;
 stimulated $\approx .20$--$.28$). The knockdown effect for CD3D grows with
 activation (effect magnitude $0.26$, $0.57$, and $1.12$ across Rest, Stim8hr, and
-Stim48hr) and becomes dependable only upon activation. The framework reconstructs
-a coherent signaling module from dependability alone, without gene annotation,
-which is the strongest available evidence that it measures a real property of the
-perturbation rather than an artifact of the summary.
+Stim48hr) and becomes dependable only upon activation. The contribution is direct
+evidence that the coefficient measures real biology: the framework reconstructs a
+coherent signaling module from dependability alone, without gene annotation, and
+noise does not organize into a coherent pathway.
 
 \begin{figure}[t]
   \centering
@@ -445,13 +457,26 @@ perturbation rather than an artifact of the summary.
   \label{fig:tcr}
 \end{figure}
 
-\subsection{A guide-limited design}
+\subsection{RQ3: how dependable the screen is overall}
+
+RQ1 and RQ2 show that dependability discriminates among targets; RQ3 asks how much
+dependability the screen delivers as a whole. Two readings converge. The
+measurement-error result above puts dependable target signal in $42\%$ of genes once
+the floor is removed. At the coefficient level, the panel generalizability
+coefficient for the current design, two guides and four donors, on the representative
+signal genes is $E\rho^2 \approx .44$. This is a moderate value: adequate for
+ranking, where only the order of targets matters, but short of the $.70$ that an
+absolute per-target threshold would demand. This calibrates how far the screen can be
+trusted. Its rankings can be relied on, yet no single target's dependability clears an
+absolute bar, so dependability is a prioritization signal for the panel rather than a
+certificate for any one target read in isolation.
+
+\subsection{RQ4: guides, not donors, limit the design}
 
 The ranking and its context-specific structure describe the screen as it stands.
 How could a future screen be made more dependable? A design study projects the
 generalizability coefficient onto alternative numbers of guides and donors
-(Figure~\ref{fig:dstudy}). On the representative signal genes the current design
-(two guides, four donors) reaches $E\rho^2 \approx .44$. The guide error term
+(Figure~\ref{fig:dstudy}). The guide error term
 exceeds the donor error term by a factor of about $2.4$; adding one guide raises
 the coefficient about three times as much as adding one donor. With two guides the
 coefficient is capped near $.53$, and no number of donors reaches $.70$, whereas
@@ -461,7 +486,9 @@ the design of subsequent screens. Repeating the design study within each
 activation state returns the same verdict in all three states
 (Table~\ref{tab:percond}), so the recommendation is not an artifact of pooling;
 within a state the guide term dominates the donor term more sharply still, because
-most donor disagreement is a cross-state phenomenon.
+most donor disagreement is a cross-state phenomenon. This is actionable guidance for
+subsequent screens: a fixed budget buys more dependability spent on additional guides
+than on additional donors.
 
 \begin{figure}[t]
   \centering
@@ -488,6 +515,23 @@ most donor disagreement is a cross-state phenomenon.
     \bottomrule
   \end{tabular}
 \end{table}
+
+\section{Conclusions}
+
+Generalizability theory gives a genome-scale Perturb-seq screen a per-target
+dependability coefficient that effect size alone cannot supply. Ranking CD4+ T cell
+targets by that coefficient reorders the validation shortlist, lifting reproducible
+effects and demoting strong but fragile ones (RQ1). Within activation states the same
+coefficient reconstructs the T-cell-receptor signaling module from reproducibility
+alone, with no gene annotation, which is direct evidence that it tracks real biology
+rather than an artifact of the summary (RQ2). At the design level the screen is
+moderately dependable overall, with $E\rho^2 \approx .44$ on the representative signal
+genes (RQ3), and its dependability is limited by guide-to-guide rather than
+donor-to-donor variability (RQ4), so a future screen recovers the most reliability by
+adding guides. The analysis needs only the released summary statistics and a
+pre-registered estimator, regenerates end to end, and records its full decision path
+for adversarial review. Dependability, not effect size, is the quantity a reproducible
+screen should rank on.
 
 \section{Reproducibility}
 
@@ -663,15 +707,19 @@ reported separately and is not substituted into $R_{\mathrm{dep}}$.
 
 \subsection{Pipeline and formula-to-code crosswalk}
 
-The analysis runs: joint pseudobulk $\rightarrow$ matched-NTC effects and covariance
-$\rightarrow$ design/rank gate $\rightarrow$ estimator comparison and synthetic
-recovery $\rightarrow$ guide/donor split-half profiles $\rightarrow$ donor shrinkage
-$\rightarrow$ $R_{\mathrm{dep}}$ $\rightarrow$ effect-weighted ranking $\rightarrow$
-within-condition repetition $\rightarrow$ D-study projection. The design-level path
-(variance components, D-study, measurement-error removal) and the per-target path
-(split-half, shrinkage, $R_{\mathrm{dep}}$) diverge after the effects are formed;
-measurement-error removal acts on the design-level residual, not on the split-half
-coefficients, which absorb measurement error by construction.
+The analysis proceeds in stages. It begins from the joint pseudobulk, forms each
+row's effect and covariance against the matched non-targeting controls, and passes the
+design through the identifiability and rank gate. The estimator is fixed by the
+synthetic-recovery comparison; the pipeline then forms the guide and donor split-half
+profiles, shrinks the donor coefficient toward the pooled mean, and combines the two
+into $R_{\mathrm{dep}}$ and the effect-weighted ranking. The same steps repeat within
+each activation state, and the design study projects the generalizability coefficient
+onto alternative guide and donor counts. Two paths diverge once the effects are
+formed. The design-level path carries the variance components, the D-study, and the
+measurement-error removal; the per-target path carries the split-half coefficients,
+the shrinkage, and $R_{\mathrm{dep}}$. Measurement-error removal acts only on the
+design-level residual, not on the split-half coefficients, which absorb measurement
+error by construction.
 
 \begin{table}[t]
   \centering
