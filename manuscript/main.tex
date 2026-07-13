@@ -262,31 +262,38 @@ coefficients themselves keep their standard names.
 
 \section{Data and estimation}
 
-The data are the released summary statistics of a genome-scale CRISPRi Perturb-seq
-screen in roughly 22 million primary human CD4+ T cells \parencite{zhu2025}. We work
-from the released joint pseudobulk: $278{,}684$ observations, each the aggregate
-expression profile of one (target, guide, donor, condition) combination over
-$18{,}129$ genes. The screen perturbs $12{,}731$ target genes with about two guides
-each, crossed with four donors and three culture conditions (Rest, Stim8hr,
-Stim48hr) across two sequencing runs; the crossed grid is about $45\%$ complete, and
-non-targeting guides provide the controls. Each observation aggregates a median of
-$49$ cells, down to single cells for some, which is what sets its measurement-error
-variance. We define each perturbation's per-gene effect as its
-non-targeting-control-relative log-CPM within the matched donor-condition-run
-stratum, so the effect is measured against the controls that share its technical
-context. No single-cell data are processed.
+The data come from a published genome-scale Perturb-seq screen in roughly 22 million
+primary human CD4+ T cells \parencite{zhu2025}: CRISPR interference (CRISPRi) silences
+a single target gene in each cell, and single-cell RNA sequencing reads out that
+cell's whole transcriptome. We do not process single cells. We start from the
+screen's released \emph{pseudobulk}, the table obtained by averaging all cells that
+share an experimental combination into one expression profile. Each of its
+$278{,}684$ rows is one such combination, a silenced target gene, the guide RNA used
+to silence it, the donor the cells came from, and the culture condition, and it gives
+the average expression of $18{,}129$ genes. The screen silences $12{,}731$ target
+genes with about two guides each, crossed with four donors and three activation
+conditions (Rest, Stim8hr, Stim48hr) over two sequencing runs. Only about $45\%$ of
+that full grid was run, and guides that target no gene serve as the controls. A row
+averages a median of $49$ cells, and as few as one, so rows differ in how precisely
+they are measured, which is what sets each row's measurement-error variance. For every
+row we compute a per-gene effect: the shift in each gene's expression, in log counts
+per million, relative to the control cells in the same donor, condition, and run, so
+every effect is read against controls that share its technical context.
 
-The variance contributed by each facet is estimated per gene by a crossed mixed
-model that weights each pseudobulk by its precision, following the
-generalizability-theory design of Section~2 \parencite{brennan2001}. We did not
-assume this estimator. Three candidates were compared on simulated data with known
-variance components, a pre-registered synthetic-recovery test, and only the
-precision-weighted model recovered the planted values under both Gaussian and
-heavy-tailed noise. A distance-based candidate failed, because a share of a
-distance is not a variance and cannot be read as one. The full estimator decision
-path (the candidate ANOVA models and their identifiability, the two levels, the
-per-target formulas, and a crosswalk to what the released code computes) is given
-in Appendix~\ref{app:estimator}.
+For each gene we ask how much of its perturbation effect is contributed by the guide
+facet and how much by the donor facet, the two facets a target must generalize
+across. A crossed mixed model, fit per gene, estimates these variance contributions
+and weights each pseudobulk by its precision, so rows built from few cells count for
+less; this is the generalizability-theory design of Section~2 \parencite{brennan2001}.
+We did not take this estimator for granted. On simulated data whose true variance
+components are known, we compared three candidates in a pre-registered test of which
+could recover the planted values, and only the precision-weighted model recovered
+them, under both Gaussian and heavy-tailed noise. A distance-based candidate failed:
+a share of a pairwise distance is not a variance, and the coefficients are defined
+from variances. The full estimator decision path (the candidate models and what each
+can and cannot identify, the two levels of the design, the per-target formulas, and a
+crosswalk to what the released code computes) is given in
+Appendix~\ref{app:estimator}.
 
 \section{Results}
 
