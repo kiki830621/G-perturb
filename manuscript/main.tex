@@ -162,7 +162,7 @@ estimator (Section~3), and takes up RQ1 through RQ4 in the results (Section~4).
 We treat one perturbation's effect as a measurement and ask how much of it would
 recur if the experiment were repeated. The quantity of interest is the target
 gene's true effect on the transcriptome. What we observe is that effect seen
-through one guide, in one donor, under one culture condition, and read from a
+through one guide, in one donor, under one activation state, and read from a
 finite sample of cells, and each of these can make the observation differ from the
 truth. This is the setting generalizability theory was built for, and the
 correspondence is direct \parencite{lordnovick1968}: the target gene is the
@@ -269,10 +269,10 @@ cell's whole transcriptome. We do not process single cells. We start from the
 screen's released \emph{pseudobulk}, the table obtained by averaging all cells that
 share an experimental combination into one expression profile. Each of its
 $278{,}684$ rows is one such combination, a silenced target gene, the guide RNA used
-to silence it, the donor the cells came from, and the T cells' activation state, whether resting or
-stimulated. It gives the average expression of $18{,}129$ genes. The screen silences $12{,}731$ target
-genes with about two guides each, crossed with four donors and three activation
-states (Rest, Stim8hr, Stim48hr) over two sequencing runs. Only about $45\%$ of
+to silence it, the donor the cells came from, and the T cells' activation state (Rest, Stim8hr,
+or Stim48hr). It gives the average expression of $18{,}129$ genes. The screen silences $12{,}731$ target
+genes with about two guides each, crossed with four donors and those three
+activation states over two sequencing runs. Only about $45\%$ of
 that full grid was run, and guides that target no gene serve as the controls. A row
 averages a median of $49$ cells, and as few as one, so rows differ in how precisely
 they are measured, which is what sets each row's measurement-error variance. For every
@@ -466,8 +466,8 @@ profile $\mathbf{y}_{tgdc}\in\mathbb{R}^{p}$ over $p=18{,}129$ genes, the
 non-targeting-control-relative log-CPM within the matched donor-condition-run
 stratum. The facets are the two guides per target (nested within target; a random
 facet we want to generalize across), the four donors (a crossed random facet, with
-inference confined to the present panel), and the three culture conditions (a fixed
-facet of deliberately chosen states, analyzed within level). Sequencing run is
+inference confined to the present panel), and the three activation states (a fixed
+facet whose levels were deliberately chosen, analyzed within level). Sequencing run is
 partially confounded with donor; the pseudobulk cell count sets the
 measurement-error variance of each observation, so profiles built from fewer cells
 are noisier.
