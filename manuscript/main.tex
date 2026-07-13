@@ -40,7 +40,7 @@ estimated from a single guide, a single donor, or a pseudobulk of few cells need
 not survive replication, and for target prioritization each false lead costs a
 validation experiment. We treat each perturbation effect as a measurement in a
 crossed Target $\times$ Guide $\times$ Donor $\times$ Condition design and apply
-generalizability theory \parencite{cronbach1972} to separate the dependable part
+generalizability theory \parencite{cronbach1972, brennan2001} to separate the dependable part
 of an effect from facet-specific idiosyncrasy. Guides and donors enter as random
 facets; condition enters as a fixed facet and is analyzed within its levels. For
 each target we report a dependability profile over the facets and a joint
@@ -347,7 +347,7 @@ For each gene we ask how much of its perturbation effect is contributed by the g
 facet and how much by the donor facet, the two facets a target must generalize
 across. A crossed mixed model, fit per gene, estimates these variance contributions
 and weights each pseudobulk by its precision, so rows built from few cells count for
-less; this is the generalizability-theory design of Section~2 \parencite{brennan2001}.
+less; this is the generalizability-theory design of Section~2.
 We did not take either estimator for granted. Across the design level and the
 per-target level we weighed five candidate estimators and chose between them on
 simulated data whose true variance components are known, in a pre-registered test of
@@ -364,8 +364,9 @@ Appendix~\ref{app:estimator}.
 \section{Results and Discussion}
 
 We take up the four questions in turn, moving from individual targets (RQ1, RQ2) to
-the measurement design (RQ3, RQ4). All four rest on one preliminary correction, which
-we describe first.
+the measurement design (RQ3, RQ4). One preliminary correction, separating dependable
+signal from measurement error, underlies the design-level answers and is described
+first.
 
 \subsection{Measurement error masks dependable signal}
 
@@ -672,8 +673,10 @@ R^{\mathrm{guide}}_{t,c}
 The correlation is Pearson, so it measures \emph{consistency} of the transcriptional
 pattern, not exact agreement of magnitude; a concordance correlation would also
 penalize scale and location shifts, and we do not currently apply one. The donor
-coefficient is the same construction on a two-versus-two donor split,
-$R^{\mathrm{donor,raw}}_{t,c}$, then shrunk toward the pooled mean $\mu_c$,
+coefficient applies the same split-half construction to donors and averages it over
+the three balanced two-versus-two donor partitions, so that the raw coefficient
+$R^{\mathrm{donor,raw}}_{t,c}$ does not depend on donor ordering; it is then shrunk
+toward the pooled mean $\mu_c$,
 \[
 \widetilde R^{\mathrm{donor}}_{t,c}
  = \mu_c + w_{t,c}\big(R^{\mathrm{donor,raw}}_{t,c}-\mu_c\big).
@@ -732,7 +735,7 @@ error by construction.
     \midrule
     $M_{t,c}$ & RMS of the target mean profile & same & exact \\
     $R^{\mathrm{guide}}$ & Pearson split-half across genes & (add agreement variant) & consistency only \\
-    $R^{\mathrm{donor,raw}}$ & two-vs-two Pearson split-half & same & exact \\
+    $R^{\mathrm{donor,raw}}$ & two-vs-two split-half, averaged over the 3 partitions & same & exact \\
     $w_{t,c}$ & global $0.5$ (half-variance split) & Fay--Herriot $\tau^2/(\tau^2+s_t^2)$ & heuristic; planned \\
     $R_{\mathrm{dep}}$ & error-adding joint, fail-closed NA & $+$ interaction term & exact under additivity \\
     $S_{t,c}$ & $M_{t,c}\times R_{\mathrm{dep}}$ & same & exact \\
