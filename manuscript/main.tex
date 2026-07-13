@@ -118,10 +118,16 @@ questions, moving from the present screen to future ones:
   \item \emph{RQ4 (improving the design):} which facet limits that dependability,
   and how much would a future screen recover by adding to it?
 \end{itemize}
-RQ1 and RQ2 concern individual targets, RQ3 and RQ4 the measurement design. Per
-target, the split-half coefficient absorbs measurement noise as it goes; at the
-design level the noise is isolated from the non-targeting controls, which is where
-the analysis begins.
+RQ1 and RQ2 concern individual targets, RQ3 and RQ4 the measurement design, and each
+answer carries a consequence. A reordering under RQ1 would mean that effect size on
+its own has been nominating fragile targets and passing over reproducible ones, so
+the shortlist a screen carries to the bench is the wrong one. A yes to RQ2 would show
+that the coefficient tracks a real property of the perturbation rather than an
+artifact of the summary, since a coherent signaling module cannot assemble itself
+from noise, and it would mark out context-specific-but-reliable targets that pooled
+ranking and effect size both miss. RQ3 fixes how far the present screen's rankings
+can be trusted, and RQ4 turns that into guidance for the next screen, naming the
+facet whose reinforcement recovers the most reliability.
 
 Reliability, as opposed to size, has been approached from two directions. One
 measures reproducibility across replicates directly: the irreproducible discovery
@@ -641,6 +647,13 @@ with a second adversarial pass and with \texttt{parallel-ai-agents}
 \parencite{parallelaiagents}, a package the author maintains that dispatches a task
 to independent agents and cross-compares their outputs. The recorded decisions, the
 blocked verdict, and every resolution are versioned in the repository.
+
+The manuscript itself was produced under the same discipline. It was drafted and
+revised in an extended interactive session with Claude Opus, run with a
+one-million-token context window at maximum reasoning effort, while the author
+reviewed each section, formula, and claim and directed every revision. The commit
+history records that revision trail alongside the methodological one, so the writing,
+like the analysis, is auditable rather than opaque.
 
 \begin{figure}[t]
   \centering
