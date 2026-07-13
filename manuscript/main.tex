@@ -272,8 +272,7 @@ S_t = M_t \, \Rdep,
 where $M_t$ is the effect magnitude, the root-mean-square of the target's mean effect
 profile across genes. A target scores high only when a sizeable effect is also
 reproducible; a large but fragile effect and a small but reproducible one are both
-demoted, each for a different reason. Comparing the $S_t$ ranking against the ranking
-by $M_t$ alone is the substance of RQ1.
+demoted, each for a different reason.
 
 The same construction applies within a single activation state. Restricting the
 observations to a state $c \in \{\mathrm{Rest}, \mathrm{Stim8hr}, \mathrm{Stim48hr}\}$,
@@ -282,8 +281,7 @@ obtain the two within-state split-half coefficients, and combine them through
 Equation~\eqref{eq:rdep} into a within-state dependability $\Rdep^{(c)}$.
 Because each state carries roughly a third of the cells, $\Rdep^{(c)}$ is noisier and
 runs lower than the pooled $\Rdep$; a target's context specificity is therefore read
-by comparing its $\Rdep^{(c)}$ across states, not against the pooled value, which is
-the substance of RQ2.
+by comparing its $\Rdep^{(c)}$ across states rather than against the pooled value.
 
 \subsection{Design-level dependability}
 
@@ -315,8 +313,14 @@ $\sigma^2_{\mathrm{d}}$, the overall bias of a guide or a donor across targets (
 opposed to the within-target variances $\sigma^2_{\mathrm{guide}}$ and
 $\sigma^2_{\mathrm{donor}}$), are common shifts that move every target together and
 leave the ordering unchanged, so counting them as error would understate a
-dependability that is fully adequate for ranking. The design study varies $n_g$ and $n_d$ to ask how much either would raise
-$E\rho^2$. The per-target $\Rdep$ is its single-target counterpart, the same
+dependability that is fully adequate for ranking.
+
+Each coefficient answers one of the four questions. The dependability-weighted score
+$S_t = M_t \Rdep$ reorders the shortlist relative to effect size (RQ1); the within-state
+$\Rdep^{(c)}$, read across states, locates context-specific targets (RQ2); the
+panel-level $E\rho^2$ fixes how dependable the screen is overall (RQ3); and the design
+study, which varies $n_g$ and $n_d$, names the limiting facet and the gain from adding
+to it (RQ4). The per-target $\Rdep$ is $E\rho^2$'s single-target counterpart, the same
 generalizability read for one target rather than for the panel.
 
 \section{Data and estimation}
