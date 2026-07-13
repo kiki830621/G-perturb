@@ -204,11 +204,10 @@ facet, kept separate rather than multiplied into a single index. Each answers a
 reproducibility question: with everything else held fixed, how well does the
 target's transcriptional signature repeat across a single facet? An observation is a
 (target, guide, donor, condition) pseudobulk whose effect profile spans the
-$18{,}129$ genes, measured against a matched non-targeting control. Write
-$\bar{P}_A$ for the mean effect profile over a set of observations $A$, a vector over
-the genes, and $\rho(\cdot,\cdot)$ for the Pearson correlation across genes; each
-coefficient is such a correlation between mean profiles that differ only in the facet
-of interest. The three share one underlying form, a \emph{signal share},
+$18{,}129$ genes, measured against a matched non-targeting control. We average a
+group of observations into a mean profile and read each coefficient off the
+correlation, across genes, between mean profiles that differ only in the facet of
+interest. The three share one underlying form, a \emph{signal share},
 $R = \sigma^2_\tau/(\sigma^2_\tau + \sigma^2_e)$, the true-signal variance over the
 total, where $\sigma^2_e$ is the error variance of the facet being refreshed;
 equivalently, its error-to-signal ratio is $(1-R)/R = \sigma^2_e/\sigma^2_\tau$. We
@@ -222,23 +221,20 @@ single-guide-by-single-donor level. All three are distribution-light empirical
 correlations, not Gaussian variance-component ratios.}
 \begin{itemize}
   \item $\Rg = \sigma^2_\tau/(\sigma^2_\tau + \sigma^2_{\mathrm{guide}})$: the signal
-  share whose error is the guide variance, estimated by the split-half correlation
-  $\rho(\bar{P}_{G_1}, \bar{P}_{G_2})$ between the mean profiles of two guide halves; a
-  high value indicates that the signature reproduces across independent guide sets.
+  share whose error is the guide variance, estimated by a split-half correlation
+  between the mean profiles of two guide halves; a high value indicates that the
+  signature reproduces across independent guide sets.
   \item $\Rd = \sigma^2_\tau/(\sigma^2_\tau + \sigma^2_{\mathrm{donor}})$: the signal
   share whose error is the donor variance, estimated by the split-half correlation
-  averaged over the three two-versus-two donor partitions,
-  $\tfrac{1}{3}\sum_{\{A,B\}} \rho(\bar{P}_A, \bar{P}_B)$, so that it does not depend
+  averaged over the three two-versus-two donor partitions so that it does not depend
   on donor ordering, then shrunk toward the pooled mean by a moment-based
   empirical-Bayes step.\footnote{With only four donors this coefficient carries three
   degrees of freedom and is noisy, so it is shrunk toward the pooled mean; the
   released code applies a global shrinkage factor in place of the target-specific one,
   as detailed in Appendix~\ref{app:estimator}.}
   \item $\Rc$: cross-context \emph{consistency}, the mean of the pairwise
-  correlations among the three within-state profiles,
-  $\tfrac{1}{3}\sum_{c<c'} \rho(\bar{P}^{(c)}, \bar{P}^{(c')})$. Because condition is a
-  fixed facet, it is reported as consistency rather than as a signal share of this
-  form.
+  correlations among the three within-state profiles. Because condition is a fixed
+  facet, it is reported as consistency rather than as a signal share of this form.
 \end{itemize}
 
 A ranking requires a single number rather than a profile. The per-target
