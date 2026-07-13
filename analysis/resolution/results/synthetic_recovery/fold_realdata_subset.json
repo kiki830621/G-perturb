@@ -261,5 +261,133 @@
       }
     ]
   },
+  "eb_shrinkage_fold": {
+    "spearman_vs_plug": -0.0145,
+    "top100_overlap": 0.0,
+    "coverage_vs_rankchange_corr": 0.7195,
+    "mean_noise_share_top_risers": 0.937,
+    "top_risers": [
+      {
+        "target": "C20orf96",
+        "rank_plug": 12721,
+        "rank_fold_shrink": 164,
+        "rose": 12557,
+        "total_cells": 6515,
+        "noise_share": 0.918
+      },
+      {
+        "target": "ARL4C",
+        "rank_plug": 12641,
+        "rank_fold_shrink": 204,
+        "rose": 12437,
+        "total_cells": 5506,
+        "noise_share": 0.913
+      },
+      {
+        "target": "IFRD1",
+        "rank_plug": 12513,
+        "rank_fold_shrink": 120,
+        "rose": 12393,
+        "total_cells": 5135,
+        "noise_share": 0.918
+      },
+      {
+        "target": "HACD1",
+        "rank_plug": 12646,
+        "rank_fold_shrink": 303,
+        "rose": 12343,
+        "total_cells": 4364,
+        "noise_share": 0.944
+      },
+      {
+        "target": "SEPTIN9",
+        "rank_plug": 12555,
+        "rank_fold_shrink": 249,
+        "rose": 12306,
+        "total_cells": 4983,
+        "noise_share": 0.935
+      },
+      {
+        "target": "GRINA",
+        "rank_plug": 12354,
+        "rank_fold_shrink": 63,
+        "rose": 12291,
+        "total_cells": 4941,
+        "noise_share": 0.902
+      },
+      {
+        "target": "HINT2",
+        "rank_plug": 12436,
+        "rank_fold_shrink": 148,
+        "rose": 12288,
+        "total_cells": 4102,
+        "noise_share": 0.935
+      },
+      {
+        "target": "SYNE2",
+        "rank_plug": 12501,
+        "rank_fold_shrink": 226,
+        "rose": 12275,
+        "total_cells": 5392,
+        "noise_share": 0.931
+      },
+      {
+        "target": "PDXP",
+        "rank_plug": 12624,
+        "rank_fold_shrink": 411,
+        "rose": 12213,
+        "total_cells": 4117,
+        "noise_share": 0.957
+      },
+      {
+        "target": "ATN1",
+        "rank_plug": 12674,
+        "rank_fold_shrink": 463,
+        "rose": 12211,
+        "total_cells": 4058,
+        "noise_share": 0.958
+      },
+      {
+        "target": "STARD5",
+        "rank_plug": 12508,
+        "rank_fold_shrink": 314,
+        "rose": 12194,
+        "total_cells": 5083,
+        "noise_share": 0.938
+      },
+      {
+        "target": "IGHMBP2",
+        "rank_plug": 12622,
+        "rank_fold_shrink": 527,
+        "rose": 12095,
+        "total_cells": 3000,
+        "noise_share": 0.966
+      },
+      {
+        "target": "SERGEF",
+        "rank_plug": 12392,
+        "rank_fold_shrink": 329,
+        "rose": 12063,
+        "total_cells": 3252,
+        "noise_share": 0.945
+      },
+      {
+        "target": "SLC31A2",
+        "rank_plug": 12428,
+        "rank_fold_shrink": 368,
+        "rose": 12060,
+        "total_cells": 5872,
+        "noise_share": 0.931
+      },
+      {
+        "target": "FABP6",
+        "rank_plug": 12430,
+        "rank_fold_shrink": 391,
+        "rose": 12039,
+        "total_cells": 3127,
+        "noise_share": 0.961
+      }
+    ]
+  },
   "interpretation": "if precision-weighting collapses coverage_vs_rankchange_corr toward 0 and the naive risers' noise_share is high, the naive fold's lift of sparse targets was low-count noise inflation, not de-attenuation of real signal"
 }

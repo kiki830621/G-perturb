@@ -109,11 +109,21 @@ def main() -> None:
     M_fold = np.sqrt((prof_fold ** 2).mean(1))            # naive (unweighted) magnitude
     # precision-weighted magnitude: w = inverse delta-method variance of the log-fold per gene
     # = 1 / (1/pooled_ct + 1/ntc_ct); low-count genes (noise) get low weight, so they cannot inflate
-    w = 1.0 / (1.0 / (pooled_ct + 0.5) + 1.0 / (ntc_ct + 0.5))   # n_target x n_gene
+    w = 1.0 / (1.0 / (pooled_ct + 0.5) + 1.0 / (ntc_ct + 0.5))   # n_target x n_gene = precision = 1/SE^2
     M_fold_pw = np.sqrt((w * prof_fold ** 2).sum(1) / w.sum(1))
+    # empirical-Bayes LFC shrinkage (apeglm-lite: normal prior N(0, tau2), global tau2 by moments):
+    #   shrunk_LFC = LFC * tau2 / (tau2 + SE^2); low-count (high SE^2) genes shrink toward 0 but stay in.
+    # This is the modern replacement for BOTH the naive fold and zero-inflation (user's #20 suggestion).
+    se2 = 1.0 / w
+    # robust global tau2 estimated by PRECISION-WEIGHTED moments, so the unbounded low-count folds
+    # (which are the very noise we want to shrink) cannot corrupt the prior-variance estimate.
+    Wsum = float(w.sum())
+    tau2 = max(1e-6, float((w * prof_fold ** 2).sum()) / Wsum - prof_fold.size / Wsum)
+    lfc_shrunk = prof_fold * (tau2 / (tau2 + se2))
+    M_shrink = np.sqrt((lfc_shrunk ** 2).mean(1))
     # noise share: fraction of each target's naive magnitude^2 coming from low-count genes (pooled<5)
     noise_share = ((prof_fold ** 2) * (pooled_ct < 5)).sum(1) / (prof_fold ** 2).sum(1)
-    del C, pooled_ct, w
+    del C, pooled_ct, w, se2, lfc_shrunk
 
     # coverage + rankings for naive fold AND precision-weighted fold
     cov_t = np.asarray(Tind @ n_cells[pert_rows][:, None]).ravel()
@@ -123,11 +133,13 @@ def main() -> None:
         return float(np.corrcoef(a, b)[0, 1])
     def topK(m, k=100):
         return set((-m).argsort()[:k])
-    r_plug, r_fold, r_fold_pw = ranks(M_plug), ranks(M_fold), ranks(M_fold_pw)
-    rc_naive = r_plug - r_fold        # + = rose under naive fold
-    rc_pw = r_plug - r_fold_pw        # + = rose under precision-weighted fold
+    r_plug, r_fold, r_fold_pw, r_shrink = ranks(M_plug), ranks(M_fold), ranks(M_fold_pw), ranks(M_shrink)
+    rc_naive = r_plug - r_fold          # + = rose under naive fold
+    rc_pw = r_plug - r_fold_pw          # + = rose under precision-weighted fold
+    rc_shrink = r_plug - r_shrink       # + = rose under EB-shrinkage fold
     cov_corr_naive = spear(np.log(cov_t + 1), rc_naive)
     cov_corr_pw = spear(np.log(cov_t + 1), rc_pw)
+    cov_corr_shrink = spear(np.log(cov_t + 1), rc_shrink)
 
     def risers_of(rc, rfold, key):
         top = np.argsort(-rc)[:15]
@@ -136,6 +148,7 @@ def main() -> None:
                       "noise_share": round(float(noise_share[i]), 3)} for i in top]
     top_naive, risers_naive = risers_of(rc_naive, r_fold, "rank_fold_naive")
     top_pw, risers_pw = risers_of(rc_pw, r_fold_pw, "rank_fold_pw")
+    top_shrink, risers_shrink = risers_of(rc_shrink, r_shrink, "rank_fold_shrink")
 
     out = {
         "issue": 20, "step": "a-subset", "n_genes_subset": len(gsub), "n_target": n_target,
@@ -152,6 +165,12 @@ def main() -> None:
             "coverage_vs_rankchange_corr": round(cov_corr_pw, 4),
             "mean_noise_share_top_risers": round(float(noise_share[top_pw].mean()), 3),
             "top_risers": risers_pw},
+        "eb_shrinkage_fold": {
+            "spearman_vs_plug": round(spear(r_plug, r_shrink), 4),
+            "top100_overlap": round(len(topK(M_plug) & topK(M_shrink)) / 100, 4),
+            "coverage_vs_rankchange_corr": round(cov_corr_shrink, 4),
+            "mean_noise_share_top_risers": round(float(noise_share[top_shrink].mean()), 3),
+            "top_risers": risers_shrink},
         "interpretation": "if precision-weighting collapses coverage_vs_rankchange_corr toward 0 and "
         "the naive risers' noise_share is high, the naive fold's lift of sparse targets was low-count "
         "noise inflation, not de-attenuation of real signal",
@@ -165,7 +184,9 @@ def main() -> None:
           f"risers' mean noise_share={noise_share[top_naive].mean():.2f}")
     print(f"prec-wtd   : spearman={spear(r_plug, r_fold_pw):.3f}  cov~Δrank corr={cov_corr_pw:+.3f}  "
           f"risers' mean noise_share={noise_share[top_pw].mean():.2f}")
-    print("  (high naive-riser noise_share + corr that collapses under weighting = noise inflation)")
+    print(f"EB-shrink  : spearman={spear(r_plug, r_shrink):.3f}  cov~Δrank corr={cov_corr_shrink:+.3f}  "
+          f"risers' mean noise_share={noise_share[top_shrink].mean():.2f}")
+    print("  (does EB shrinkage recover a coverage advantage that precision-weighting missed?)")
 
 
 if __name__ == "__main__":
