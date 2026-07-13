@@ -364,38 +364,13 @@ Appendix~\ref{app:estimator}.
 \section{Results and Discussion}
 
 We take up the four questions in turn, moving from individual targets (RQ1, RQ2) to
-the measurement design (RQ3, RQ4). One preliminary correction, separating dependable
-signal from measurement error, underlies the design-level answers and is described
-first.
+the measurement design (RQ3, RQ4).
 
-\subsection{Measurement error masks dependable signal}
+\subsection{Reliability-weighted ranking reorders the shortlist}
 
-The residual of a pseudobulk decomposition combines biological idiosyncrasy with
-measurement error, and the latter is inflated when a pseudobulk aggregates few
-cells. The non-targeting controls carry no perturbation, so the variance of the
-non-targeting effect within its stratum estimates the per-gene measurement-error
-floor directly. Subtracting this floor from the residual raises the median
-target-signal share from $.019$ to $.081$ and raises the number of genes with a
-target-signal share above $.10$ from $40$ to $7{,}674$, or $42\%$ of the genome
-(Figure~\ref{fig:me}). The dependable signal was present but masked; the same
-controls give a clean non-targeting-versus-non-targeting negative test
-($r \approx 0$), so the correction introduces no signal where none exists. This
-correction is what makes the design-level coefficients measurable, and every
-overall-dependability number below is read after it.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{fig1_me_removal.pdf}
-  \caption{Measurement-error removal via the non-targeting controls. Left, the
-  median target-signal share; right, the number of genes with a dependable
-  target-signal share above $.10$, on a logarithmic axis.}
-  \label{fig:me}
-\end{figure}
-
-\subsection{RQ1: reliability-weighted ranking reorders the shortlist}
-
-Ranking targets by $S_t$ reorders the candidate list relative to effect size
-alone (Figure~\ref{fig:rank}). Of the $100$ highest-effect targets, $50$ fall out
+RQ1 asks whether ranking targets by dependability reorders the shortlist that effect
+size alone produces. It does: ranking by $S_t$ reorders the candidate list relative to
+effect size alone (Figure~\ref{fig:rank}). Of the $100$ highest-effect targets, $50$ fall out
 of the $100$ most dependable, and reproducible targets that effect size underranks
 rise (Table~\ref{tab:rankshift}). These are the targets a dependability-weighted
 screen would nominate for validation but a strength-ranked screen would overlook.
@@ -431,8 +406,10 @@ promotes reproducible effects that a strength ranking buries.
   \end{tabular}
 \end{table}
 
-\subsection{RQ2: context-specific dependability recovers the TCR module}
+\subsection{Context-specific dependability recovers the TCR module}
 
+RQ2 asks whether per-target dependability, read within each activation state,
+separates a context-specific signal from noise and reconstructs a coherent module.
 Analyzed within activation states, dependability separates targets that are
 reliable across all states from targets that are reliable in one state and not
 another (Figure~\ref{fig:tcr}). Because a within-state coefficient $\Rdep^{(c)}$ rests on
@@ -458,24 +435,43 @@ noise does not organize into a coherent pathway.
   \label{fig:tcr}
 \end{figure}
 
-\subsection{RQ3: how dependable the screen is overall}
+\subsection{Removing measurement error reveals a moderately dependable screen}
 
-RQ1 and RQ2 show that dependability discriminates among targets; RQ3 asks how much
-dependability the screen delivers as a whole. Two readings converge. The
-measurement-error result above puts dependable target signal in $42\%$ of genes once
-the floor is removed. At the coefficient level, the panel generalizability
-coefficient for the current design, two guides and four donors, on the representative
-signal genes is $E\rho^2 \approx .44$. This is a moderate value: adequate for
-ranking, where only the order of targets matters, but short of the $.70$ that an
-absolute per-target threshold would demand. This calibrates how far the screen can be
-trusted. Its rankings can be relied on, yet no single target's dependability clears an
-absolute bar, so dependability is a prioritization signal for the panel rather than a
-certificate for any one target read in isolation.
+RQ3 asks how dependable the screen is as a whole, and answering it means first
+separating dependable signal from measurement error. The residual of a pseudobulk
+decomposition combines biological idiosyncrasy with measurement error, and the latter
+is inflated when a pseudobulk aggregates few cells. The non-targeting controls carry
+no perturbation, so the variance of the non-targeting effect within its stratum
+estimates the per-gene measurement-error floor directly. Subtracting this floor from
+the residual raises the median target-signal share from $.019$ to $.081$ and raises
+the number of genes with a target-signal share above $.10$ from $40$ to $7{,}674$, or
+$42\%$ of the genome (Figure~\ref{fig:me}). The dependable signal was present but
+masked; the same controls give a clean non-targeting-versus-non-targeting negative
+test ($r \approx 0$), so the correction introduces no signal where none exists.
 
-\subsection{RQ4: guides, not donors, limit the design}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{fig1_me_removal.pdf}
+  \caption{Measurement-error removal via the non-targeting controls. Left, the
+  median target-signal share; right, the number of genes with a dependable
+  target-signal share above $.10$, on a logarithmic axis.}
+  \label{fig:me}
+\end{figure}
 
-The ranking and its context-specific structure describe the screen as it stands.
-How could a future screen be made more dependable? A design study projects the
+With measurement error removed, the panel generalizability coefficient for the
+current design, two guides and four donors, on the representative signal genes is
+$E\rho^2 \approx .44$. This is a moderate value: adequate for ranking, where only the
+order of targets matters, but short of the $.70$ that an absolute per-target threshold
+would demand. This calibrates how far the screen can be trusted. Its rankings can be
+relied on, yet no single target's dependability clears an absolute bar, so
+dependability is a prioritization signal for the panel rather than a certificate for
+any one target read in isolation.
+
+\subsection{Guides, not donors, limit the design}
+
+RQ4 asks which facet limits the screen's dependability, and how much a future screen
+would recover by adding to the limiting one. The ranking and its context-specific
+structure describe the screen as it stands; a design study projects the
 generalizability coefficient onto alternative numbers of guides and donors
 (Figure~\ref{fig:dstudy}). The guide error term
 exceeds the donor error term by a factor of about $2.4$; adding one guide raises
@@ -628,7 +624,7 @@ E\rho^2(n_g,n_d) = \frac{\sigma^2_T}{\sigma^2_T + \sigma^2_{TG}/n_g
 \]
 the design-level coefficient of Section~4. Its residual carries measurement error;
 subtracting the floor estimated from the non-targeting controls is the
-measurement-error removal of Section~4.1.
+measurement-error removal of Section~4.3.
 
 \emph{Per-target level.} A single target has only two guides and four donors, so its
 own variance components are unstable to non-identifiable. We therefore estimate a
