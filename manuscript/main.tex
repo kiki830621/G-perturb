@@ -98,15 +98,17 @@ and dependability can point to different targets, so a ranking that reads only t
 first keeps nominating the fragile ones. We therefore treat \emph{dependability} as
 a first-class quantity alongside magnitude, and rank by the two together.
 
-Two properties are at stake that effect size does not by itself deliver:
-\emph{accuracy}, that a reported effect is dependable rather than measurement
-noise, and \emph{generalizability}, that it recurs across guides, donors, and
-cell-state contexts. We therefore ask four questions, moving from the present
-screen to future ones:
+Dependability has two senses, both captured by a single reproducibility
+coefficient. An effect is dependable when it is \emph{accurate}, a real signal
+rather than measurement noise, and when it is \emph{generalizable}, recurring across
+guides, donors, and cell-state contexts. A split-half of the effect profile fails on
+either count, when the effect is buried in noise or when it does not recur, so one
+coefficient answers both. We ask four questions, moving from the present screen to
+future ones:
 \begin{itemize}
   \item \emph{RQ1 (per target):} which targets carry an individually dependable
   effect, one that would recur under a fresh guide and a fresh donor, and does
-  ranking by that dependability reorder the list that effect magnitude alone
+  ranking by that dependability reorder the list that effect size alone
   produces?
   \item \emph{RQ2 (in context):} does the same dependability, evaluated within each
   activation state, separate context-specific signal from noise and recover
@@ -116,9 +118,10 @@ screen to future ones:
   \item \emph{RQ4 (improving the design):} which facet limits that dependability,
   and how much would a future screen recover by adding to it?
 \end{itemize}
-RQ1 and RQ2 concern individual targets, RQ3 and RQ4 the measurement design; all
-four presuppose that the dependable part of an effect can first be separated from
-measurement noise.
+RQ1 and RQ2 concern individual targets, RQ3 and RQ4 the measurement design. Per
+target, the split-half coefficient absorbs measurement noise as it goes; at the
+design level the noise is isolated from the non-targeting controls, which is where
+the analysis begins.
 
 Reliability, as opposed to size, has been approached from two directions. One
 measures reproducibility across replicates directly: the irreproducible discovery
@@ -247,14 +250,19 @@ coefficients themselves keep their standard names.
 
 \section{Data and estimation}
 
-The data are the released summary statistics of a genome-scale Perturb-seq screen
-in primary human CD4+ T cells \parencite{zhu2025}: CRISPR perturbations of
-$18{,}129$ genes in a crossed design of two guides per gene, four donors, and
-three culture conditions (Rest, Stim8hr, Stim48hr), with non-targeting guides as
-controls. We work from the released joint pseudobulk and define each
-perturbation's per-gene effect as its non-targeting-control-relative log-CPM within
-the matched donor-condition-run stratum, so that the effect is measured against the
-controls that share its technical context. No single-cell data are processed.
+The data are the released summary statistics of a genome-scale CRISPRi Perturb-seq
+screen in roughly 22 million primary human CD4+ T cells \parencite{zhu2025}. We work
+from the released joint pseudobulk: $278{,}684$ observations, each the aggregate
+expression profile of one (target, guide, donor, condition) combination over
+$18{,}129$ genes. The screen perturbs $12{,}731$ target genes with about two guides
+each, crossed with four donors and three culture conditions (Rest, Stim8hr,
+Stim48hr) across two sequencing runs; the crossed grid is about $45\%$ complete, and
+non-targeting guides provide the controls. Each observation aggregates a median of
+$49$ cells, down to single cells for some, which is what sets its measurement-error
+variance. We define each perturbation's per-gene effect as its
+non-targeting-control-relative log-CPM within the matched donor-condition-run
+stratum, so the effect is measured against the controls that share its technical
+context. No single-cell data are processed.
 
 The variance contributed by each facet is estimated per gene by a crossed mixed
 model that weights each pseudobulk by its precision, following the
