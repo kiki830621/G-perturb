@@ -8,12 +8,12 @@
 
 ---
 
-### 0:00–0:20 · The problem  (slides 1–2)
+### 0:00–0:22 · Intro and the problem  (slides 1–2)
 
-**ON SCREEN:** the title slide, then "Dependability, not effect size."
+**ON SCREEN:** the title slide (name and affiliation), then "Dependability, not effect size."
 
 **VOICEOVER:**
-> "Perturb-seq screens usually rank drug targets by how strongly a perturbation shifts gene expression. But a large effect seen in a single guide, or a single donor, can be measurement noise rather than real biology, and a target picked on that basis may not reproduce."
+> "I'm Che Cheng, from the Institute of Statistical Science at Academia Sinica, and this is G-perturb. Perturb-seq screens usually rank drug targets by how strongly a perturbation shifts gene expression. But a large effect seen in a single guide, or a single donor, can be measurement noise rather than real biology, and a target picked on that basis may not reproduce."
 
 ### 0:20–0:48 · The method  (slide 3)
 
@@ -27,7 +27,7 @@
 **ON SCREEN:** the IDD → Sol BLOCKED → resolved cards.
 
 **VOICEOVER:**
-> "I also wanted the analysis to be checkable, so every methodological decision, which estimator, which threshold, and why, is recorded as a GitHub issue, through an issue-driven workflow I maintain as an open-source Claude Code plugin. I then gave that record to a different model, GPT-5.6 Sol, and asked it to find problems. It blocked the design and raised eleven methodological issues, three of them critical. I worked through each one with Claude and cross-checked the fixes across models."
+> "I also wanted the analysis to be checkable, so every methodological decision, which estimator and which threshold, is recorded as a GitHub issue, through an issue-driven workflow I built as an open-source Claude Code plugin. I gave that record to a different model, GPT-5.6 Sol, and asked it to find problems. It blocked the design and raised eleven issues, three of them critical, which I then worked through with Claude and cross-checked across models."
 
 ### 1:23–1:48 · Ranking, RQ1  (slide 5)
 

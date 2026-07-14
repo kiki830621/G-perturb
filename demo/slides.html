@@ -51,8 +51,11 @@
   ul.bullets li::before { content: ''; position: absolute; left: 0; top: .62em; width: 26px; height: 3px; background: var(--accent); border-radius: 2px; }
   ul.bullets .em { color: var(--accent); font-style: italic; }
   .thesis { font-family: var(--serif); font-size: 56px; line-height: 1.26; color: var(--fg);
-    max-width: 1600px; margin: 10px 0 52px; }
+    max-width: 1600px; margin: 10px 0 30px; }
   .thesis .hl { color: var(--accent); font-style: italic; }
+  .byline { font-family: var(--sans); font-size: 32px; color: var(--fg); margin: 0 0 36px; }
+  .byline b { font-weight: 600; }
+  .byline .aff { color: var(--muted); }
 
   /* stacked title meta, one line each */
   .meta { font-family: var(--mono); font-size: 28px; color: var(--faint); line-height: 1.95; letter-spacing: .01em; }
@@ -139,6 +142,7 @@
       <h1>G-perturb</h1>
       <p class="thesis">Rank CD4<sup>+</sup> T-cell drug targets by whether the readout is
         <span class="hl">dependable</span>, not by how large it is.</p>
+      <div class="byline"><b>Che Cheng</b> <span class="aff">· Institute of Statistical Science, Academia Sinica</span></div>
       <div class="meta">
         <div><b>Built with Claude: Life Sciences</b> · Researcher track</div>
         <div><b>Data</b> · Marson-lab CD4<sup>+</sup> T-cell screen (Zhu et al. 2025)</div>
