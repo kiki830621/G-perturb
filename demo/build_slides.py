@@ -20,10 +20,13 @@ def data_uri(path):
         print(f"  (PIL skip: {e})")
     return "data:image/png;base64," + base64.b64encode(raw).decode()
 
-html = open(os.path.join(here, "slides_template.html")).read()
+# The template is already a complete standalone HTML doc (<!DOCTYPE> + <meta charset>),
+# so this just inlines the figures and writes it back as UTF-8. Explicit encoding keeps
+# the special glyphs (→ · × ρ ² −) intact regardless of the shell locale.
+html = open(os.path.join(here, "slides_template.html"), encoding="utf-8").read()
 for tok, fn in FIGS.items():
     if tok in html:
         html = html.replace(tok, data_uri(os.path.join(FIGDIR, fn))); print(f"  {tok} <- {fn}")
 out = os.path.join(here, "slides.html")
-open(out, "w").write(html)
+open(out, "w", encoding="utf-8").write(html)
 print(f"wrote {out}  ({len(html)//1024} KB)")

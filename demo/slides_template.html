@@ -1,195 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>G-perturb: reliability-weighted target ranking (slides)</title>
 <style>
   :root {
-    --ground: #f5f7f8; --surface: #ffffff; --surface-2: #eef1f3;
-    --ink: #15181d; --muted: #5a626e; --faint: #8b93a0; --line: #e0e4e8;
-    --accent: #0d9488; --activation: #d9620a; --blocked: #b91c1c; --resolved: #2a8a3e;
-    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --bg: #f6f7f5; --panel: #ffffff; --fg: #171a1f; --muted: #586070; --faint: #8a929f;
+    --line: #e3e6e9; --accent: #0d7d74; --accent2: #0a6f66; --emph: #b3271e; --act: #c85a10;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, monospace;
   }
-  @media (prefers-color-scheme: dark) {
-    :root { --ground: #0e1116; --surface: #171b21; --surface-2: #1e242c; --ink: #e9edf2;
-      --muted: #99a2b0; --faint: #6b7482; --line: #272e38; --accent: #2dd4bf; --activation: #f2914e;
-      --blocked: #f05a5a; --resolved: #56c96a; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; background: #0e1013; overflow: hidden; }
+
+  #stage { position: fixed; inset: 0; overflow: hidden; }
+
+  /* The fixed 1920×1080 deck, scaled & centered to the viewport by JS */
+  #deck {
+    position: absolute; top: 0; left: 0; width: 1920px; height: 1080px;
+    background: var(--bg); color: var(--fg); font-family: var(--sans);
+    transform-origin: 0 0; overflow: hidden; box-shadow: 0 0 90px rgba(0,0,0,.4);
   }
-  :root[data-theme="light"] { --ground: #f5f7f8; --surface: #ffffff; --surface-2: #eef1f3; --ink: #15181d;
-    --muted: #5a626e; --faint: #8b93a0; --line: #e0e4e8; --accent: #0d9488; --activation: #d9620a;
-    --blocked: #b91c1c; --resolved: #2a8a3e; }
-  :root[data-theme="dark"] { --ground: #0e1116; --surface: #171b21; --surface-2: #1e242c; --ink: #e9edf2;
-    --muted: #99a2b0; --faint: #6b7482; --line: #272e38; --accent: #2dd4bf; --activation: #f2914e;
-    --blocked: #f05a5a; --resolved: #56c96a; }
 
-  * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; }
-  body { background: var(--ground); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
-  .deck { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; }
-  @media (prefers-reduced-motion: reduce) { .deck { scroll-behavior: auto; } }
-  .slide { min-height: 100vh; scroll-snap-align: start; display: grid; place-items: center;
-    padding: clamp(2rem, 6vh, 5rem) clamp(1.5rem, 6vw, 6rem); position: relative; }
-  .inner { width: 100%; max-width: 1000px; }
-  .wide { max-width: 1080px; }
+  .slide {
+    position: absolute; inset: 0; width: 1920px; height: 1080px;
+    padding: 88px 132px; display: none; flex-direction: column; justify-content: center;
+    opacity: 0; transition: opacity .28s ease;
+  }
+  .slide.active { display: flex; opacity: 1; }
 
-  .eyebrow { font-family: var(--mono); font-size: clamp(0.72rem, 1.1vw, 0.85rem); letter-spacing: 0.16em;
-    text-transform: uppercase; color: var(--accent); font-weight: 600; margin: 0 0 1rem; }
-  .eyebrow.act { color: var(--activation); }
-  h1 { font-family: var(--serif); font-weight: 600; letter-spacing: -0.01em; margin: 0; text-wrap: balance;
-    font-size: clamp(3rem, 9vw, 6rem); line-height: 0.98; }
-  h2 { font-family: var(--serif); font-weight: 600; letter-spacing: -0.01em; margin: 0 0 0.6em; text-wrap: balance;
-    font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.06; }
-  p { margin: 0; font-size: clamp(1.05rem, 1.7vw, 1.4rem); line-height: 1.5; color: var(--muted); max-width: 40ch; }
-  p.wide-p { max-width: 62ch; }
-  .ink { color: var(--ink); }
-  .hl { color: var(--accent); font-style: italic; }
-  .hl.act { color: var(--activation); }
+  .eyebrow { font-family: var(--mono); font-size: 26px; letter-spacing: .16em; white-space: nowrap;
+    text-transform: uppercase; color: var(--accent2); font-weight: 600; margin-bottom: 28px; max-width: none; }
+  .eyebrow.act { color: var(--act); }
 
-  .thesis { font-family: var(--serif); font-size: clamp(1.5rem, 3vw, 2.3rem); line-height: 1.3; color: var(--ink);
-    max-width: 24ch; margin: 1.5rem 0 2rem; text-wrap: pretty; }
-  .metaline { font-family: var(--mono); font-size: clamp(0.78rem, 1.2vw, 0.92rem); color: var(--faint);
-    letter-spacing: 0.03em; display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; }
+  h1 { font-family: var(--serif); font-size: 156px; font-weight: 600; line-height: .98;
+    letter-spacing: -.01em; color: var(--fg); margin-bottom: 36px; }
+  h2 { font-family: var(--serif); font-size: 76px; font-weight: 600; line-height: 1.08;
+    letter-spacing: -.01em; color: var(--fg); margin-bottom: 30px; max-width: 24ch; }
+  h2 .hl { color: var(--accent); font-style: italic; }
+  h2 .hl.act { color: var(--act); }
 
-  .huge { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; letter-spacing: -0.03em;
-    white-space: nowrap; font-size: clamp(3rem, 9.5vw, 7.5rem); line-height: 0.92; color: var(--accent); margin: 0.18em 0 0.12em; }
-  .sub { font-family: var(--mono); font-size: clamp(0.85rem, 1.4vw, 1.05rem); color: var(--muted); letter-spacing: 0.02em; }
+  .lead { font-size: 44px; line-height: 1.42; color: var(--fg); max-width: 1360px; }
+  .lead .em { color: var(--accent); font-style: italic; }
+  p { font-size: 33px; line-height: 1.5; color: var(--muted); max-width: 1500px; }
+  ul.bullets { list-style: none; max-width: 1560px; }
+  ul.bullets li { font-size: 42px; line-height: 1.38; color: var(--fg); position: relative; padding-left: 48px; margin-bottom: 30px; }
+  ul.bullets li:last-child { margin-bottom: 0; }
+  ul.bullets li::before { content: ''; position: absolute; left: 0; top: .62em; width: 26px; height: 3px; background: var(--accent); border-radius: 2px; }
+  ul.bullets .em { color: var(--accent); font-style: italic; }
+  .thesis { font-family: var(--serif); font-size: 56px; line-height: 1.26; color: var(--fg);
+    max-width: 1600px; margin: 10px 0 52px; }
+  .thesis .hl { color: var(--accent); font-style: italic; }
 
-  figure { margin: 1.4rem 0 0; }
-  .fig-frame { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 18px 44px -22px rgba(0,0,0,0.3); }
-  .fig-frame img { display: block; width: 100%; height: auto; border-radius: 6px; max-height: 62vh; object-fit: contain; }
+  /* stacked title meta, one line each */
+  .meta { font-family: var(--mono); font-size: 28px; color: var(--faint); line-height: 1.95; letter-spacing: .01em; }
+  .meta div b { color: var(--muted); font-weight: 600; }
 
-  .formula { font-family: var(--mono); font-size: clamp(0.82rem, 1.5vw, 1.05rem); background: var(--surface-2);
-    border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.3rem; margin: 1.5rem 0 0; overflow-x: auto;
-    line-height: 1.9; color: var(--ink); display: inline-block; }
-  .formula .c { color: var(--muted); } .formula .a { color: var(--accent); }
-  .facets { display: flex; flex-wrap: wrap; gap: 0.55rem; margin: 1.6rem 0 0; }
-  .chip { font-family: var(--mono); font-size: clamp(0.8rem, 1.3vw, 0.95rem); padding: 0.4rem 0.85rem; border-radius: 999px;
-    border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
-  .chip.rand { border-color: var(--accent); color: var(--accent); }
-  .chip.fix { border-color: var(--activation); color: var(--activation); }
+  /* the research question, stated then answered */
+  .rq { font-size: 40px; line-height: 1.4; color: var(--fg); font-style: italic; max-width: 42ch; margin-bottom: 26px; }
 
-  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.7rem; margin: 1.8rem 0 0; }
-  .flow .node { flex: 1 1 220px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem 1.15rem; }
-  .flow .node .t { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
-  .flow .node .h { font-family: var(--serif); font-size: clamp(1.2rem, 2vw, 1.5rem); margin: 0.3rem 0 0.4rem; }
-  .flow .node p { font-size: 0.95rem; }
-  .flow .node.blocked .h { color: var(--blocked); } .flow .node.resolved .h { color: var(--resolved); }
+  /* facet chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 16px; margin: 6px 0 38px; }
+  .chip { font-family: var(--mono); font-size: 30px; padding: 12px 26px; border-radius: 999px;
+    border: 2px solid var(--line); background: var(--panel); color: var(--muted); }
+  .chip.rand { border-color: var(--accent); color: var(--accent2); }
+  .chip.fix { border-color: var(--act); color: var(--act); }
 
-  .grid2 { display: grid; grid-template-columns: 1fr 1.35fr; gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; }
-  @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } .fig-frame img { max-height: 46vh; } }
+  /* self-contained CSS math (no external library) */
+  .formula { background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    padding: 40px 60px; margin: 4px 0 30px; box-shadow: 0 18px 46px -30px rgba(0,0,0,.35);
+    display: flex; align-items: center; gap: 70px; flex-wrap: wrap; }
+  .eqn { font-family: var(--serif); font-size: 46px; color: var(--fg);
+    display: inline-flex; align-items: center; gap: 14px; }
+  .eqn i { font-style: italic; }
+  .eqn sup { font-size: .58em; vertical-align: super; }
+  .eqn sub { font-size: .58em; vertical-align: sub; }
+  .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle;
+    margin: 0 .16em; text-align: center; }
+  .frac > .nm { padding: 0 .5em .1em; }
+  .frac > .dn { padding: .1em .5em 0; border-top: 2px solid currentColor; }
+  .fnote { font-family: var(--mono); font-size: 28px; color: var(--muted); max-width: 66ch; line-height: 1.5; }
+  .fnote .a { color: var(--accent2); }
 
-  /* progress + nav hint */
-  .rail { position: fixed; top: 0; left: 0; height: 3px; width: 100%; background: var(--accent); z-index: 40;
-    transform: scaleX(0); transform-origin: left; transition: transform .25s ease; }
-  .counter { position: fixed; bottom: 1.1rem; right: 1.3rem; font-family: var(--mono); font-size: 0.8rem;
-    color: var(--faint); z-index: 40; font-variant-numeric: tabular-nums; }
-  .hint { position: fixed; bottom: 1.1rem; left: 1.3rem; font-family: var(--mono); font-size: 0.72rem; color: var(--faint); z-index: 40; }
-  .brandmark { position: fixed; top: 1rem; left: 1.4rem; font-family: var(--serif); font-size: 1rem; color: var(--muted); z-index: 40; }
+  /* process flow cards */
+  .flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: stretch; gap: 22px; margin-top: 18px; }
+  .node { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 34px; }
+  .node .t { font-family: var(--mono); font-size: 23px; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .node .h { font-family: var(--serif); font-size: 46px; margin: 12px 0 16px; }
+  .node p { font-size: 27px; max-width: none; color: var(--muted); line-height: 1.4; }
+  .node.blocked .h { color: var(--emph); }
+  .node.resolved .h { color: var(--accent2); }
+  .flow .arrow { align-self: center; color: var(--faint); font-family: var(--mono); font-size: 40px; }
+
+  /* finding slide: text | big figure (figure ~58% of the width) */
+  .split { display: grid; grid-template-columns: 0.80fr 1.20fr; gap: 70px; align-items: center; height: 100%; }
+  .bignum { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600;
+    font-size: 128px; line-height: .92; letter-spacing: -.03em; color: var(--emph); margin: 4px 0 10px; white-space: nowrap; }
+  .bignum.accent { color: var(--accent); }
+  .subnum { font-family: var(--mono); font-size: 29px; color: var(--muted); line-height: 1.5; margin-bottom: 24px; }
+  .subnum .k { color: var(--fg); }
+  .take { font-size: 34px; line-height: 1.44; color: var(--fg); max-width: none; }
+  .take .em { color: var(--accent); font-style: italic; }
+  .take .em.act { color: var(--act); }
+
+  .figwrap { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px;
+    box-shadow: 0 24px 60px -34px rgba(0,0,0,.4); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; height: 100%; max-height: 916px; }
+  .figwrap img { display: block; width: 100%; height: auto; max-height: 820px; object-fit: contain; border-radius: 8px; }
+  .figcap { font-family: var(--mono); font-size: 22px; color: var(--faint); line-height: 1.45; margin-top: 16px; text-align: center; max-width: 62ch; }
+  .figcap .k { color: var(--muted); }
+
+  /* conclusion */
+  .kicker { font-family: var(--serif); font-size: 72px; line-height: 1.2; color: var(--fg); max-width: 24ch; margin-bottom: 40px; }
+  .kicker .hl { color: var(--accent); font-style: italic; }
+  .concl { font-size: 33px; line-height: 1.55; color: var(--muted); max-width: 1500px; margin-bottom: 40px; }
+  .concl .k { color: var(--fg); }
+  .signoff { font-family: var(--serif); font-size: 42px; color: var(--fg); }
+
+  #ui { position: absolute; bottom: 34px; right: 56px; display: flex; align-items: center; gap: 18px;
+    font-family: var(--mono); font-size: 22px; color: var(--faint); }
+  #progress { display: flex; gap: 9px; }
+  #progress .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); cursor: pointer; }
+  #progress .dot.active { background: var(--accent); }
+  .brandmark { position: absolute; top: 42px; right: 56px; font-family: var(--serif); font-size: 26px; color: var(--faint); }
 </style>
+</head>
+<body>
 
-<div class="rail" id="rail"></div>
-<div class="brandmark">G-perturb</div>
-<div class="counter" id="counter">01 / 09</div>
-<div class="hint">↓ / → to advance</div>
+<div id="stage">
+  <div id="deck">
+    <div class="brandmark">G-perturb</div>
 
-<div class="deck" id="deck">
+    <!-- 1 · TITLE -->
+    <section class="slide active">
+      <p class="eyebrow">Generalizability theory × Perturb-seq</p>
+      <h1>G-perturb</h1>
+      <p class="thesis">Rank CD4<sup>+</sup> T-cell drug targets by whether the readout is
+        <span class="hl">dependable</span>, not by how large it is.</p>
+      <div class="meta">
+        <div><b>Built with Claude: Life Sciences</b> · Researcher track</div>
+        <div><b>Data</b> · Marson-lab CD4<sup>+</sup> T-cell screen (Zhu et al. 2025)</div>
+        <div><b>Preprint</b> · submitted to bioRxiv, under screening</div>
+        <div><b>License</b> · code Apache-2.0 · paper CC-BY 4.0</div>
+      </div>
+    </section>
 
-  <section class="slide"><div class="inner">
-    <p class="eyebrow">Generalizability theory × Perturb-seq</p>
-    <h1>G-perturb</h1>
-    <p class="thesis">Rank CD4<sup>+</sup> T-cell drug targets by whether the readout is
-      <span class="hl">dependable</span> — not by how large it is.</p>
-    <div class="metaline"><span>Built with Claude: Life Sciences</span><span>Marson-lab CD4<sup>+</sup> screen</span><span>bioRxiv · submitted</span><span>Apache-2.0</span></div>
-  </div></section>
+    <!-- 2 · PROBLEM -->
+    <section class="slide">
+      <p class="eyebrow">The problem</p>
+      <h2>Dependability, not <span class="hl">effect size</span></h2>
+      <ul class="bullets">
+        <li>A large effect from <span class="em">one</span> guide, <span class="em">one</span> donor, or a pseudobulk of a handful of cells can be an artifact.</li>
+        <li>In target prioritization, every false lead spends a validation experiment on the wrong target.</li>
+        <li>So dependability matters as much as magnitude.</li>
+      </ul>
+    </section>
 
-  <section class="slide"><div class="inner">
-    <p class="eyebrow">The problem</p>
-    <h2>Dependability, not effect size</h2>
-    <p class="wide-p ink">A large effect measured in <em>one</em> guide, <em>one</em> donor, or a pseudobulk of
-      a handful of cells can be an artifact. For target prioritization — where every false lead costs a
-      validation experiment — dependability matters as much as magnitude.</p>
-  </div></section>
+    <!-- 3 · METHOD -->
+    <section class="slide">
+      <p class="eyebrow">The method</p>
+      <h2>A measurement, decomposed</h2>
+      <p style="margin-bottom:24px">Each perturbation effect is a measurement in a crossed design. Two facets
+        are <span style="color:var(--accent2)">random</span>, meaning we generalize across them; one is
+        <span style="color:var(--act)">fixed</span>, meaning we want consistency within its levels.</p>
+      <div class="chips">
+        <span class="chip">Target</span>
+        <span class="chip rand">Guide · random</span>
+        <span class="chip rand">Donor · random</span>
+        <span class="chip fix">Condition · fixed</span>
+      </div>
+      <div class="formula">
+        <div class="eqn">
+          <span><i>R</i><sub>dep,t</sub></span><span>=</span>
+          <span class="frac">
+            <span class="nm">1</span>
+            <span class="dn">1 +
+              <span class="frac"><span class="nm">1 − <i>R</i><sup>guide</sup></span><span class="dn"><i>R</i><sup>guide</sup></span></span>
+              +
+              <span class="frac"><span class="nm">1 − <i>R</i><sup>donor</sup></span><span class="dn"><i>R</i><sup>donor</sup></span></span>
+            </span>
+          </span>
+        </div>
+        <div class="eqn"><span><i>S</i><sub>t</sub></span><span>=</span><span><i>M</i><sub>t</sub></span><span>×</span><span><i>R</i><sub>dep,t</sub></span></div>
+      </div>
+      <p class="fnote"><i>R</i><sub>dep,t</sub> is the correlation expected between two independent repeats of the experiment, run with fresh guides and fresh donors.</p>
+    </section>
 
-  <section class="slide"><div class="inner">
-    <p class="eyebrow">The method</p>
-    <h2>A measurement, decomposed</h2>
-    <p class="wide-p">Each perturbation effect is a measurement in a crossed design. Two facets are
-      <em>random</em> (generalize across them); one is <em>fixed</em> (consistency, not sampling).</p>
-    <div class="facets"><span class="chip">Target</span><span class="chip rand">Guide · random</span>
-      <span class="chip rand">Donor · random</span><span class="chip fix">Condition · fixed</span></div>
-    <div class="formula"><span class="a">R_dep,t</span> = 1 / ( 1 + (1&minus;R<span class="c">^guide</span>)/R<span class="c">^guide</span> + (1&minus;R<span class="c">^donor</span>)/R<span class="c">^donor</span> )   <span class="c">// = correlation of two independent redos</span></div>
-  </div></section>
+    <!-- 4 · PROCESS -->
+    <section class="slide">
+      <p class="eyebrow">The process</p>
+      <h2>An auditable, cross-model-hardened method</h2>
+      <p style="max-width:1500px;margin-bottom:6px">Every scientific decision (which estimator, which threshold,
+        and why) was filed as a GitHub issue, so the reasoning could be red-teamed rather than assumed.</p>
+      <div class="flow">
+        <div class="node"><div class="t">IDD · my Claude Code plugin</div><div class="h">Decide and document</div>
+          <p>Each decision recorded as a timestamped issue, a concrete surface to attack.</p></div>
+        <div class="arrow">→</div>
+        <div class="node blocked"><div class="t">GPT-5.6 Sol · red-team</div><div class="h">BLOCKED</div>
+          <p>A competing frontier model returned 11 methodological holes, 3 critical.</p></div>
+        <div class="arrow">→</div>
+        <div class="node resolved"><div class="t">Claude · resolution</div><div class="h">Worked through</div>
+          <p>Each hole resolved, then cross-verified across models with my parallel-ai-agents.</p></div>
+      </div>
+    </section>
 
-  <section class="slide"><div class="inner wide">
-    <p class="eyebrow">The process — why you can trust it</p>
-    <h2>An auditable, cross-model-hardened method</h2>
-    <p class="wide-p">Every scientific decision filed as a GitHub issue — a ledger you <em>can</em> red-team.</p>
-    <div class="flow">
-      <div class="node"><div class="t">IDD · my Claude Code plugin</div><div class="h">Decide &amp; document</div><p>Each decision a timestamped issue.</p></div>
-      <div class="node blocked"><div class="t">GPT-5.6 Sol</div><div class="h">BLOCKED</div><p>11 methodological holes, 3 critical.</p></div>
-      <div class="node resolved"><div class="t">Claude</div><div class="h">Worked through</div><p>Resolved, then cross-verified across models (my parallel-ai-agents).</p></div>
+    <!-- 5 · RQ1 RANKING (fig3) -->
+    <section class="slide">
+      <div class="split">
+        <div>
+          <p class="eyebrow">Research question 1 · the ranking</p>
+          <p class="rq">Does ranking by dependability reorder the shortlist that effect size alone produces?</p>
+          <div class="bignum">50 / 100</div>
+          <div class="subnum"><span class="k">top effect-only hits drop out of the dependability top-100</span><br>
+            Spearman ρ = 0.74 overall · RPS3 #79 → #4 · 7,258 scored</div>
+          <p class="take">Yes. Weighting effect size by dependability moves reproducible targets up and
+            strong but fragile ones down.</p>
+        </div>
+        <figure class="figwrap">
+          <img src="__FIG3__" alt="effect-only vs dependability-weighted ranking">
+          <figcaption class="figcap"><span class="k">Rank by effect (x) against rank by dependability-weighted score (y).</span>
+            Teal upper-left: strong and dependable, where the rankings agree. Red: demoted. Green: promoted. RPS3 circled.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- 6 · RQ2 TCR (fig4) -->
+    <section class="slide">
+      <div class="split">
+        <div>
+          <p class="eyebrow act">Research question 2 · context</p>
+          <p class="rq">Within an activation state, does dependability separate a context-specific signal from noise?</p>
+          <p class="take" style="max-width:26ch;margin-bottom:24px">Yes. With no gene labels, the method
+            reconstructs the T-cell-receptor module. The CD3 complex, ZAP70 and LAT are reliably measurable
+            <span class="em act">only</span> in activated T cells.</p>
+          <div class="subnum"><span class="k">92 targets flagged context-specific but reliable.</span><br>
+            Resting dependability sits at the noise floor.</div>
+        </div>
+        <figure class="figwrap">
+          <img src="__FIG4__" alt="TCR module dependability per activation state">
+          <figcaption class="figcap"><span class="k">Per-state dependability for the TCR module.</span>
+            Resting values sit at the noise floor; the effect becomes reliably measurable only on activation.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- 7 · RQ3 OVERALL DEPENDABILITY (no figure) -->
+    <section class="slide">
+      <p class="eyebrow">Research question 3 · the design</p>
+      <p class="rq">How dependable is the screen as a whole?</p>
+      <div class="bignum accent" style="font-size:200px; margin: 10px 0 24px">Eρ² ≈ .44</div>
+      <p class="lead" style="max-width:42ch">The panel's reliability: its correlation with an independent
+        replication. Adequate to rank targets, short of the .70 an absolute threshold would need.</p>
+    </section>
+
+    <!-- 8 · RQ4 GUIDE-LIMITED (fig2) -->
+    <section class="slide">
+      <div class="split">
+        <div>
+          <p class="eyebrow">Research question 4 · improving the design</p>
+          <p class="rq">Which facet limits dependability, and how much would a future screen recover?</p>
+          <div class="subnum" style="font-size:34px;color:var(--fg);margin-bottom:24px">
+            Two guides cap generalizability near <span style="color:var(--emph)">0.53</span>.<br>
+            No number of donors reaches <span style="color:var(--emph)">0.70</span>; about 15 guides do.</div>
+          <p class="take">Guides, not donors. <span class="em">Adding guides raises dependability; adding donors
+            barely moves it</span>, and this holds within every activation state.</p>
+        </div>
+        <figure class="figwrap">
+          <img src="__FIG2__" alt="D-study generalizability surface, guides by donors">
+          <figcaption class="figcap"><span class="k">Generalizability Eρ² across the design grid.</span>
+            The current screen (2 guides, 4 donors) is marked; reaching .70 needs about 15 guides, unreachable by adding donors.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- 9 · CONCLUSION -->
+    <section class="slide">
+      <p class="eyebrow">Conclusion</p>
+      <div class="kicker"><span class="hl">Dependability</span>, not effect size, is what a
+        reproducible screen should rank on.</div>
+      <p class="concl">Generalizability theory gives each target a dependability coefficient that effect size
+        cannot supply. On this screen it reorders the validation shortlist, reconstructs the TCR module from
+        reproducibility alone, and shows the design is limited by guides rather than donors.
+        <span class="k">The full pipeline is described in the paper; every number regenerates from one re-run.</span></p>
+      <div class="meta" style="font-size:29px">
+        <div><b>Submitted</b> · bioRxiv, under screening</div>
+        <div><b>Open</b> · github.com/kiki830621/G-perturb</div>
+      </div>
+      <p class="signoff" style="margin-top:36px">Built with Claude.</p>
+    </section>
+
+    <div id="ui">
+      <nav id="progress"></nav>
+      <span id="counter"></span>
     </div>
-  </div></section>
-
-  <section class="slide"><div class="inner wide"><div class="grid2">
-    <div><p class="eyebrow">Finding · measurement error</p><h2>Signal hidden under noise</h2>
-      <div class="huge">40 → 7,674</div><div class="sub">genes with dependable target signal · 42% of the genome</div>
-      <p style="margin-top:1.2rem">Estimate the noise floor from the non-targeting controls, subtract it — the dependable hits were there all along.</p></div>
-    <figure><div class="fig-frame"><img src="__FIG1__" alt="me-removal reveal"></div></figure>
-  </div></div></section>
-
-  <section class="slide"><div class="inner wide"><div class="grid2">
-    <div><p class="eyebrow">Finding · the bottleneck</p><h2>Reliability is guide-limited</h2>
-      <p class="ink" style="font-size:clamp(1.1rem,1.9vw,1.5rem);max-width:22ch">2 guides cap near 0.53. No number of donors reaches 0.70.</p>
-      <p style="margin-top:1.1rem"><strong class="ink">Add guides, not people</strong> — and this holds in every activation state.</p></div>
-    <figure><div class="fig-frame"><img src="__FIG2__" alt="D-study surface"></div></figure>
-  </div></div></section>
-
-  <section class="slide"><div class="inner wide"><div class="grid2">
-    <div><p class="eyebrow">Finding · the ranking</p><h2>The list reshuffles</h2>
-      <div class="huge">50 / 100</div><div class="sub">top effect-only hits drop out (Spearman ρ = 0.74) · RPS3 climbs #79 → #4</div>
-      <p style="margin-top:1.2rem">Rank by effect × dependability, errors adding. The reshuffle <em>is</em> the deliverable.</p></div>
-    <figure><div class="fig-frame"><img src="__FIG3__" alt="ranking reshuffle"></div></figure>
-  </div></div></section>
-
-  <section class="slide"><div class="inner wide"><div class="grid2">
-    <div><p class="eyebrow act">Finding · context — the sharpest test</p><h2>Reliable only when activated</h2>
-      <p class="ink wide-p">With no gene labels, the method reconstructs the TCR signaling module: the CD3
-        complex, ZAP70 and LAT are reliably measurable <span class="hl act">only</span> in activated
-        T cells — resting dependability sits at the noise floor.</p></div>
-    <figure><div class="fig-frame"><img src="__FIG4__" alt="TCR context-specificity"></div></figure>
-  </div></div></section>
-
-  <section class="slide"><div class="inner">
-    <p class="eyebrow">Reproduce</p>
-    <h2>Every number regenerates<br>from one re-run</h2>
-    <p class="wide-p">Data fetch → frozen checksummed manifest → identifiability gates → synthetic method
-      selection → per-gene decomposition → measurement-error removal → D-study → per-context ranking.</p>
-    <p class="metaline" style="margin-top:2rem"><span class="ink" style="font-family:var(--serif);font-size:1.15rem">Built with Claude.</span><span>Apache-2.0</span><span>a frozen, cross-model-audited analysis</span></p>
-  </div></section>
-
+  </div>
 </div>
 
 <script>
   (function () {
-    var deck = document.getElementById('deck');
-    var slides = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
-    var counter = document.getElementById('counter'), rail = document.getElementById('rail');
-    var n = slides.length, pad = function (i) { return (i < 10 ? '0' : '') + i; };
-    function current() {
-      var top = deck.scrollTop, best = 0, bd = Infinity;
-      slides.forEach(function (s, i) { var d = Math.abs(s.offsetTop - top); if (d < bd) { bd = d; best = i; } });
-      return best;
-    }
-    function update() {
-      var i = current(); counter.textContent = pad(i + 1) + ' / ' + pad(n);
-      rail.style.transform = 'scaleX(' + (n > 1 ? i / (n - 1) : 1) + ')';
-    }
-    function go(i) { i = Math.max(0, Math.min(n - 1, i)); slides[i].scrollIntoView({ behavior: 'smooth' }); }
-    deck.addEventListener('scroll', function () { window.requestAnimationFrame(update); }, { passive: true });
-    document.addEventListener('keydown', function (e) {
-      if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1) { e.preventDefault(); go(current() + 1); }
-      else if (['ArrowUp', 'ArrowLeft', 'PageUp'].indexOf(e.key) > -1) { e.preventDefault(); go(current() - 1); }
-      else if (e.key === 'Home') { e.preventDefault(); go(0); } else if (e.key === 'End') { e.preventDefault(); go(n - 1); }
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var total = slides.length, idx = 0;
+    var prog = document.getElementById('progress'), counter = document.getElementById('counter');
+    slides.forEach(function (_, i) {
+      var d = document.createElement('div'); d.className = 'dot';
+      d.addEventListener('click', function () { go(i); }); prog.appendChild(d);
     });
-    update();
+    function render() {
+      slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+      Array.prototype.forEach.call(prog.children, function (d, i) { d.classList.toggle('active', i === idx); });
+      counter.textContent = (idx + 1) + ' / ' + total;
+    }
+    function go(n) { idx = Math.max(0, Math.min(total - 1, n)); render(); }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(idx + 1); }
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(idx - 1); }
+      else if (e.key === 'Home') { go(0); } else if (e.key === 'End') { go(total - 1); }
+      else if (e.key === 'f' || e.key === 'F') {
+        if (document.fullscreenElement) document.exitFullscreen();
+        else document.documentElement.requestFullscreen();
+      }
+    });
+    var deck = document.getElementById('deck');
+    function fit() {
+      var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+      deck.style.transform = 'translate(' + (window.innerWidth - 1920 * s) / 2 + 'px,'
+        + (window.innerHeight - 1080 * s) / 2 + 'px) scale(' + s + ')';
+    }
+    window.addEventListener('resize', fit);
+    fit(); render();
   })();
 </script>
+</body>
+</html>
