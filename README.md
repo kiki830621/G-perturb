@@ -6,6 +6,8 @@
 
 > 🧬 **Preprint status:** the manuscript was **submitted to [bioRxiv](https://www.biorxiv.org/) on 2026-07-14** (submission ID `BIORXIV/2026/738312`) and is currently **undergoing screening**. The bioRxiv DOI will be added here once the preprint posts (typically 24–72 h after screening clears). Manuscript licensed CC-BY 4.0; code Apache-2.0.
 
+> **Start here:** [short summary](./SUMMARY.md) · [full paper (PDF)](./manuscript/main.pdf) · [3-minute demo slides](./demo/slides.html) with [voiceover script](./demo/read-aloud.md).
+
 > 📄 Full design rationale: [`docs/design.md`](./docs/design.md) (canonical design). 📝 Research write-up (methods + results, paper voice): [`docs/writeup.md`](./docs/writeup.md) — the bioRxiv-format LaTeX preprint is in [`manuscript/`](./manuscript/) ([`main.pdf`](./manuscript/main.pdf)). The **method** is a distribution-light generalizability decomposition — facet variance shares plus an irreducible replication floor. The **deliverables** are a reliability-weighted target ranking and the dependability findings below, all resting on that decomposition.
 
 ---
@@ -121,11 +123,15 @@ Note: the flat `DE_stats.suppl_table.csv` is a *reduced* 16-column release — i
 
 ```
 G-perturb/
+├── manuscript/   # bioRxiv-format LaTeX preprint (main.tex, main.pdf, figures)
+├── SUMMARY.md    # short written summary
+├── demo/         # 1920×1080 slide deck (slides.html) + read-aloud voiceover
 ├── analysis/
-│   ├── data/     # released summary statistics + CODEBOOK.json (large files gitignored)
-│   └── ...       # analysis scripts / notebooks
-├── docs/         # design rationale (single canonical design.md)
-├── results/      # ranked tables and figures
+│   ├── data/         # released summary statistics + CODEBOOK.json (large files gitignored)
+│   └── resolution/   # the pipeline: gates, controls, synthetic recovery, real-data decomposition, ranking
+├── docs/         # design rationale, research write-up, the Sol adversarial review
+├── openspec/     # spec-driven-development change records (audit trail)
+├── archive/      # exploratory work not used in the final pipeline
 ├── LICENSE       # Apache-2.0
 └── NOTICE
 ```
