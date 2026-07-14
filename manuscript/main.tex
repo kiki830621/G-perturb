@@ -441,19 +441,30 @@ noise does not organize into a coherent pathway.
   \label{fig:tcr}
 \end{figure}
 
-\subsection{Removing measurement error reveals a moderately dependable screen}
+\subsection{The screen is moderately dependable overall}
 
-RQ3 asks how dependable the screen is as a whole, and answering it means first
-separating dependable signal from measurement error. The residual of a pseudobulk
-decomposition combines biological idiosyncrasy with measurement error, and the latter
-is inflated when a pseudobulk aggregates few cells. The non-targeting controls carry
-no perturbation, so the variance of the non-targeting effect within its stratum
-estimates the per-gene measurement-error floor directly. Subtracting this floor from
-the residual raises the median target-signal share from $.019$ to $.081$ and raises
-the number of genes with a target-signal share above $.10$ from $40$ to $7{,}674$, or
-$42\%$ of the genome (Figure~\ref{fig:me}). The dependable signal was present but
-masked; the same controls give a clean non-targeting-versus-non-targeting negative
-test ($r \approx 0$), so the correction introduces no signal where none exists.
+RQ3 asks how dependable the screen is as a whole. The panel generalizability
+coefficient for the current design, two guides and four donors, on the representative
+signal genes is $E\rho^2 \approx .44$. Read as a reliability, this is the correlation
+expected between the target scores this screen produces and those an independent
+replication with fresh guides and donors would produce, and equivalently the fraction
+of the between-target variance in the measured effects that reflects real
+target-to-target difference rather than guide-and-donor sampling error. This is a
+moderate value: adequate for ranking, where only the order of targets matters, but
+short of the $.70$ that an absolute per-target threshold would demand. It calibrates
+how far the screen can be trusted: the rankings can be relied on, yet no single
+target's dependability clears an absolute bar, so dependability is a prioritization
+signal for the panel rather than a certificate for any one target read in isolation.
+
+That coefficient is measurable only after a preliminary correction for measurement
+error. The residual of a pseudobulk decomposition combines biological idiosyncrasy
+with measurement error, which is inflated when a pseudobulk aggregates few cells. The
+non-targeting controls carry no perturbation, so the variance of the non-targeting
+effect within its stratum estimates the per-gene measurement-error floor directly;
+subtracting it from the residual raises the number of genes with a dependable
+target-signal share above $.10$ from $40$ to $7{,}674$, or $42\%$ of the genome
+(Figure~\ref{fig:me}). The correction introduces no signal where none exists, since
+the non-targeting-versus-non-targeting test is clean ($r \approx 0$).
 
 \begin{figure}[t]
   \centering
@@ -463,19 +474,6 @@ test ($r \approx 0$), so the correction introduces no signal where none exists.
   target-signal share above $.10$, on a logarithmic axis.}
   \label{fig:me}
 \end{figure}
-
-With measurement error removed, the panel generalizability coefficient for the
-current design, two guides and four donors, on the representative signal genes is
-$E\rho^2 \approx .44$. Read as a reliability, this is the correlation expected between
-the target scores this screen produces and those an independent replication with fresh
-guides and donors would produce, and equivalently the fraction of the between-target
-variance in the measured effects that reflects real target-to-target difference rather
-than guide-and-donor sampling error. This is a moderate value: adequate for ranking,
-where only the order of targets matters, but short of the $.70$ that an absolute
-per-target threshold would demand. This calibrates how far the screen can be trusted. Its rankings can be
-relied on, yet no single target's dependability clears an absolute bar, so
-dependability is a prioritization signal for the panel rather than a certificate for
-any one target read in isolation.
 
 \subsection{Guides, not donors, limit the design}
 
