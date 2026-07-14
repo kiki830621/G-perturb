@@ -6,7 +6,7 @@
 
 > 🧬 **Preprint status:** the manuscript was **submitted to [bioRxiv](https://www.biorxiv.org/) on 2026-07-14** (submission ID `BIORXIV/2026/738312`) and is currently **undergoing screening**. The bioRxiv DOI will be added here once the preprint posts (typically 24–72 h after screening clears). Manuscript licensed CC-BY 4.0; code Apache-2.0.
 
-> **Start here:** [short summary](./SUMMARY.md) · [full paper (PDF)](./manuscript/main.pdf) · [3-minute demo slides](./demo/slides.html) with [voiceover script](./demo/read-aloud.md).
+> **Start here:** [▶ 3-minute demo video](https://youtu.be/zBD30nhal64) · [short summary](./SUMMARY.md) · [full paper (PDF)](./manuscript/main.pdf) · [demo slides](./demo/slides.html) + [voiceover](./demo/read-aloud.md).
 
 > 📄 Full design rationale: [`docs/design.md`](./docs/design.md) (canonical design). 📝 Research write-up (methods + results, paper voice): [`docs/writeup.md`](./docs/writeup.md) — the bioRxiv-format LaTeX preprint is in [`manuscript/`](./manuscript/) ([`main.pdf`](./manuscript/main.pdf)). The **method** is a distribution-light generalizability decomposition — facet variance shares plus an irreducible replication floor. The **deliverables** are a reliability-weighted target ranking and the dependability findings below, all resting on that decomposition.
 

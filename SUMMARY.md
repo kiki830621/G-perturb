@@ -10,4 +10,4 @@ On the released 44.6 GB pseudobulk this reorders the shortlist: 50 of the top 10
 
 - **Full paper (PDF):** [`manuscript/main.pdf`](./manuscript/main.pdf) — submitted to bioRxiv (`BIORXIV/2026/738312`, under screening), CC-BY 4.0.
 - **Code:** this repository, Apache-2.0. The whole pipeline regenerates every number from one re-run.
-- **3-minute demo:** slides in [`demo/slides.html`](./demo/slides.html); read-aloud voiceover in [`demo/read-aloud.md`](./demo/read-aloud.md).
+- **3-minute demo video:** <https://youtu.be/zBD30nhal64> (slides in [`demo/slides.html`](./demo/slides.html), read-aloud voiceover in [`demo/read-aloud.md`](./demo/read-aloud.md)).
