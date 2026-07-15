@@ -4,7 +4,7 @@
 
 > Built for **Built with Claude: Life Sciences** (Researcher track, 2026), in partnership with Gladstone Institutes. All work in this repository is done from scratch during the hackathon, per the event rules.
 
-> 🧬 **Preprint:** posted on bioRxiv on 2026-07-15, DOI [`10.64898/2026.07.13.738312`](https://doi.org/10.64898/2026.07.13.738312) ([read on bioRxiv](https://www.biorxiv.org/content/10.64898/2026.07.13.738312v1)). Manuscript licensed CC-BY 4.0; code Apache-2.0.
+> 🧬 **Preprint:** posted on bioRxiv on 2026-07-15, DOI [`10.64898/2026.07.13.738312`](https://doi.org/10.64898/2026.07.13.738312) ([read on bioRxiv](https://www.biorxiv.org/content/10.64898/2026.07.13.738312v1)). Manuscript licensed CC BY-NC 4.0; code Apache-2.0.
 
 > **Start here:** [▶ 3-minute demo video](https://youtu.be/zBD30nhal64) · [short summary](./SUMMARY.md) · [full paper (PDF)](./manuscript/main.pdf) · [demo slides](./demo/slides.html) + [voiceover](./demo/read-aloud.md).
 

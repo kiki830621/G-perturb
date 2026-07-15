@@ -8,6 +8,6 @@ On the released 44.6 GB pseudobulk this reorders the shortlist: 50 of the top 10
 
 ## Read more
 
-- **Full paper:** posted on bioRxiv, DOI [`10.64898/2026.07.13.738312`](https://doi.org/10.64898/2026.07.13.738312); PDF also in this repo at [`manuscript/main.pdf`](./manuscript/main.pdf). CC-BY 4.0.
+- **Full paper:** posted on bioRxiv, DOI [`10.64898/2026.07.13.738312`](https://doi.org/10.64898/2026.07.13.738312); PDF also in this repo at [`manuscript/main.pdf`](./manuscript/main.pdf). CC BY-NC 4.0.
 - **Code:** this repository, Apache-2.0. The whole pipeline regenerates every number from one re-run.
 - **3-minute demo video:** <https://youtu.be/zBD30nhal64> (slides in [`demo/slides.html`](./demo/slides.html), read-aloud voiceover in [`demo/read-aloud.md`](./demo/read-aloud.md)).
