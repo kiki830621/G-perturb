@@ -83,3 +83,36 @@ the `audit-complete-methodology` OpenSpec change, which gates #8's statistical c
   (hacking opened 2026-07-07 12:30 PM ET). Repo scaffolding and all analysis were created after that.
 - **Open source** — Apache-2.0. The repo is **private during development** and flips to
   **public before submission** (`gh repo edit kiki830621/G-perturb --visibility public`).
+
+## Reference materials — source paper, code, data (local, gitignored)
+
+The Perturb-seq dataset this project analyzes comes from **Zhu et al. (2025)** — bib key
+`zhu2025` in [`manuscript/references.bib`](./manuscript/references.bib): *Genome-scale
+perturb-seq in primary human CD4+ T cells maps context-specific regulators of T cell
+programs and human immune traits*, bioRxiv, DOI
+[`10.64898/2025.12.23.696273`](https://doi.org/10.64898/2025.12.23.696273) (openRxiv
+prefix, CC-BY 4.0; authors incl. Dann, Pritchard, Marson).
+
+Local reference copies live under `references/` and are **all gitignored** (third-party,
+large — kept local, never redistributed through this repo):
+
+| Path | What | Size | License |
+|------|------|------|---------|
+| `references/Zhu2025_genome-scale-perturb-seq-CD4-Tcells_bioRxiv.pdf` | Preprint main text (6 pp) | 7.2 MB | CC-BY 4.0 |
+| `references/code/GWT_perturbseq_analysis_2025/` | Official analysis code (`src/`, 8 numbered stages + `utils.py`) **plus the paper's supplementary tables** (`metadata/suppl_tables/`) | 822 MB | MIT |
+| `references/code/pert2state_model/` | Official standalone cell-state-regulator model (python package) | 24 MB | MIT |
+
+Upstream repos: `emdann/GWT_perturbseq_analysis_2025`, `emdann/pert2state_model` (shallow
+`--depth 1` clones of the latest snapshot; refresh with `git -C references/code/<repo> pull`).
+Other GitHub links in the preprint (`crispat`, `GSEApy`, `mashr`) are third-party tools the
+authors *used*, not their own code, and are not vendored.
+
+**Primary data (not under `references/`):**
+
+- Cell-level / pseudobulk count matrices + DE estimates — CZI virtual cell models:
+  <https://virtualcellmodels.cziscience.com/dataset/genome-scale-tcell-perturb-seq>. This is
+  the same joint pseudobulk the methodology section requires (B-001); the project's working
+  copy is under `analysis/data/raw/` (≈100 GB, gitignored — e.g. `GWCD4i.pseudobulk_merged.h5ad`),
+  with the frozen evidence manifest at `analysis/resolution/results/evidence.manifest.json`.
+- Raw sequencing / cellranger outputs — SRA/GEO `SRP643211` / `GSE314342` (hundreds of GB,
+  not downloaded).

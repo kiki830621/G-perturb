@@ -57,3 +57,7 @@ analysis/resolution/realdata/effect.f32
 analysis/resolution/realdata/*.npy
 analysis/resolution/realdata/design.csv
 analysis/resolution/realdata/*.log
+
+# --- Reference PDFs (third-party papers kept locally, not redistributed) ---
+references/*.pdf
+references/code/
