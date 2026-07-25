@@ -2,11 +2,13 @@
 
 About 450 words, roughly 2:58 at a normal speaking pace, inside the 3-minute limit. The bracketed headers are pacing markers, not spoken. Read it plainly, the way you would explain the work to a colleague; there is no need to hit any word hard.
 
+This is the script as recorded in the [demo video](https://youtu.be/zBD30nhal64) and is kept verbatim. The preprint has since posted: bioRxiv [10.64898/2026.07.13.738312](https://doi.org/10.64898/2026.07.13.738312).
+
 ---
 
 [0:00 · Intro and the problem]
 
-I'm Che Cheng, from the Institute of Statistical Science at Academia Sinica, and this is G-perturb. Perturb-seq screens usually rank drug targets by how strongly a perturbation shifts gene expression. But a large effect seen in a single guide, or a single donor, can be measurement noise rather than real biology, and a target picked on that basis may not reproduce.
+I'm Che Cheng, from the Institute of Statistical Science at Academia Sinica, and my project is G-perturb. Perturb-seq screens usually rank drug targets by how strongly a perturbation shifts gene expression. But a large effect seen in a single guide, or a single donor, can be measurement noise rather than real biology, and a target picked on that basis may not reproduce.
 
 [0:20 · The method]
 

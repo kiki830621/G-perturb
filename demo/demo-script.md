@@ -5,6 +5,8 @@
 > **Honesty rule (binding):** say Sol *blocked* the design and I *worked through* the issues. Never "withstood Sol" or "certified / approved." The repo shows the blocked verdict and the fixes; the claim and the evidence must match.
 >
 > **Attribution:** issue-driven development (IDD) is my own open-source Claude Code plugin, not a built-in feature.
+>
+> **Status note:** the voiceover below is kept verbatim as recorded in the [demo video](https://youtu.be/zBD30nhal64), where the paper was still under submission. The preprint has since posted: bioRxiv [10.64898/2026.07.13.738312](https://doi.org/10.64898/2026.07.13.738312).
 
 ---
 
