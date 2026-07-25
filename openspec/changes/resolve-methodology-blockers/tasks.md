@@ -10,7 +10,7 @@
 
 ## 3. 推論契約在 synthetic 上先校準（B-004…B-007）
 
-- [ ] 3.1 交付 `Measurement-error covariance drives a precision-weighted second stage`：以 matched-NTC 估 per-target effect 的 measurement-error covariance，餵進 precision-weighted GLS 第二階段，permutation exchange group 尊重 guide-nested-within-target 與 donor-crossed 結構；驗證方式為在已知 ground-truth synthetic 上 component bias ≤ 0.02、coverage ∈ [0.93, 0.97]。
+- [x] 3.1 交付 `Measurement-error covariance drives a precision-weighted second stage`：以 matched-NTC 估 per-target effect 的 measurement-error covariance，餵進 precision-weighted GLS 第二階段，permutation exchange group 尊重 guide-nested-within-target 與 donor-crossed 結構；驗證方式為在已知 ground-truth synthetic 上 component bias ≤ 0.02、coverage ∈ [0.93, 0.97]。
 - [ ] 3.2 落實 high-dimensional gene 依賴的 low-dimensional basis／shrinkage 與 negative variance component 的 boundary-aware 估計；驗證方式為 negative-component 情境不以截零 silently 改變 estimand，且 synthetic recovery 的 RMSE ≤ 0.05。
 
 ## 4. selective-FDR test tree 與 pathway null（B-008／B-009）
