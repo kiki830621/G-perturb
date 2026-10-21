@@ -138,7 +138,7 @@ G-perturb/
 
 ## Author
 
-**Che Cheng** — Postdoctoral Research Fellow, Institute of Statistical Science, Academia Sinica
+**Che Cheng** — Postdoctoral Scholar, Institute of Statistical Science, Academia Sinica
 · <https://che-cheng-website.vercel.app> · ORCID <https://orcid.org/0000-0003-3376-7833> · GitHub <https://github.com/kiki830621>
 
 ## License
